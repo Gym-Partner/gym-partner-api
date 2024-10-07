@@ -1,15 +1,15 @@
-package user
+package interactor
 
 import (
     "errors"
     "fmt"
     "gitlab.com/Titouan-Esc/api_common/utils"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
-    "gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository/user"
+    "gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
 )
 
 type UserInteractor struct {
-    IUserRepository user.IUserRepository
+    IUserRepository repository.IUserRepository
 }
 
 // -------------------------- CRUD ------------------------------

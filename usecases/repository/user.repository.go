@@ -1,4 +1,4 @@
-package user
+package repository
 
 import "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
 
