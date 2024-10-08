@@ -14,5 +14,7 @@ func Dispatch(sql *mongo.Mongo, logServ, logSess *logger.Log) *router.Router {
 
 	route.AddCORS()
 
+	route.AddRoute(" Get All Users ", "GET", "/user/getAll", userController.GetAll, logServ)
+
 	return route
 }
