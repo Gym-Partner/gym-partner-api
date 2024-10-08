@@ -1,4 +1,4 @@
-START_FLAG = /Users/oscar/Documents/gym-partner-env
+START_FLAG = /Users/oscar/Documents/gym-partner-env/
 LOGGER_FLAG = DEBUG
 
 run:

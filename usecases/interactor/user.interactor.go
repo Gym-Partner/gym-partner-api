@@ -24,16 +24,16 @@ func (ui *UserInteractor) GetOneById(uid string) (model.User, error) {
     return user, err
 }
 
-func (ui *UserInteractor) Create(data model.User) error {
+func (ui *UserInteractor) Create(data model.User) (model.User, error) {
     exist := ui.IUserRepository.IsExist(data.Email, "EMAIL")
 
     if exist {
-        return errors.New(fmt.Sprintf("User [%s] already exist in database", data.Email))
+        return model.User{}, errors.New(fmt.Sprintf("User [%s] already exist in database", data.Email))
     }
 
-    err := ui.IUserRepository.Create(data)
+    user, err := ui.IUserRepository.Create(data)
 
-    return err
+    return user, err
 }
 
 func (ui *UserInteractor) Update(patch model.User) error {

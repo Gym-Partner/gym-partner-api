@@ -23,7 +23,7 @@ func main() {
 
 	address := fmt.Sprintf("%s:%s", viper.GetString("API_SERVER_HOST"), viper.GetString("API_SERVER_PORT"))
 
-	fmt.Println("Server running on : ", address)
+	fmt.Println("Server running on : ", address + viper.GetString("API_PREFIX"))
 	if err := http.ListenAndServe(address, router.Handle); err != nil {
 		logServ.Error("[RUN] ", err.Error())
 		return
