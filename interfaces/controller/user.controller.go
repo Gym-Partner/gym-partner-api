@@ -44,6 +44,22 @@ func (uc *UserController) GetAll(res http.ResponseWriter, req *http.Request) {
     manager.Respons().Build(http.StatusOK, users)
 }
 
+func (uc *UserController) GetOne(res http.ResponseWriter, req *http.Request) {
+    manager := controller.NewController(res, req, uc.Logger, false)
+    if manager.Errors.Error {
+        manager.StopRequest()
+        return
+    }
+
+    user, err := uc.UserInteractor.GetOneById(manager.UserId)
+    if err != nil {
+        manager.Respons().Build(http.StatusInternalServerError, err)
+        return
+    }
+
+    manager.Respons().Build(http.StatusOK, user)
+}
+
 func (uc *UserController) Create(res http.ResponseWriter, req *http.Request) {
     manager := controller.NewController(res, req, uc.Logger, false)
     if manager.Errors.Error {
@@ -67,5 +83,5 @@ func (uc *UserController) Create(res http.ResponseWriter, req *http.Request) {
     }
 
     newUser := user.NewUserFromData(user)
-    manager.Respons().Build(http.StatusOK, newUser)
+    manager.Respons().Build(http.StatusCreated, newUser)
 }
