@@ -104,4 +104,19 @@ func (uc *UserController) Update(res http.ResponseWriter, req *http.Request) {
     manager.Respons().Build(http.StatusNoContent, nil)
 }
 
-func (uc *UserController) Delete(res http.ResponseWriter, req *http.Request) {}
+func (uc *UserController) Delete(res http.ResponseWriter, req *http.Request) {
+    manager := controller.NewController(res, req, uc.Logger, false)
+    if manager.Errors.Error {
+        manager.StopRequest()
+        return
+    }
+
+    body := utils.ReadBody[model.User](manager.Body)
+
+    if err := uc.UserInteractor.Delete(body.Id); err != nil {
+        manager.Respons().Build(http.StatusInternalServerError, err)
+        return
+    }
+
+    manager.Respons().Build(http.StatusNoContent, nil)
+}

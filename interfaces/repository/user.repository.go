@@ -105,6 +105,13 @@ func (u UserRepository) Update(data model.User) error {
 }
 
 func (u UserRepository) Delete(uid string) error {
-    //TODO implement me
-    panic("implement me")
+    filter := bson.D{{"id", uid}}
+
+    _, err := u.Sql.Database.Collection("users").DeleteOne(context.TODO(), filter)
+    if err != nil {
+        u.Logger.Error(err.Error())
+        return err
+    }
+
+    return nil
 }
