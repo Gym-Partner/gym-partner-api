@@ -85,3 +85,23 @@ func (uc *UserController) Create(res http.ResponseWriter, req *http.Request) {
     newUser := user.NewUserFromData(user)
     manager.Respons().Build(http.StatusCreated, newUser)
 }
+
+func (uc *UserController) Update(res http.ResponseWriter, req *http.Request) {
+    manager := controller.NewController(res, req, uc.Logger, false)
+    if manager.Errors.Error {
+        manager.StopRequest()
+        return
+    }
+
+    body := utils.ReadBody[model.User](manager.Body)
+    //body.Id = manager.UserId
+
+    if err := uc.UserInteractor.Update(body); err != nil {
+        manager.Respons().Build(http.StatusInternalServerError, err)
+        return
+    }
+
+    manager.Respons().Build(http.StatusNoContent, nil)
+}
+
+func (uc *UserController) Delete(res http.ResponseWriter, req *http.Request) {}

@@ -64,8 +64,18 @@ func (u UserRepository) GetAll() (model.Users, error) {
 }
 
 func (u UserRepository) GetOneById(uid string) (model.User, error) {
-    //TODO implement me
-    panic("implement me")
+    var user model.User
+
+    filter := bson.D{{"id", uid}}
+
+    if err := u.Sql.Database.Collection("users").FindOne(context.TODO(), filter, options.FindOne().SetProjection(model.UserProjection)).Decode(&user); err != nil {
+        if errors.Is(err, mongo.ErrNoDocuments) {
+            u.Logger.Error(err.Error())
+            return model.User{}, err
+        }
+    }
+
+    return user, nil
 }
 
 func (u UserRepository) Create(data model.User) (model.User, error) {
@@ -82,8 +92,16 @@ func (u UserRepository) Create(data model.User) (model.User, error) {
 }
 
 func (u UserRepository) Update(data model.User) error {
-    //TODO implement me
-    panic("implement me")
+    filter := bson.D{{"id", data.Id}}
+    update := bson.D{{"$set", data}}
+
+    _, err := u.Sql.Database.Collection("users").UpdateOne(context.TODO(), filter, update)
+    if err != nil {
+        u.Logger.Error(err.Error())
+        return err
+    }
+
+    return nil
 }
 
 func (u UserRepository) Delete(uid string) error {

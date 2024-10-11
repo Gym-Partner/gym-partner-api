@@ -4,8 +4,8 @@ import "go.mongodb.org/mongo-driver/bson"
 
 type User struct {
     Id string `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName string `json:"last_name"`
+	FirstName string `json:"firstname"`
+	LastName string `json:"lastname"`
 	UserName string `json:"username"`
 	Email string `json:"email"`
 	Password string `json:"password"`
@@ -15,8 +15,8 @@ type Users []User
 
 var UserProjection = bson.M{
 	"id": 1,
-	"first_name": 1,
-	"last_name": 1,
+	"firstname": 1,
+	"lastname": 1,
 	"username": 1,
 	"email": 1,
 	"password": 1,
