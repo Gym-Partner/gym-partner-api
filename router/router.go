@@ -9,7 +9,7 @@ import (
 func Router(db *core.Database) *gin.Engine {
 	route := gin.Default()
 
-    userController := controller.NewUserController(db.Handler)
+    userController := controller.NewUserController(db)
 
     route.POST("/user/create", userController.Create)
     route.GET("/ping", userController.PING)

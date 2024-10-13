@@ -1,7 +1,5 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson"
-
 type User struct {
     Id string `json:"id"`
 	FirstName string `json:"firstname"`
