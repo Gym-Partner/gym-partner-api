@@ -33,9 +33,7 @@ func (uc *UserController) Create(ctx *gin.Context) {
         return
     }
     
-    ctx.JSON(200, gin.H{
-        "data": user,
-    })
+    ctx.JSON(200, user.UserRespons())
 }
 
 func (uc *UserController) PING(ctx *gin.Context) {

@@ -1,5 +1,7 @@
 package model
 
+import "github.com/gin-gonic/gin"
+
 type User struct {
     Id string `json:"id"`
 	FirstName string `json:"first_name"`
@@ -10,3 +12,9 @@ type User struct {
 }
 
 type Users []User
+
+func (u *User) UserRespons() gin.H {
+	return gin.H{
+		"data": u,
+	}
+}

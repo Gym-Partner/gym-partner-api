@@ -37,6 +37,8 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 }
 
 func (u UserRepository) Create(data model.User) (model.User, error) {
+    var user model.User
+
     data.Id = uuid.New().String()
 
     if retour := u.DB.Table("users").Create(&data); retour.Error != nil {
@@ -44,5 +46,11 @@ func (u UserRepository) Create(data model.User) (model.User, error) {
         return model.User{}, retour.Error
     }
 
-    return data, nil
+    user.Id = data.Id
+    user.FirstName = data.FirstName
+    user.LastName = data.LastName
+    user.UserName = data.UserName
+    user.Email = data.Email
+
+    return user, nil
 }
