@@ -30,9 +30,10 @@ func (uc *UserController) Create(ctx *gin.Context) {
         ctx.JSON(500, gin.H{
             "message": err.Error(),
         })
+        return
     }
     
-    ctx.JSON(204, gin.H{
+    ctx.JSON(200, gin.H{
         "data": user,
     })
 }

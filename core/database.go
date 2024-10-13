@@ -60,6 +60,6 @@ func (db *Database) DatabasePing() error {
 		return err
 	}
 
-	db.Logger.Info("[DB PING][PostgreSQL] Ping is good")
+	db.Logger.Info("[DB PING][PostgreSQL] Connected to the Database")
 	return nil
 }

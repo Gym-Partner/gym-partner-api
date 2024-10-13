@@ -20,8 +20,6 @@ func (ui *UserInteractor) Create(c *gin.Context) (model.User, error) {
         return model.User{}, errors.New("Error to parse body " + err.Error())
     }
 
-
-
     user, err := ui.IUserRepository.Create(data)
     return user, err
 }

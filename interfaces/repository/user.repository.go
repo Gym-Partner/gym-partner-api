@@ -37,14 +37,12 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 }
 
 func (u UserRepository) Create(data model.User) (model.User, error) {
-    var user model.User
-
     data.Id = uuid.New().String()
 
     if retour := u.DB.Table("users").Create(&data); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
-        return user, retour.Error
+        return model.User{}, retour.Error
     }
 
-    return user, nil
+    return data, nil
 }
