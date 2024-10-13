@@ -1,12 +1,14 @@
 package interactor
 
 import (
+    "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
     "gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
 )
 
 type UserInteractor struct {
     IUserRepository repository.IUserRepository
+    Log *core.Log
 }
 
 // -------------------------- CRUD ------------------------------

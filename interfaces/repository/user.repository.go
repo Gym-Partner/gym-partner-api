@@ -11,11 +11,6 @@ type UserRepository struct {
     Log *core.Log
 }
 
-func (u UserRepository) Create(data model.User) (model.User, error) {
-    //TODO implement me
-    panic("implement me")
-}
-
 func (u UserRepository) IsExist(data, OPT string) bool {
     var user model.User
     var queryColumn string
@@ -38,4 +33,9 @@ func (u UserRepository) IsExist(data, OPT string) bool {
     } else {
         return true
     }
+}
+
+func (u UserRepository) Create(data model.User) (model.User, error) {
+    //TODO implement me
+    panic("implement me")
 }
