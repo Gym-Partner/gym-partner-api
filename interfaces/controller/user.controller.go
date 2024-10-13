@@ -1,10 +1,8 @@
 package controller
 
 import (
-    "fmt"
     "github.com/gin-gonic/gin"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
-    "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
     "gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
     "gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
 )
@@ -21,14 +19,22 @@ func NewUserController(db *core.Database) *UserController {
                 DB: db.Handler,
                 Log: db.Logger,
             },
-            Log: db.Logger,
         },
         Log: db.Logger,
     }
 }
 
 func (uc *UserController) Create(ctx *gin.Context) {
+    user, err := uc.UserInteractor.Create(ctx)
+    if err != nil {
+        ctx.JSON(500, gin.H{
+            "message": err.Error(),
+        })
+    }
     
+    ctx.JSON(204, gin.H{
+        "data": user,
+    })
 }
 
 func (uc *UserController) PING(ctx *gin.Context) {

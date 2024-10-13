@@ -2,9 +2,9 @@ package model
 
 type User struct {
     Id string `json:"id"`
-	FirstName string `json:"firstname"`
-	LastName string `json:"lastname"`
-	UserName string `json:"username"`
+	FirstName string `json:"first_name"`
+	LastName string `json:"last_name"`
+	UserName string `json:"username" gorm:"column:username"`
 	Email string `json:"email"`
 	Password string `json:"password"`
 }

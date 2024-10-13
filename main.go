@@ -3,7 +3,6 @@ package main
 import (
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/router"
-    "net/http"
 )
 
 func main() {
@@ -17,5 +16,5 @@ func main() {
 
 	route := router.Router(db)
 
-	http.ListenAndServe(":4200", route)
+	route.Run(":4200")
 }

@@ -11,8 +11,11 @@ func Router(db *core.Database) *gin.Engine {
 
     userController := controller.NewUserController(db)
 
-    route.POST("/user/create", userController.Create)
-    route.GET("/ping", userController.PING)
+    v1 := route.Group("/v1")
+    {
+        v1.POST("/user/create", userController.Create)
+        v1.GET("/ping", userController.PING)
+    }
 
 	return route
 }
