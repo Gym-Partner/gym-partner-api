@@ -11,14 +11,17 @@ func Router(db *core.Database) *gin.Engine {
 
     userController := controller.NewUserController(db)
 
-    v1 := route.Group("/v1")
+    api := route.Group("/api")
     {
-        v1.POST("/user/create", userController.Create)
-        v1.GET("/user/getAll", userController.GetAll)
-        v1.POST("/user/getOne", userController.GetOne)
-        v1.PATCH("/user/update", userController.Update)
-        
-        v1.GET("/ping", userController.PING)
+        v1 := api.Group("/v1")
+        {
+            v1.POST("/user/create", userController.Create)
+            v1.GET("/user/getAll", userController.GetAll)
+            v1.POST("/user/getOne", userController.GetOne)
+            v1.PATCH("/user/update", userController.Update)
+
+            v1.GET("/ping", userController.PING)
+        }
     }
 
 	return route
