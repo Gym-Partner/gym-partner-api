@@ -5,6 +5,7 @@ import (
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
     "gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
+    "net/http"
 )
 
 type UserController struct {
@@ -27,13 +28,11 @@ func NewUserController(db *core.Database) *UserController {
 func (uc *UserController) Create(ctx *gin.Context) {
     user, err := uc.UserInteractor.Create(ctx)
     if err != nil {
-        ctx.JSON(500, gin.H{
-            "message": err.Error(),
-        })
+        ctx.JSON(err.Code, err.Respons())
         return
     }
-    
-    ctx.JSON(200, user.UserRespons())
+
+    ctx.JSON(http.StatusCreated, user.UserRespons())
 }
 
 func (uc *UserController) PING(ctx *gin.Context) {

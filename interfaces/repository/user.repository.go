@@ -36,14 +36,14 @@ func (u UserRepository) IsExist(data, OPT string) bool {
     }
 }
 
-func (u UserRepository) Create(data model.User) (model.User, error) {
+func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
     var user model.User
 
     data.Id = uuid.New().String()
 
     if retour := u.DB.Table("users").Create(&data); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
-        return model.User{}, retour.Error
+        return model.User{}, core.NewError(500, "Failed to create user in the database", retour.Error)
     }
 
     user.Id = data.Id
