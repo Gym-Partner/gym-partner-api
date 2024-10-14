@@ -16,6 +16,7 @@ func Router(db *core.Database) *gin.Engine {
         v1.POST("/user/create", userController.Create)
         v1.GET("/user/getAll", userController.GetAll)
         v1.POST("/user/getOne", userController.GetOne)
+        v1.PATCH("/user/update", userController.Update)
         
         v1.GET("/ping", userController.PING)
     }

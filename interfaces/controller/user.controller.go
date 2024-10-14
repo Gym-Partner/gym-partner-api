@@ -57,6 +57,15 @@ func (uc *UserController) GetOne(ctx *gin.Context) {
     ctx.JSON(http.StatusOK, user.Respons())
 }
 
+func (uc *UserController) Update(ctx *gin.Context) {
+    if err := uc.UserInteractor.Update(ctx); err != nil {
+        ctx.JSON(err.Code, err.Respons())
+        return
+    }
+
+    ctx.JSON(http.StatusOK, nil)
+}
+
 // ------------------------------ PING ------------------------------
 
 func (uc *UserController) PING(ctx *gin.Context) {

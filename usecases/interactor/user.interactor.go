@@ -15,10 +15,13 @@ type UserInteractor struct {
 
 // -------------------------- CRUD ------------------------------
 
-func (ui *UserInteractor) Create(c *gin.Context) (model.User, *core.Error) {
-    data, err := utils.InjectBodyInModel[model.User](c)
-    exist := ui.IUserRepository.IsExist(data.Email, "EMAIL")
+func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
+    data, err := utils.InjectBodyInModel[model.User](ctx)
+    if err != nil {
+        return model.User{}, err
+    }
 
+    exist := ui.IUserRepository.IsExist(data.Email, "EMAIL")
     if exist {
         return model.User{}, core.NewError(500, fmt.Sprintf("User [%s] already exist in the database", data.Email))
     }
@@ -40,4 +43,28 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 
     user, err := ui.IUserRepository.GetOneById(data.Id)
     return user, err
+}
+
+func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
+    patch, err := utils.InjectBodyInModel[model.User](ctx)
+    if err != nil {
+        return err
+    }
+
+    exist := ui.IUserRepository.IsExist(patch.Id, "ID")
+    if !exist {
+        return core.NewError(500, fmt.Sprintf("User [%s] not found, or not exist in the database", patch.Id))
+    }
+
+    target, err := ui.IUserRepository.GetOneById(patch.Id)
+    if err != nil {
+        return err
+    }
+
+    if err = utils.Bind(&target, patch); err != nil {
+        return err
+    }
+
+    err = ui.IUserRepository.Update(target)
+    return err
 }

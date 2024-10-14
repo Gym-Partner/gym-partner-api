@@ -1,16 +1,22 @@
 package utils
 
 import (
+    "fmt"
     "github.com/gin-gonic/gin"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
     "golang.org/x/crypto/bcrypt"
+    "reflect"
+    "strconv"
+    "strings"
+    "time"
+    "unicode"
 )
 
 func HashPassword(password string) (string, *core.Error) {
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", core.NewError(500, "Error to hash password", err)
+		return "", core.NewError(500, "Error to hash password")
 	}
 
 	return string(hasedPassword), nil
@@ -20,8 +26,99 @@ func InjectBodyInModel[T model.User](ctx *gin.Context) (T, *core.Error) {
 	var data T
 
 	if err := ctx.ShouldBind(&data); err != nil {
-		return data, core.NewError(500, "Error to inject Resquest Body to model", err)
+		return data, core.NewError(500, "Error to inject Resquest Body to model")
 	}
 
 	return data, nil
+}
+
+func Bind(target, patch interface{}) *core.Error {
+	patchValue := reflect.ValueOf(patch)
+	if patchValue.Kind() != reflect.Struct {
+		return core.NewError(500, "The patch was be always an struct")
+	}
+
+	targetValue := reflect.ValueOf(target)
+	if targetValue.Kind() != reflect.Ptr || targetValue.Elem().Kind() != reflect.Struct {
+		return core.NewError(500, "The target was be always an pointer of struct")
+	}
+
+	for i := 0; i < patchValue.NumField(); i++ {
+		patchField := patchValue.Type().Field(i)
+		patchFieldName := ToTitle(patchField.Name)
+		targetField := targetValue.Elem().FieldByName(patchFieldName)
+
+		if !targetField.IsValid() || !targetField.CanSet() {
+			// Le champ n'existe pas dans la cible ou ne peut pas être modifié
+			continue
+		}
+
+		patchFieldValue := patchValue.Field(i)
+
+		if !IsEmptyValue(patchFieldValue) {
+			if targetField.Type() == reflect.TypeOf(time.Time{}) && patchFieldValue.Type() == reflect.TypeOf(int64(0)) {
+				targetField.Set(reflect.ValueOf(time.Unix(patchFieldValue.Interface().(int64), 0)))
+			} else {
+				targetField.Set(patchFieldValue)
+			}
+		}
+	}
+
+	return nil
+}
+
+func ToTitle(s string) string {
+	return strings.Join(strings.FieldsFunc(s, unicode.IsSpace), " ")
+}
+
+func IsEmptyValue(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+		return v.Len() == 0
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Interface, reflect.Ptr:
+		return v.IsNil()
+	}
+
+	return false
+}
+
+// Function for change struct to map
+func StructToMap(data interface{}) map[string]string {
+	result := make(map[string]string)
+
+	v := reflect.ValueOf(data)
+	typeOfS := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		fieldName := typeOfS.Field(i).Name
+
+		// Convertir la valeur du champ en string
+		var value string
+		switch field.Kind() {
+		case reflect.String:
+			value = field.String()
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			value = strconv.FormatInt(field.Int(), 10)
+		case reflect.Float32, reflect.Float64:
+			value = strconv.FormatFloat(field.Float(), 'f', -1, 64)
+		case reflect.Bool:
+			value = strconv.FormatBool(field.Bool())
+		// Ajouter d'autres types si nécessaire
+		default:
+			value = fmt.Sprintf("%v", field.Interface())
+		}
+
+		result[fieldName] = value
+	}
+
+	return result
 }

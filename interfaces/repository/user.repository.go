@@ -50,7 +50,7 @@ func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
 
     if retour := u.DB.Table("users").Create(&data); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
-        return model.User{}, core.NewError(500, "Failed to create user in the database", retour.Error)
+        return model.User{}, core.NewError(500, "Failed to create user in the database")
     }
 
     user.Id = data.Id
@@ -67,7 +67,7 @@ func (u UserRepository) GetAll() (model.Users, *core.Error) {
 
     if retour := u.DB.Table("users").Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
-        return model.Users{}, core.NewError(500, "Failed to recover all of users", retour.Error)
+        return model.Users{}, core.NewError(500, "Failed to recover all of users")
     }
 
     return users, nil
@@ -76,10 +76,19 @@ func (u UserRepository) GetAll() (model.Users, *core.Error) {
 func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
     var user model.User
 
-    if retour := u.DB.Table("users").Where("id = ?", uid).Select("id, first_name, last_name, username, email").First(&user); retour.Error != nil {
+    if retour := u.DB.Table("users").Where("id = ?", uid).First(&user); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
-        return model.User{}, core.NewError(500, fmt.Sprintf("Failed to recover the user with this ID : %s", uid), retour.Error)
+        return model.User{}, core.NewError(500, fmt.Sprintf("Failed to recover the user with this ID: %s", uid))
     }
 
     return user, nil
+}
+
+func (u UserRepository) Update(data model.User) *core.Error {
+    if retour := u.DB.Table("users").Save(&data); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return core.NewError(500, fmt.Sprintf("Failed to update the user with this ID: %s", data.Id))
+    }
+
+    return nil
 }

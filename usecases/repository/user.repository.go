@@ -12,6 +12,6 @@ type IUserRepository interface {
     GetOneById(uid string) (model.User, *core.Error)
 
     Create(data model.User) (model.User, *core.Error)
-    // Update(data model.User) error
+    Update(data model.User) *core.Error
     // Delete(uid string) error
 }

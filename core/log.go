@@ -27,7 +27,6 @@ func (l *Log) ChargeLog() {
 
 	logDir := l.FilePath + "/" + time.Now().Format("20060102")
 	logFilePath := logDir + "-session.log"
-	//override := viper.GetString("API_LOGGER_CREATE")
 
 	// Gin's log creation
 	f, _ := os.Create(fmt.Sprintf("%s/gin.log", l.FilePath))
