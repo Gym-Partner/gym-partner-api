@@ -6,6 +6,7 @@ import (
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
     "gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
+    "gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
 
 type UserInteractor struct {
@@ -15,12 +16,7 @@ type UserInteractor struct {
 // -------------------------- CRUD ------------------------------
 
 func (ui *UserInteractor) Create(c *gin.Context) (model.User, *core.Error) {
-    var data model.User
-
-    if err := c.ShouldBind(&data); err != nil {
-        return model.User{}, core.NewError(500, "Error to bind request body to model.User", err)
-    }
-
+    data, err := utils.InjectBodyInModel[model.User](c)
     exist := ui.IUserRepository.IsExist(data.Email, "EMAIL")
 
     if exist {
@@ -31,7 +27,17 @@ func (ui *UserInteractor) Create(c *gin.Context) (model.User, *core.Error) {
     return user, err
 }
 
-func (ui *UserInteractor) GetAll(c *gin.Context) (model.Users, *core.Error) {
+func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
     users, err := ui.IUserRepository.GetAll()
     return users, err
+}
+
+func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
+    data, err := utils.InjectBodyInModel[model.User](c)
+    if err != nil {
+        return model.User{}, err
+    }
+
+    user, err := ui.IUserRepository.GetOneById(data.Id)
+    return user, err
 }

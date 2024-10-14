@@ -25,6 +25,8 @@ func NewUserController(db *core.Database) *UserController {
     }
 }
 
+// ------------------------------ CRUD ------------------------------
+
 func (uc *UserController) Create(ctx *gin.Context) {
     user, err := uc.UserInteractor.Create(ctx)
     if err != nil {
@@ -32,17 +34,30 @@ func (uc *UserController) Create(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusCreated, user.UserRespons())
+    ctx.JSON(http.StatusCreated, user.Respons())
 }
 
 func (uc *UserController) GetAll(ctx *gin.Context) {
-    users, err := uc.UserInteractor.GetAll(ctx)
+    users, err := uc.UserInteractor.GetAll()
     if err != nil {
         ctx.JSON(err.Code, err.Respons())
+        return
     }
 
-    ctx.JSON(http.StatusOK, users.UsersRespons())
+    ctx.JSON(http.StatusOK, users.Respons())
 }
+
+func (uc *UserController) GetOne(ctx *gin.Context) {
+    user, err := uc.UserInteractor.GetOne(ctx)
+    if err != nil {
+        ctx.JSON(err.Code, err.Respons())
+        return
+    }
+
+    ctx.JSON(http.StatusOK, user.Respons())
+}
+
+// ------------------------------ PING ------------------------------
 
 func (uc *UserController) PING(ctx *gin.Context) {
     ctx.JSON(200, gin.H{

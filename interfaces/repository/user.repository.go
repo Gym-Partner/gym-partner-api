@@ -1,6 +1,7 @@
 package repository
 
 import (
+    "fmt"
     "github.com/google/uuid"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
@@ -64,10 +65,21 @@ func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
 func (u UserRepository) GetAll() (model.Users, *core.Error) {
     var users model.Users
 
-    if retour := u.DB.Table("users").Find(&users); retour.Error != nil {
+    if retour := u.DB.Table("users").Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
         return model.Users{}, core.NewError(500, "Failed to recover all of users", retour.Error)
     }
 
     return users, nil
+}
+
+func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
+    var user model.User
+
+    if retour := u.DB.Table("users").Where("id = ?", uid).Select("id, first_name, last_name, username, email").First(&user); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return model.User{}, core.NewError(500, fmt.Sprintf("Failed to recover the user with this ID : %s", uid), retour.Error)
+    }
+
+    return user, nil
 }

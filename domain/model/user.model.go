@@ -13,13 +13,13 @@ type User struct {
 
 type Users []User
 
-func (u *User) UserRespons() gin.H {
+func (u *User) Respons() gin.H {
 	return gin.H{
 		"data": u,
 	}
 }
 
-func (u *Users) UsersRespons() gin.H {
+func (u *Users) Respons() gin.H {
 	return gin.H{
 		"data": u,
 	}
