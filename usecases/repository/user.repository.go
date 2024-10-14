@@ -13,5 +13,5 @@ type IUserRepository interface {
 
     Create(data model.User) (model.User, *core.Error)
     Update(data model.User) *core.Error
-    // Delete(uid string) error
+    Delete(uid string) *core.Error
 }

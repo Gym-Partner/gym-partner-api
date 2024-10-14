@@ -66,6 +66,15 @@ func (uc *UserController) Update(ctx *gin.Context) {
     ctx.JSON(http.StatusOK, nil)
 }
 
+func (uc *UserController) Delete(ctx *gin.Context) {
+    if err := uc.UserInteractor.Delete(ctx); err != nil {
+        ctx.JSON(err.Code, err.Respons())
+        return
+    }
+
+    ctx.JSON(http.StatusOK, nil)
+}
+
 // ------------------------------ PING ------------------------------
 
 func (uc *UserController) PING(ctx *gin.Context) {

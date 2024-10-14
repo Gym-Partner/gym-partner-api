@@ -42,9 +42,10 @@ func (l *Log) ChargeLog() {
 }
 
 func createLogger(filePath string) *zap.Logger {
-	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg := zap.NewDevelopmentEncoderConfig()
 	encoderCfg.TimeKey = "timestamp"
 	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderCfg.StacktraceKey = ""
 
 	config := zap.Config{
 		Level: zap.NewAtomicLevelAt(zap.DebugLevel),

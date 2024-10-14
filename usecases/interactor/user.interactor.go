@@ -68,3 +68,21 @@ func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
     err = ui.IUserRepository.Update(target)
     return err
 }
+
+func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
+    data, err := utils.InjectBodyInModel[model.User](ctx)
+    if err != nil {
+        return err
+    }
+
+    exist := ui.IUserRepository.IsExist(data.Id, "ID")
+    if !exist {
+        return core.NewError(500, "User not found in the database")
+    }
+
+    if err = ui.IUserRepository.Delete(data.Id); err != nil {
+        return err
+    }
+
+    return nil
+}
