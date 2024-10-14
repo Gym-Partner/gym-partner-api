@@ -8,7 +8,7 @@ import (
 type IUserRepository interface {
     IsExist(data, OPT string) bool
 
-	// GetAll() (model.Users, error)
+	GetAll() (model.Users, *core.Error)
     // GetOneById(uid string) (model.User, error)
 
     Create(data model.User) (model.User, *core.Error)

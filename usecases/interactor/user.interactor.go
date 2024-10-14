@@ -30,3 +30,8 @@ func (ui *UserInteractor) Create(c *gin.Context) (model.User, *core.Error) {
     user, err := ui.IUserRepository.Create(data)
     return user, err
 }
+
+func (ui *UserInteractor) GetAll(c *gin.Context) (model.Users, *core.Error) {
+    users, err := ui.IUserRepository.GetAll()
+    return users, err
+}

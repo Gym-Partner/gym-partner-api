@@ -14,6 +14,8 @@ func Router(db *core.Database) *gin.Engine {
     v1 := route.Group("/v1")
     {
         v1.POST("/user/create", userController.Create)
+        v1.GET("/user/getAll", userController.GetAll)
+        
         v1.GET("/ping", userController.PING)
     }
 

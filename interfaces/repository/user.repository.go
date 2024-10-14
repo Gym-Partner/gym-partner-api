@@ -60,3 +60,14 @@ func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
 
     return user, nil
 }
+
+func (u UserRepository) GetAll() (model.Users, *core.Error) {
+    var users model.Users
+
+    if retour := u.DB.Table("users").Find(&users); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return model.Users{}, core.NewError(500, "Failed to recover all of users", retour.Error)
+    }
+
+    return users, nil
+}

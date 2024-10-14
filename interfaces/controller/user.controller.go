@@ -35,6 +35,15 @@ func (uc *UserController) Create(ctx *gin.Context) {
     ctx.JSON(http.StatusCreated, user.UserRespons())
 }
 
+func (uc *UserController) GetAll(ctx *gin.Context) {
+    users, err := uc.UserInteractor.GetAll(ctx)
+    if err != nil {
+        ctx.JSON(err.Code, err.Respons())
+    }
+
+    ctx.JSON(http.StatusOK, users.UsersRespons())
+}
+
 func (uc *UserController) PING(ctx *gin.Context) {
     ctx.JSON(200, gin.H{
         "message": "PONG",

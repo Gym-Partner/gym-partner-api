@@ -18,3 +18,9 @@ func (u *User) UserRespons() gin.H {
 		"data": u,
 	}
 }
+
+func (u *Users) UsersRespons() gin.H {
+	return gin.H{
+		"data": u,
+	}
+}
