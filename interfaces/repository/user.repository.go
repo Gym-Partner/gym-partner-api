@@ -4,6 +4,7 @@ import (
     "github.com/google/uuid"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+    "gitlab.com/gym-partner1/api/gym-partner-api/utils"
     "gorm.io/gorm"
 )
 
@@ -38,8 +39,13 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 
 func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
     var user model.User
+    var err *core.Error
 
     data.Id = uuid.New().String()
+    data.Password, err = utils.HashPassword(data.Password)
+    if err != nil {
+        return model.User{}, err
+    }
 
     if retour := u.DB.Table("users").Create(&data); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
