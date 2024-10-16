@@ -74,7 +74,7 @@ func (cs *CognitoService) SignIn(user model.User) (string, *Error) {
 	authInput := &cognitoidentityprovider.InitiateAuthInput{
 		AuthFlow: aws.String("USER_PASSWORD_AUTH"),
 		AuthParameters: aws.StringMap(map[string]string{
-			"USERNAME": user.Email,
+			"USERNAME": user.Id,
 			"PASSWORD": user.Password,
 		}),
 		ClientId: aws.String(cs.CognitoAppIdClient),

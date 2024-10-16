@@ -34,7 +34,8 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
         return user, core.NewError(500, "Failed initial AWS Service", err)
     }
 
-    if err = cognito.SignUp(user); err != nil {
+    data.Id = user.Id
+    if err = cognito.SignUp(data); err != nil {
         return user, core.NewError(500, "Failed create user to Cognito", err)
     }
 
@@ -53,6 +54,17 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
     }
 
     user, err := ui.IUserRepository.GetOneById(data.Id)
+    return user, err
+}
+
+func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Error) {
+    data, err := utils.InjectBodyInModel[model.User](ctx)
+    if err != nil {
+        return model.User{}, err
+    }
+
+    user, err := ui.IUserRepository.GetOneByEmail(data.Email)
+    user.Password = data.Password
     return user, err
 }
 
@@ -98,18 +110,13 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
     return nil
 }
 
-func (ui *UserInteractor) Login(ctx *gin.Context) (string, *core.Error) {
-    data, err := utils.InjectBodyInModel[model.User](ctx)
-    if err != nil {
-        return "", err
-    }
-
+func (ui *UserInteractor) Login(user model.User) (string, *core.Error) {
     cognito, err := ui.AwsService.NewCognito()
     if err != nil {
         return "", err
     }
 
-    token, err := cognito.SignIn(data)
+    token, err := cognito.SignIn(user)
     if err != nil {
         return "", err
     }

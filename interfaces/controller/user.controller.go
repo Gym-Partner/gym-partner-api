@@ -79,7 +79,13 @@ func (uc *UserController) Delete(ctx *gin.Context) {
 // ------------------------------ AUTH ------------------------------
 
 func (uc *UserController) Login(ctx *gin.Context) {
-    token, err := uc.UserInteractor.Login(ctx)
+    user, err := uc.UserInteractor.GetOneByEmail(ctx)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, err.Respons())
+        return
+    }
+
+    token, err := uc.UserInteractor.Login(user)
     if err != nil {
         ctx.JSON(http.StatusInternalServerError, err.Respons())
         return

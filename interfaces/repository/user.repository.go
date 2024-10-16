@@ -77,6 +77,17 @@ func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
     return user, nil
 }
 
+func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
+    var user model.User
+
+    if retour := u.DB.Table("users").Where("email = ?", email).Select("id").First(&user); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return model.User{}, core.NewError(500, fmt.Sprintf("Failed to recover the user with this Email: %s", email), retour.Error)
+    }
+
+    return user, nil
+}
+
 func (u UserRepository) Update(data model.User) *core.Error {
     if retour := u.DB.Table("users").Save(&data); retour.Error != nil {
         u.Log.Error(retour.Error.Error())
