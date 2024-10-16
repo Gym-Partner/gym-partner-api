@@ -15,7 +15,13 @@ type Users []User
 
 func (u *User) Respons() gin.H {
 	return gin.H{
-		"data": u,
+		"data": gin.H{
+			"id": u.Id,
+			"first_name": u.FirstName,
+			"last_name": u.LastName,
+			"username": u.UserName,
+			"email": u.Email,
+		},
 	}
 }
 

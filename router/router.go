@@ -21,6 +21,8 @@ func Router(db *core.Database) *gin.Engine {
             v1.PATCH("/user/update", userController.Update)
             v1.DELETE("/user/delete", userController.Delete)
 
+            v1.POST("/user/login", userController.Login)
+
             v1.GET("/ping", userController.PING)
         }
     }

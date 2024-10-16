@@ -11,6 +11,7 @@ import (
 
 type UserInteractor struct {
     IUserRepository repository.IUserRepository
+    AwsService *core.AWS
 }
 
 // -------------------------- CRUD ------------------------------
@@ -27,6 +28,16 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
     }
 
     user, err := ui.IUserRepository.Create(data)
+
+    cognito, err := ui.AwsService.NewCognito()
+    if err != nil {
+        return user, core.NewError(500, "Failed initial AWS Service", err)
+    }
+
+    if err = cognito.SignUp(user); err != nil {
+        return user, core.NewError(500, "Failed create user to Cognito", err)
+    }
+
     return user, err
 }
 
@@ -85,4 +96,23 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
     }
 
     return nil
+}
+
+func (ui *UserInteractor) Login(ctx *gin.Context) (string, *core.Error) {
+    data, err := utils.InjectBodyInModel[model.User](ctx)
+    if err != nil {
+        return "", err
+    }
+
+    cognito, err := ui.AwsService.NewCognito()
+    if err != nil {
+        return "", err
+    }
+
+    token, err := cognito.SignIn(data)
+    if err != nil {
+        return "", err
+    }
+
+    return token, nil
 }

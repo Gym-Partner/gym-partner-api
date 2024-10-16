@@ -39,7 +39,6 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 }
 
 func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
-    var user model.User
     var err *core.Error
 
     data.Id = uuid.New().String()
@@ -53,13 +52,7 @@ func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
         return model.User{}, core.NewError(500, "Failed to create user in the database", retour.Error)
     }
 
-    user.Id = data.Id
-    user.FirstName = data.FirstName
-    user.LastName = data.LastName
-    user.UserName = data.UserName
-    user.Email = data.Email
-
-    return user, nil
+    return data, nil
 }
 
 func (u UserRepository) GetAll() (model.Users, *core.Error) {

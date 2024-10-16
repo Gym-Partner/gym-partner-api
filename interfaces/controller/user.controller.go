@@ -20,6 +20,7 @@ func NewUserController(db *core.Database) *UserController {
                 DB: db.Handler,
                 Log: db.Logger,
             },
+            AwsService: core.NewAWS(db.Logger),
         },
         Log: db.Logger,
     }
@@ -73,6 +74,20 @@ func (uc *UserController) Delete(ctx *gin.Context) {
     }
 
     ctx.JSON(http.StatusOK, nil)
+}
+
+// ------------------------------ AUTH ------------------------------
+
+func (uc *UserController) Login(ctx *gin.Context) {
+    token, err := uc.UserInteractor.Login(ctx)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, err.Respons())
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{
+        "token": token,
+    })
 }
 
 // ------------------------------ PING ------------------------------
