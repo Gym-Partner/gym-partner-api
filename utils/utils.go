@@ -1,13 +1,11 @@
 package utils
 
 import (
-    "fmt"
     "github.com/gin-gonic/gin"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
     "golang.org/x/crypto/bcrypt"
     "reflect"
-    "strconv"
     "strings"
     "time"
     "unicode"
@@ -88,37 +86,4 @@ func IsEmptyValue(v reflect.Value) bool {
 	}
 
 	return false
-}
-
-// Function for change struct to map
-func StructToMap(data interface{}) map[string]string {
-	result := make(map[string]string)
-
-	v := reflect.ValueOf(data)
-	typeOfS := v.Type()
-
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i)
-		fieldName := typeOfS.Field(i).Name
-
-		// Convertir la valeur du champ en string
-		var value string
-		switch field.Kind() {
-		case reflect.String:
-			value = field.String()
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			value = strconv.FormatInt(field.Int(), 10)
-		case reflect.Float32, reflect.Float64:
-			value = strconv.FormatFloat(field.Float(), 'f', -1, 64)
-		case reflect.Bool:
-			value = strconv.FormatBool(field.Bool())
-		// Ajouter d'autres types si nécessaire
-		default:
-			value = fmt.Sprintf("%v", field.Interface())
-		}
-
-		result[fieldName] = value
-	}
-
-	return result
 }

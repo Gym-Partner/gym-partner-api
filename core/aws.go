@@ -88,3 +88,31 @@ func (cs *CognitoService) SignIn(user model.User) (string, *Error) {
 
 	return *result.AuthenticationResult.AccessToken, nil
 }
+
+func (cs *CognitoService) GetUserByToken(token string) (*cognitoidentityprovider.GetUserOutput, *Error) {
+	input := &cognitoidentityprovider.GetUserInput{
+		AccessToken: aws.String(token),
+	}
+
+	result, err := cs.CognitoProvider.GetUser(input)
+	if err != nil {
+		cs.Log.Error("Failed to recover the User by his token")
+		return nil, NewError(500, "Failed to recover the User by his token", err)
+	}
+
+	return result, nil
+}
+
+func (cs *CognitoService) DeleteUser(token string) *Error {
+	input := &cognitoidentityprovider.DeleteUserInput{
+		AccessToken: aws.String(token),
+	}
+
+	_, err := cs.CognitoProvider.DeleteUser(input)
+	if err != nil {
+		cs.Log.Error("Failed to delete User")
+		return NewError(500, "Failed to delete User", err)
+	}
+
+	return nil
+}

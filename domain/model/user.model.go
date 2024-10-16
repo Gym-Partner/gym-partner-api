@@ -9,6 +9,7 @@ type User struct {
 	UserName string `json:"username" gorm:"column:username"`
 	Email string `json:"email"`
 	Password string `json:"password"`
+	Token string `json:"token"`
 }
 
 type Users []User
