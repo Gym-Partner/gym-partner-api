@@ -48,12 +48,9 @@ func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
 }
 
 func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
-    data, err := utils.InjectBodyInModel[model.User](c)
-    if err != nil {
-        return model.User{}, err
-    }
+    uid, _ := c.Get("uid")
 
-    user, err := ui.IUserRepository.GetOneById(data.Id)
+    user, err := ui.IUserRepository.GetOneById(*uid.(*string))
     return user, err
 }
 
@@ -69,10 +66,12 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 }
 
 func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
+    uid, _ := ctx.Get("uid")
     patch, err := utils.InjectBodyInModel[model.User](ctx)
     if err != nil {
         return err
     }
+    patch.Id = *uid.(*string)
 
     exist := ui.IUserRepository.IsExist(patch.Id, "ID")
     if !exist {
