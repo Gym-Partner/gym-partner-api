@@ -1,33 +1,33 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson"
+import "github.com/gin-gonic/gin"
 
 type User struct {
     Id string `json:"id"`
-	FirstName string `json:"firstname"`
-	LastName string `json:"lastname"`
-	UserName string `json:"username"`
+	FirstName string `json:"first_name"`
+	LastName string `json:"last_name"`
+	UserName string `json:"username" gorm:"column:username"`
 	Email string `json:"email"`
 	Password string `json:"password"`
+	// Token string `json:"token"`
 }
 
 type Users []User
 
-var UserProjection = bson.M{
-	"id": 1,
-	"firstname": 1,
-	"lastname": 1,
-	"username": 1,
-	"email": 1,
-	"password": 1,
+func (u *User) Respons() gin.H {
+	return gin.H{
+		"data": gin.H{
+			"id": u.Id,
+			"first_name": u.FirstName,
+			"last_name": u.LastName,
+			"username": u.UserName,
+			"email": u.Email,
+		},
+	}
 }
 
-func (u *User) NewUserFromData(data User) *User {
-	return &User{
-		Id: data.Id,
-		FirstName: data.FirstName,
-		LastName: data.LastName,
-		UserName: data.UserName,
-		Email: data.Email,
+func (u *Users) Respons() gin.H {
+	return gin.H{
+		"data": u,
 	}
 }

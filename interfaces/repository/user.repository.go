@@ -1,21 +1,17 @@
 package repository
 
 import (
-    "context"
-    "errors"
+    "fmt"
     "github.com/google/uuid"
-    "gitlab.com/Titouan-Esc/api_common/logger"
-    "gitlab.com/Titouan-Esc/api_common/middlewares"
-    mongodb "gitlab.com/Titouan-Esc/api_common/mongo"
+    "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
-    "go.mongodb.org/mongo-driver/bson"
-    "go.mongodb.org/mongo-driver/mongo"
-    "go.mongodb.org/mongo-driver/mongo/options"
+    "gitlab.com/gym-partner1/api/gym-partner-api/utils"
+    "gorm.io/gorm"
 )
 
 type UserRepository struct {
-	Sql *mongodb.Mongo
-	Logger *logger.Log
+	DB *gorm.DB
+    Log *core.Log
 }
 
 func (u UserRepository) IsExist(data, OPT string) bool {
@@ -29,88 +25,84 @@ func (u UserRepository) IsExist(data, OPT string) bool {
         queryColumn = "email"
     }
 
-    filter := bson.D{{queryColumn, data}}
-
-    if err := u.Sql.Database.Collection("users").FindOne(context.TODO(), filter).Decode(&user); err != nil {
-        if errors.Is(err, mongo.ErrNoDocuments) {
-            return false
-        }
+    if retour := u.DB.Table("users").Where(queryColumn + " = ?", data).First(&user); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return false
     }
 
     if user.Id == "" {
-        u.Logger.Warning("User not found in database")
+        u.Log.Error("User not found")
         return false
     } else {
         return true
     }
 }
 
-func (u UserRepository) GetAll() (model.Users, error) {
-    var users model.Users
+func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
+    var err *core.Error
 
-    cursor, err := u.Sql.Database.Collection("users").Find(context.TODO(), bson.D{{}}, options.Find().SetProjection(model.UserProjection))
+    data.Id = uuid.New().String()
+    data.Password, err = utils.HashPassword(data.Password)
     if err != nil {
-        if errors.Is(err, mongo.ErrNoDocuments) {
-            return model.Users{}, err
-        }
+        return model.User{}, err
     }
 
-    if err = cursor.All(context.TODO(), &users); err != nil {
-        u.Logger.Error(err.Error())
-        return model.Users{}, err
+    if retour := u.DB.Table("users").Create(&data); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return model.User{}, core.NewError(500, "Failed to create user in the database", retour.Error)
+    }
+
+    return data, nil
+}
+
+func (u UserRepository) GetAll() (model.Users, *core.Error) {
+    var users model.Users
+
+    if retour := u.DB.Table("users").Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return model.Users{}, core.NewError(500, "Failed to recover all of users", retour.Error)
     }
 
     return users, nil
 }
 
-func (u UserRepository) GetOneById(uid string) (model.User, error) {
+func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
     var user model.User
 
-    filter := bson.D{{"id", uid}}
-
-    if err := u.Sql.Database.Collection("users").FindOne(context.TODO(), filter, options.FindOne().SetProjection(model.UserProjection)).Decode(&user); err != nil {
-        if errors.Is(err, mongo.ErrNoDocuments) {
-            u.Logger.Error(err.Error())
-            return model.User{}, err
-        }
+    if retour := u.DB.Table("users").Where("id = ?", uid).First(&user); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return model.User{}, core.NewError(500, fmt.Sprintf("Failed to recover the user with this ID: %s", uid), retour.Error)
     }
 
     return user, nil
 }
 
-func (u UserRepository) Create(data model.User) (model.User, error) {
-    data.Id = uuid.New().String()
-    data.Password = middlewares.HashPassword(data.Password)
+func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
+    var user model.User
 
-    _, err := u.Sql.Database.Collection("users").InsertOne(context.TODO(), data)
-    if err != nil {
-        u.Logger.Error(err.Error())
-        return model.User{}, err
+    if retour := u.DB.Table("users").Where("email = ?", email).Select("id").First(&user); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return model.User{}, core.NewError(500, fmt.Sprintf("Failed to recover the user with this Email: %s", email), retour.Error)
     }
-    
-    return data, nil
+
+    return user, nil
 }
 
-func (u UserRepository) Update(data model.User) error {
-    filter := bson.D{{"id", data.Id}}
-    update := bson.D{{"$set", data}}
-
-    _, err := u.Sql.Database.Collection("users").UpdateOne(context.TODO(), filter, update)
-    if err != nil {
-        u.Logger.Error(err.Error())
-        return err
+func (u UserRepository) Update(data model.User) *core.Error {
+    if retour := u.DB.Table("users").Save(&data); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return core.NewError(500, fmt.Sprintf("Failed to update the user with this ID: %s", data.Id), retour.Error)
     }
 
     return nil
 }
 
-func (u UserRepository) Delete(uid string) error {
-    filter := bson.D{{"id", uid}}
+func (u UserRepository) Delete(uid string) *core.Error {
+    var user model.User
 
-    _, err := u.Sql.Database.Collection("users").DeleteOne(context.TODO(), filter)
-    if err != nil {
-        u.Logger.Error(err.Error())
-        return err
+    if retour := u.DB.Table("users").Where("id = ?", uid).Delete(&user); retour.Error != nil {
+        u.Log.Error(retour.Error.Error())
+        return core.NewError(500, fmt.Sprintf("Failed to delete the user with this ID: %s", uid), retour.Error)
     }
 
     return nil

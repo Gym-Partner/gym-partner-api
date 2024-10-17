@@ -1,11 +1,9 @@
 package controller
 
 import (
-    "gitlab.com/Titouan-Esc/api_common/controller"
-    "gitlab.com/Titouan-Esc/api_common/logger"
-    "gitlab.com/Titouan-Esc/api_common/mongo"
-    "gitlab.com/Titouan-Esc/api_common/utils"
-    "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+    "fmt"
+    "github.com/gin-gonic/gin"
+    "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
     "gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
     "net/http"
@@ -13,110 +11,98 @@ import (
 
 type UserController struct {
     UserInteractor interactor.UserInteractor
-    Logger *logger.Log
+    Log *core.Log
 }
 
-func NewUserController(sql *mongo.Mongo, log *logger.Log) *UserController {
+func NewUserController(db *core.Database) *UserController {
     return &UserController{
         UserInteractor: interactor.UserInteractor{
             IUserRepository: repository.UserRepository{
-                Sql: sql,
-                Logger: log,
+                DB: db.Handler,
+                Log: db.Logger,
             },
         },
-        Logger: log,
+        Log: db.Logger,
     }
 }
 
-func (uc *UserController) GetAll(res http.ResponseWriter, req *http.Request) {
-    manager := controller.NewController(res, req, uc.Logger, false)
-    if manager.Errors.Error {
-        manager.StopRequest()
+// ------------------------------ CRUD ------------------------------
+
+func (uc *UserController) Create(ctx *gin.Context) {
+    user, err := uc.UserInteractor.Create(ctx)
+    if err != nil {
+        ctx.JSON(err.Code, err.Respons())
         return
     }
+
+    ctx.JSON(http.StatusCreated, user.Respons())
+}
+
+func (uc *UserController) GetAll(ctx *gin.Context) {
+    uid, _ := ctx.Get("uid")
+    fmt.Println(*uid.(*string))
 
     users, err := uc.UserInteractor.GetAll()
     if err != nil {
-        manager.Respons().Build(http.StatusInternalServerError, err.Error())
+        ctx.JSON(err.Code, err.Respons())
         return
     }
 
-    manager.Respons().Build(http.StatusOK, users)
+    ctx.JSON(http.StatusOK, users.Respons())
 }
 
-func (uc *UserController) GetOne(res http.ResponseWriter, req *http.Request) {
-    manager := controller.NewController(res, req, uc.Logger, false)
-    if manager.Errors.Error {
-        manager.StopRequest()
-        return
-    }
-
-    user, err := uc.UserInteractor.GetOneById(manager.UserId)
+func (uc *UserController) GetOne(ctx *gin.Context) {
+    user, err := uc.UserInteractor.GetOne(ctx)
     if err != nil {
-        manager.Respons().Build(http.StatusInternalServerError, err)
+        ctx.JSON(err.Code, err.Respons())
         return
     }
 
-    manager.Respons().Build(http.StatusOK, user)
+    ctx.JSON(http.StatusOK, user.Respons())
 }
 
-func (uc *UserController) Create(res http.ResponseWriter, req *http.Request) {
-    manager := controller.NewController(res, req, uc.Logger, false)
-    if manager.Errors.Error {
-        manager.StopRequest()
+func (uc *UserController) Update(ctx *gin.Context) {
+    if err := uc.UserInteractor.Update(ctx); err != nil {
+        ctx.JSON(err.Code, err.Respons())
         return
     }
 
-    body := utils.ReadBody[model.User](manager.Body)
+    ctx.JSON(http.StatusOK, nil)
+}
 
-    user, err := uc.UserInteractor.Create(body)
+func (uc *UserController) Delete(ctx *gin.Context) {
+    if err := uc.UserInteractor.Delete(ctx); err != nil {
+        ctx.JSON(err.Code, err.Respons())
+        return
+    }
+
+    ctx.JSON(http.StatusOK, nil)
+}
+
+// ------------------------------ AUTH ------------------------------
+
+func (uc *UserController) Login(ctx *gin.Context) {
+    user, err := uc.UserInteractor.GetOneByEmail(ctx)
     if err != nil {
-        manager.Respons().Build(http.StatusInternalServerError, err.Error())
+        ctx.JSON(http.StatusInternalServerError, err.Respons())
         return
     }
 
-    mapBody := utils.StructToMap(user)
-
-    if err = manager.Cognito.SignUp(mapBody); err != nil {
-            manager.Respons().Build(http.StatusInternalServerError, err.Error())
-            return
+    token, err := uc.UserInteractor.Login(ctx, user)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, err.Respons())
+        return
     }
 
-    newUser := user.NewUserFromData(user)
-    manager.Respons().Build(http.StatusCreated, newUser)
+    ctx.JSON(http.StatusOK, gin.H{
+        "token": token,
+    })
 }
 
-func (uc *UserController) Update(res http.ResponseWriter, req *http.Request) {
-    manager := controller.NewController(res, req, uc.Logger, false)
-    if manager.Errors.Error {
-        manager.StopRequest()
-        return
-    }
+// ------------------------------ PING ------------------------------
 
-    body := utils.ReadBody[model.User](manager.Body)
-    //body.Id = manager.UserId
-
-    if err := uc.UserInteractor.Update(body); err != nil {
-        manager.Respons().Build(http.StatusInternalServerError, err)
-        return
-    }
-
-    manager.Respons().Build(http.StatusNoContent, nil)
-}
-
-func (uc *UserController) Delete(res http.ResponseWriter, req *http.Request) {
-    manager := controller.NewController(res, req, uc.Logger, false)
-    if manager.Errors.Error {
-        manager.StopRequest()
-        return
-    }
-
-    body := utils.ReadBody[model.User](manager.Body)
-
-    if err := uc.UserInteractor.Delete(body.Id); err != nil {
-        manager.Respons().Build(http.StatusInternalServerError, err)
-        return
-    }
-
-    manager.Respons().Build(http.StatusNoContent, nil)
+func (uc *UserController) PING(ctx *gin.Context) {
+    ctx.JSON(200, gin.H{
+        "message": "PONG",
+    })
 }

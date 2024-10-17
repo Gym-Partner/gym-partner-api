@@ -1,31 +1,20 @@
 package main
 
 import (
-    "fmt"
-    "github.com/spf13/viper"
-    "gitlab.com/Titouan-Esc/api_common/env"
-    "gitlab.com/Titouan-Esc/api_common/logger"
-    "gitlab.com/Titouan-Esc/api_common/mongo"
-    "gitlab.com/gym-partner1/api/gym-partner-api/infra"
-    "net/http"
+    "gitlab.com/gym-partner1/api/gym-partner-api/core"
+    "gitlab.com/gym-partner1/api/gym-partner-api/router"
 )
 
 func main() {
-	environment := env.NewEnv()
-	environment.LoadEnv()
+	env := core.NewEnv()
+	env.LoadEnv()
 
-	logServ := logger.GetLoggers().Server
-	logSess := logger.GetLoggers().Session
+	log := core.NewLog(env.FilePath)
+	log.ChargeLog()
 
-	db := mongo.NewMongo(logServ)
+	db := core.NewDatabase(log)
 
-	router := infra.Dispatch(db, logServ, logSess)
+	route := router.Router(db)
 
-	address := fmt.Sprintf("%s:%s", viper.GetString("API_SERVER_HOST"), viper.GetString("API_SERVER_PORT"))
-
-	fmt.Println(fmt.Sprintf("Server running on : http://%s%s", address, viper.GetString("API_PREFIX")))
-	if err := http.ListenAndServe(address, router.Handle); err != nil {
-		logServ.Error("[RUN] ", err.Error())
-		return
-	}
+	route.Run(":4200")
 }
