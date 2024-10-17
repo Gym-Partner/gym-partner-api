@@ -11,12 +11,12 @@ import (
 
 type UserInteractor struct {
     IUserRepository repository.IUserRepository
-    AwsService *core.AWS
 }
 
 // -------------------------- CRUD ------------------------------
 
 func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
+    aws, _ := ctx.Get("aws")
     data, err := utils.InjectBodyInModel[model.User](ctx)
     if err != nil {
         return model.User{}, err
@@ -29,7 +29,7 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
     user, err := ui.IUserRepository.Create(data)
 
-    cognito, err := ui.AwsService.NewCognito()
+    cognito, err := aws.(*core.AWS).NewCognito()
     if err != nil {
         return user, core.NewError(500, "Failed initial AWS Service", err)
     }
@@ -110,8 +110,9 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
     return nil
 }
 
-func (ui *UserInteractor) Login(user model.User) (string, *core.Error) {
-    cognito, err := ui.AwsService.NewCognito()
+func (ui *UserInteractor) Login(ctx *gin.Context, user model.User) (string, *core.Error) {
+    aws, _ := ctx.Get("aws")
+    cognito, err := aws.(*core.AWS).NewCognito()
     if err != nil {
         return "", err
     }
@@ -122,23 +123,4 @@ func (ui *UserInteractor) Login(user model.User) (string, *core.Error) {
     }
 
     return token, nil
-}
-
-func (ui *UserInteractor) Test(ctx *gin.Context) (string, *core.Error) {
-    data, err := utils.InjectBodyInModel(ctx)
-    if err != nil {
-        return "", err
-    }
-
-    cognito, err := ui.AwsService.NewCognito()
-    if err != nil {
-        return "", err
-    }
-
-    uid, err := cognito.GetUserByToken(data.Token)
-    if err != nil {
-        return "", err
-    }
-
-    return *uid.Username, nil
 }

@@ -1,6 +1,7 @@
 package controller
 
 import (
+    "fmt"
     "github.com/gin-gonic/gin"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
@@ -20,7 +21,6 @@ func NewUserController(db *core.Database) *UserController {
                 DB: db.Handler,
                 Log: db.Logger,
             },
-            AwsService: core.NewAWS(db.Logger),
         },
         Log: db.Logger,
     }
@@ -39,6 +39,9 @@ func (uc *UserController) Create(ctx *gin.Context) {
 }
 
 func (uc *UserController) GetAll(ctx *gin.Context) {
+    uid, _ := ctx.Get("uid")
+    fmt.Println(*uid.(*string))
+
     users, err := uc.UserInteractor.GetAll()
     if err != nil {
         ctx.JSON(err.Code, err.Respons())
@@ -85,7 +88,7 @@ func (uc *UserController) Login(ctx *gin.Context) {
         return
     }
 
-    token, err := uc.UserInteractor.Login(user)
+    token, err := uc.UserInteractor.Login(ctx, user)
     if err != nil {
         ctx.JSON(http.StatusInternalServerError, err.Respons())
         return
