@@ -93,17 +93,24 @@ func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
 }
 
 func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
-    data, err := utils.InjectBodyInModel[model.User](ctx)
+    token, _ := ctx.Get("token")
+    uid, _ := ctx.Get("uid")
+    aws, _ := ctx.Get("aws")
+    cognito, err := aws.(*core.AWS).NewCognito()
     if err != nil {
         return err
     }
 
-    exist := ui.IUserRepository.IsExist(data.Id, "ID")
+    exist := ui.IUserRepository.IsExist(*uid.(*string), "ID")
     if !exist {
         return core.NewError(500, "User not found in the database")
     }
 
-    if err = ui.IUserRepository.Delete(data.Id); err != nil {
+    if err = ui.IUserRepository.Delete(*uid.(*string)); err != nil {
+        return err
+    }
+
+    if err = cognito.DeleteUser(token.(string)); err != nil {
         return err
     }
 

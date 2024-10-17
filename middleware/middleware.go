@@ -41,5 +41,6 @@ func Auth() gin.HandlerFunc {
 		}
 
 		ctx.Set("uid", uid)
+		ctx.Set("token", newToken)
     }
 }
