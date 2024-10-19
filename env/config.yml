@@ -1,0 +1,17 @@
+# Database
+DB_USER: "postgres"
+DB_NAME: "gym-partner-db"
+DB_PASSWORD: "aaaAAA111"
+DB_HOST: "gym-partner-db.c1h3cnfwx7iw.us-east-1.rds.amazonaws.com"
+DB_PORT: "5432"
+
+# Server
+API_SERVER_HOST: "localhost"
+API_SERVER_PORT: "4200"
+
+# AWS
+AWS_REGION: "us-east-1"
+
+# AWS Cognito
+APP_CLIENT_ID: "4qq70oblk6fem0h2b7ch5iki5s"
+USER_PASSWORD_AUTH: "gym-partner-password-auth"
