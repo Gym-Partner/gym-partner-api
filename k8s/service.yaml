@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gym-partner-service
+  namespace: gym-partner
+spec:
+  selector:
+    app: gym-partner-api
+  ports:
+    - protocol: TCP
+      port: 4200
+      targetPort: 4200
+  type: NodePort

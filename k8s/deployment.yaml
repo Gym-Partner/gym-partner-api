@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gym-partner-deployment
+  namespace: gym-partner
+  labels:
+    app: gym-partner-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gym-partner-api
+  template:
+    metadata:
+      labels:
+        app: gym-partner-api
+    spec:
+      containers:
+        - name: gym-partner-api
+          image: public.ecr.aws/h4z0a5x7/gym-partner/gym-partner-api:v1.0.0.0
+          resources:
+            limits:
+                memory: "512Mi"
+                cpu: "500m"
+            requests:
+                memory: "256Mi"
+                cpu: "250m"
+          ports:
+            - containerPort: 4200
+              protocol: TCP
+      restartPolicy: Always
+      automountServiceAccountToken: false
