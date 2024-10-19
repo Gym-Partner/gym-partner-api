@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: gym-partner-api
-          image: public.ecr.aws/h4z0a5x7/gym-partner/gym-partner-api:v1.0.0.0
+          image: public.ecr.aws/h4z0a5x7/gym-partner/gym-partner-api:v1.0.0.1
           resources:
             limits:
                 memory: "512Mi"
