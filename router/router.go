@@ -18,7 +18,7 @@ func Router(db *core.Database) *gin.Engine {
         v1Auth := api.Group("/v1", middleware.Auth())
         {
             v1Auth.GET("/user/getAll", userController.GetAll)
-            v1Auth.POST("/user/getOne", userController.GetOne)
+            v1Auth.GET("/user/getOne", userController.GetOne)
             v1Auth.PATCH("/user/update", userController.Update)
             v1Auth.DELETE("/user/delete", userController.Delete)
         }

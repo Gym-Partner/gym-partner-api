@@ -1,7 +1,6 @@
 package controller
 
 import (
-    "fmt"
     "github.com/gin-gonic/gin"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
@@ -39,9 +38,6 @@ func (uc *UserController) Create(ctx *gin.Context) {
 }
 
 func (uc *UserController) GetAll(ctx *gin.Context) {
-    uid, _ := ctx.Get("uid")
-    fmt.Println(*uid.(*string))
-
     users, err := uc.UserInteractor.GetAll()
     if err != nil {
         ctx.JSON(err.Code, err.Respons())
