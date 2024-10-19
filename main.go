@@ -1,8 +1,11 @@
 package main
 
 import (
+    "fmt"
+    "github.com/spf13/viper"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/router"
+    "net/http"
 )
 
 func main() {
@@ -15,6 +18,9 @@ func main() {
 	db := core.NewDatabase(log)
 
 	route := router.Router(db)
+	address := viper.GetString("API_SERVER_HOST") + ":" + viper.GetString("API_SERVER_PORT")
 
-	route.Run(":4200")
+	if err := http.ListenAndServe(address, route.Handler()); err != nil {
+		log.Error(fmt.Sprintf("[RUN] %s", err.Error()))
+	}
 }
