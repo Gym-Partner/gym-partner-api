@@ -4,7 +4,7 @@ variables:
     AWS_CLI_REGION: "us-east-1"
     ECR_URI: "public.ecr.aws/h4z0a5x7/gym-partner/gym-partner-api"
     DOCKER_IMAGE: "gym-partner/gym-partner-api"
-    TAG: "v1.0.0.2"
+    TAG: "v1.0.0.3"
     DOCKER_DRIVER: overlay2
     ARGOCD_APPLICATION_NAME: "gym-partner-api"
 
