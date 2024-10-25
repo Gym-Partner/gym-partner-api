@@ -8,6 +8,8 @@ DB_PORT: "5433"
 # Server
 # API_SERVER_HOST: "localhost"
 API_SERVER_PORT: "4200"
+API_FULLCHAIN: "/app/env/certs/fullchain.pem"
+API_PRIVKEY: "/app/env/certs/privkey.pem"
 
 # AWS
 AWS_REGION: "us-east-1"
