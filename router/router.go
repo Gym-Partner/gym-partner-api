@@ -2,7 +2,10 @@ package router
 
 import (
     "github.com/gin-gonic/gin"
+    swaggerFiles "github.com/swaggo/files"
+    ginSwagger "github.com/swaggo/gin-swagger"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
+    "gitlab.com/gym-partner1/api/gym-partner-api/docs"
     "gitlab.com/gym-partner1/api/gym-partner-api/interfaces/controller"
     "gitlab.com/gym-partner1/api/gym-partner-api/middleware"
 )
@@ -10,6 +13,7 @@ import (
 func Router(db *core.Database) *gin.Engine {
 	route := gin.Default()
     route.Use(middleware.InitMiddleware(db.Logger))
+    docs.SwaggerInfo.BasePath = "/api/v1"
 
     userController := controller.NewUserController(db)
 
@@ -30,6 +34,7 @@ func Router(db *core.Database) *gin.Engine {
             v1NoAuth.GET("/ping", userController.PING)
         }
     }
+    route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return route
 }

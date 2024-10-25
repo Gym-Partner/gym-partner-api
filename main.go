@@ -5,7 +5,6 @@ import (
     "github.com/spf13/viper"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/router"
-    "net/http"
 )
 
 func main() {
@@ -20,7 +19,11 @@ func main() {
 	route := router.Router(db)
 	address := viper.GetString("API_SERVER_HOST") + ":" + viper.GetString("API_SERVER_PORT")
 
-	if err := http.ListenAndServeTLS(address, viper.GetString("API_FULLCHAIN"), viper.GetString("API_PRIVKEY"), route.Handler()); err != nil {
+//	if err := http.ListenAndServeTLS(address, viper.GetString("API_FULLCHAIN"), viper.GetString("API_PRIVKEY"), route.Handler()); err != nil {
+//		log.Error(fmt.Sprintf("[RUN] %s", err.Error()))
+//	}
+
+	if err := route.RunTLS(address, viper.GetString("API_FULLCHAIN"), viper.GetString("API_PRIVKEY")); err != nil {
 		log.Error(fmt.Sprintf("[RUN] %s", err.Error()))
 	}
 }

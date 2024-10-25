@@ -27,6 +27,17 @@ func NewUserController(db *core.Database) *UserController {
 
 // ------------------------------ CRUD ------------------------------
 
+// @BasePath /api/v1
+
+// Create godoc
+// @Summary create exemple
+// @Schemes
+// @Description create user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 201 {string} Create
+// @Router /user/create [post]
 func (uc *UserController) Create(ctx *gin.Context) {
     user, err := uc.UserInteractor.Create(ctx)
     if err != nil {
