@@ -20,10 +20,10 @@ spec:
           image: public.ecr.aws/h4z0a5x7/gym-partner/gym-partner-api:v1.0.1.1
           resources:
             limits:
-                memory: "512Mi"
+                memory: "1Gi"
                 cpu: "500m"
             requests:
-                memory: "256Mi"
+                memory: "512Mi"
                 cpu: "250m"
           ports:
             - containerPort: 4200
