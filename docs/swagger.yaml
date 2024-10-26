@@ -1,0 +1,193 @@
+definitions:
+  core.Error:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+      occurredAt:
+        type: string
+      originalErr: {}
+    type: object
+  model.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.User:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /ping:
+    get:
+      description: Do ping for test connection with the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PONG
+          schema:
+            type: string
+      summary: Do ping
+      tags:
+      - PING
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Create new user in database and return the created user withour
+        the password
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully created
+          schema:
+            $ref: '#/definitions/model.User'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Create a new user
+      tags:
+      - User
+  /user/delete:
+    delete:
+      description: Delete one user and return nil
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: User successfully deleted
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Delete one user
+      tags:
+      - User
+  /user/getAll:
+    get:
+      description: Retreive all user in database and return this without password
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users successfully retrieves
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Retrieve all user
+      tags:
+      - User
+  /user/getOne:
+    get:
+      description: Retrieve one user with id in token and return this without password
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully retrieve
+          schema:
+            $ref: '#/definitions/model.User'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Retrieve one user
+      tags:
+      - User
+  /user/login:
+    post:
+      description: Sign in one user with this credentials and return user's token
+      parameters:
+      - description: User's credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User's token
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Sign in one user
+      tags:
+      - User
+  /user/update:
+    patch:
+      description: Update on user and return nil
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User data update
+        in: body
+        name: user_update
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      responses:
+        "200":
+          description: User successfully updated
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Update one user
+      tags:
+      - User
+swagger: "2.0"
