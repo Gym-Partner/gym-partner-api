@@ -9,7 +9,11 @@ type User struct {
 	UserName string `json:"username" gorm:"column:username"`
 	Email string `json:"email"`
 	Password string `json:"password"`
-	// Token string `json:"token"`
+}
+
+type Login struct {
+    Email string `json:"email"`
+	Password string `json:"password"`
 }
 
 type Users []User
