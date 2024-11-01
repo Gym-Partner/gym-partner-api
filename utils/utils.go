@@ -1,11 +1,14 @@
 package utils
 
 import (
-    "github.com/gin-gonic/gin"
+	"bytes"
+	"encoding/json"
+	"github.com/gin-gonic/gin"
     "gitlab.com/gym-partner1/api/gym-partner-api/core"
     "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
     "golang.org/x/crypto/bcrypt"
-    "reflect"
+	"io"
+	"reflect"
     "strings"
     "time"
     "unicode"
@@ -86,4 +89,13 @@ func IsEmptyValue(v reflect.Value) bool {
 	}
 
 	return false
+}
+
+func StructToReadCloser(data interface{}) (io.ReadCloser, error) {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return io.NopCloser(bytes.NewReader(jsonData)), nil
 }

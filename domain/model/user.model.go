@@ -1,6 +1,9 @@
 package model
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
 
 type User struct {
     Id string `json:"id"`
@@ -28,6 +31,15 @@ func (u *User) Respons() gin.H {
 			"email": u.Email,
 		},
 	}
+}
+
+func (u *User) GenerateTestStruct() {
+	u.Id = uuid.New().String()
+	u.FirstName = "Test"
+	u.LastName = "Test"
+	u.UserName = "test_test"
+	u.Email = "test@gmail.com"
+	u.Password = "aaaAAA111"
 }
 
 func (u *Users) Respons() gin.H {
