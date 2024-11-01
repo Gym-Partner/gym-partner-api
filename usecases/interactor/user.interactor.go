@@ -13,6 +13,12 @@ type UserInteractor struct {
     IUserRepository repository.IUserRepository
 }
 
+func MockUserInteractor(mock *core.Mock) *UserInteractor {
+    return &UserInteractor{
+        IUserRepository: mock,
+    }
+}
+
 // -------------------------- CRUD ------------------------------
 
 func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
