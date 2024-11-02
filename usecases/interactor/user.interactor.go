@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -12,11 +13,13 @@ import (
 
 type UserInteractor struct {
 	IUserRepository repository.IUserRepository
+	IUtils          utils.IUtils[model.User]
 }
 
-func MockUserInteractor(mock *core.Mock) *UserInteractor {
+func MockUserInteractor(mock *core.Mock[model.User]) *UserInteractor {
 	return &UserInteractor{
 		IUserRepository: mock,
+		IUtils:          mock,
 	}
 }
 
@@ -24,7 +27,7 @@ func MockUserInteractor(mock *core.Mock) *UserInteractor {
 
 func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 	aws, _ := ctx.Get("aws")
-	data, err := utils.InjectBodyInModel[model.User](ctx)
+	data, err := ui.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return model.User{}, err
 	}
@@ -34,6 +37,8 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 		return model.User{}, core.NewError(core.InternalErrCode, fmt.Sprintf(core.ErrIntUserExist, data.Email))
 	}
 
+	data.Id = uuid.New().String()
+	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
 
 	cognito, err := aws.(*core.AWS).NewCognito()
@@ -62,7 +67,7 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 }
 
 func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Error) {
-	data, err := utils.InjectBodyInModel[model.User](ctx)
+	data, err := ui.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return model.User{}, err
 	}
@@ -74,7 +79,7 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 
 func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
 	uid, _ := ctx.Get("uid")
-	patch, err := utils.InjectBodyInModel[model.User](ctx)
+	patch, err := ui.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return err
 	}
@@ -90,7 +95,7 @@ func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
 		return err
 	}
 
-	if err = utils.Bind(&target, patch); err != nil {
+	if err = ui.IUtils.Bind(&target, patch); err != nil {
 		return err
 	}
 

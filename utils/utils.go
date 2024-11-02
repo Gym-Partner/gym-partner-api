@@ -4,17 +4,25 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-    "gitlab.com/gym-partner1/api/gym-partner-api/core"
-    "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
-    "golang.org/x/crypto/bcrypt"
+	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+	"golang.org/x/crypto/bcrypt"
 	"io"
 	"reflect"
-    "strings"
-    "time"
-    "unicode"
+	"strings"
+	"time"
+	"unicode"
 )
 
-func HashPassword(password string) (string, *core.Error) {
+type IUtils[T model.User] interface {
+	HashPassword(password string) (string, *core.Error)
+	InjectBodyInModel(ctx *gin.Context) (T, *core.Error)
+	Bind(target, patch interface{}) *core.Error
+}
+
+type Utils[T model.User] struct{}
+
+func (u Utils[T]) HashPassword(password string) (string, *core.Error) {
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", core.NewError(500, "Error to hash password")
@@ -23,7 +31,7 @@ func HashPassword(password string) (string, *core.Error) {
 	return string(hasedPassword), nil
 }
 
-func InjectBodyInModel[T model.User](ctx *gin.Context) (T, *core.Error) {
+func (u Utils[T]) InjectBodyInModel(ctx *gin.Context) (T, *core.Error) {
 	var data T
 
 	if err := ctx.ShouldBind(&data); err != nil {
@@ -33,7 +41,7 @@ func InjectBodyInModel[T model.User](ctx *gin.Context) (T, *core.Error) {
 	return data, nil
 }
 
-func Bind(target, patch interface{}) *core.Error {
+func (u Utils[T]) Bind(target, patch interface{}) *core.Error {
 	patchValue := reflect.ValueOf(patch)
 	if patchValue.Kind() != reflect.Struct {
 		return core.NewError(500, "The patch was be always an struct")
@@ -91,7 +99,7 @@ func IsEmptyValue(v reflect.Value) bool {
 	return false
 }
 
-func StructToReadCloser(data interface{}) (io.ReadCloser, error) {
+func (u Utils[T]) StructToReadCloser(data interface{}) (io.ReadCloser, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil, err

@@ -38,13 +38,13 @@ const (
 )
 
 const (
-	TestCreateSuccess = "[TEST] CREATE_SUCCESS"
-	TestGetAllSuccess = "[TEST] GET_ALL_SUCCESS"
-	TestGetOneSuccess = "[TEST] GET_ONE_SUCCESS"
-	TestUdateSuccess  = "[TEST] UPDATE_SUCCESS"
-	TestDeleteSuccess = "[TEST] DELETE_SUCCESS"
+	TestCreateSuccess = "[TEST]CREATE_SUCCESS"
+	TestGetAllSuccess = "[TEST]GET_ALL_SUCCESS"
+	TestGetOneSuccess = "[TEST]GET_ONE_SUCCESS"
+	TestUdateSuccess  = "[TEST]UPDATE_SUCCESS"
+	TestDeleteSuccess = "[TEST]DELETE_SUCCESS"
 
-	TestUserExistFailed     = "[TEST] USER_EXIST_FAILED"
-	TestUserNotExistFailed  = "[TEST] USER_NOT_EXIST_FAILED"
-	TestInternalErrorFailed = "[TEST] INTERNAL_ERROR_FAILED"
+	TestUserExistFailed     = "[TEST]USER_EXIST_FAILED"
+	TestUserNotExistFailed  = "[TEST]USER_NOT_EXIST_FAILED"
+	TestInternalErrorFailed = "[TEST]INTERNAL_ERROR_FAILED"
 )
