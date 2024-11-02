@@ -1,11 +1,12 @@
 package core
 
 import (
-    "fmt"
-    "github.com/spf13/viper"
-    "log"
-    "os"
-    "strings"
+	"fmt"
+	"log"
+	"os"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type Env struct {
@@ -19,12 +20,12 @@ func NewEnv() *Env {
 func (e *Env) LoadEnv() {
 	start, err := parseStartArgument()
 	if err != nil {
-		log.Println("Error while parsing START argument :", err.Error())
+		log.Println(ErrEnvParseStart, err.Error())
 		return
 	}
 
 	if err := loadConfigFile(*start); err != nil {
-		log.Println("Error while loading config file :", err.Error())
+		log.Println(ErrEnvLoad, err.Error())
 		return
 	}
 
@@ -50,7 +51,7 @@ func parseStartArgument() (*string, error) {
 			return &start, nil
 		}
 	}
-	return nil, fmt.Errorf("no START parameter provided")
+	return nil, fmt.Errorf(ErrEnvNoStart)
 }
 func loadConfigFile(start string) error {
 	viper.AutomaticEnv()
@@ -59,7 +60,7 @@ func loadConfigFile(start string) error {
 	viper.AddConfigPath(start)
 
 	if err := viper.ReadInConfig(); err != nil {
-		return fmt.Errorf("no config file found at: %s/config.yml", start)
+		return fmt.Errorf(ErrEnvNoConfigFile, start)
 	}
 
 	return nil

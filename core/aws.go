@@ -1,23 +1,24 @@
 package core
 
 import (
-    "github.com/aws/aws-sdk-go/aws"
-    "github.com/aws/aws-sdk-go/aws/session"
-    "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
-    "github.com/spf13/viper"
-    "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
-    "strings"
+	"strings"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/spf13/viper"
+	"gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
 )
 
 type AWS struct {
 	Cognito *CognitoService
-	Log *Log
+	Log     *Log
 }
 
 type CognitoService struct {
-	CognitoProvider *cognitoidentityprovider.CognitoIdentityProvider
+	CognitoProvider    *cognitoidentityprovider.CognitoIdentityProvider
 	CognitoAppIdClient string
-	Log *Log
+	Log                *Log
 }
 
 func NewAWS(log *Log) *AWS {
@@ -32,30 +33,30 @@ func (a *AWS) NewCognito() (*CognitoService, *Error) {
 	}
 	sess, err := session.NewSession(config)
 	if err != nil {
-		return nil, NewError(500, "Error create new session to AWS Cognito", err)
+		return nil, NewError(InternalErrCode, ErrAWSCognitoCreateSession, err)
 	}
 
 	client := cognitoidentityprovider.New(sess)
 
 	return &CognitoService{
-		CognitoProvider: client,
+		CognitoProvider:    client,
 		CognitoAppIdClient: viper.GetString("APP_CLIENT_ID"),
-		Log: a.Log,
+		Log:                a.Log,
 	}, nil
 }
 
 func (cs *CognitoService) SignUp(user model.User) *Error {
 	userCognito := &cognitoidentityprovider.SignUpInput{
-		ClientId:aws.String(cs.CognitoAppIdClient),
+		ClientId: aws.String(cs.CognitoAppIdClient),
 		Username: aws.String(user.Id),
 		Password: aws.String(strings.TrimSpace(user.Password)),
 		UserAttributes: []*cognitoidentityprovider.AttributeType{
 			{
-				Name: aws.String("name"),
+				Name:  aws.String("name"),
 				Value: aws.String(user.UserName),
 			},
 			{
-				Name: aws.String("email"),
+				Name:  aws.String("email"),
 				Value: aws.String(user.Email),
 			},
 		},
@@ -63,8 +64,8 @@ func (cs *CognitoService) SignUp(user model.User) *Error {
 
 	_, err := cs.CognitoProvider.SignUp(userCognito)
 	if err != nil {
-		cs.Log.Error("Erro to create user in AWS Cognito")
-		return NewError(500, "Error to create user in AWS Cognito", err)
+		cs.Log.Error(ErrAWSCognitoCreateUser)
+		return NewError(InternalErrCode, ErrAWSCognitoCreateUser, err)
 	}
 
 	return nil
@@ -82,8 +83,8 @@ func (cs *CognitoService) SignIn(user model.User) (string, *Error) {
 
 	result, err := cs.CognitoProvider.InitiateAuth(authInput)
 	if err != nil {
-		cs.Log.Error("Failed to auth user to AWS Cognito")
-		return "", NewError(500, "Failed to auth user to AWS Cognito", err)
+		cs.Log.Error(ErrAWSCognitoAuthUser)
+		return "", NewError(InternalErrCode, ErrAWSCognitoAuthUser, err)
 	}
 
 	return *result.AuthenticationResult.AccessToken, nil
@@ -96,8 +97,8 @@ func (cs *CognitoService) GetUserByToken(token string) (*string, *Error) {
 
 	result, err := cs.CognitoProvider.GetUser(input)
 	if err != nil {
-		cs.Log.Error("Failed to recover the User by his token")
-		return nil, NewError(500, "Failed to recover the User by his token", err)
+		cs.Log.Error(ErrAWSCognitoGetUserByToken)
+		return nil, NewError(InternalErrCode, ErrAWSCognitoGetUserByToken, err)
 	}
 
 	return result.Username, nil
@@ -110,8 +111,8 @@ func (cs *CognitoService) DeleteUser(token string) *Error {
 
 	_, err := cs.CognitoProvider.DeleteUser(input)
 	if err != nil {
-		cs.Log.Error("Failed to delete User")
-		return NewError(500, "Failed to delete User", err)
+		cs.Log.Error(ErrAWSCognitoDeleteUser)
+		return NewError(InternalErrCode, ErrAWSCognitoDeleteUser, err)
 	}
 
 	return nil
