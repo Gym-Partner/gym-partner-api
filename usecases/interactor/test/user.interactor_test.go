@@ -1,6 +1,7 @@
 package test
 
 import (
+	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 	"net/http"
 	"testing"
 
@@ -10,38 +11,33 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
-	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
 
 func TestUserInteractor_INSERT(t *testing.T) {
 	var user model.User
 	user.GenerateTestStruct()
 
-	buf, _ := utils.StructToReadCloser(user)
-	context := &gin.Context{
-		Request: &http.Request{
-			Body: buf,
-		},
-	}
-
 	setupTest := []struct {
 		name        string
-		setupMock   func(mock *core.Mock[model.User])
+		setupMock   func(mock *core.Mock[model.User], ctx *gin.Context)
 		expectedRes *model.User
 		expectedErr *core.Error
 	}{
 		{
 			name: core.TestCreateSuccess,
-			setupMock: func(mock *core.Mock[model.User]) {
+			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
+				mock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				mock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
-				mock.On("Create", user).Return(user, nil).Once()
+				mock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
+				mock.On("Create", user).Return(user, (*core.Error)(nil)).Once()
 			},
 			expectedRes: &user,
 			expectedErr: nil,
 		},
 		{
 			name: core.TestUserExistFailed,
-			setupMock: func(mock *core.Mock[model.User]) {
+			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
+				mock.On("InjectBodyInModel", ctx).Return(user, nil).Once()
 				mock.On("IsExist", user.Email, "EMAIL").Return(true).Once()
 			},
 			expectedRes: &model.User{},
@@ -49,8 +45,10 @@ func TestUserInteractor_INSERT(t *testing.T) {
 		},
 		{
 			name: core.TestInternalErrorFailed,
-			setupMock: func(mock *core.Mock[model.User]) {
+			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
+				mock.On("InjectBodyInModel", ctx).Return(user, nil).Once()
 				mock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
+				mock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
 				mock.On("Create", user).Return(nil, core.NewError(core.InternalErrCode, core.ErrDBCreateUser)).Once()
 			},
 			expectedRes: &model.User{},
@@ -63,7 +61,14 @@ func TestUserInteractor_INSERT(t *testing.T) {
 			UserMock := new(core.Mock[model.User])
 			ui := interactor.MockUserInteractor(UserMock)
 
-			value.setupMock(UserMock)
+			buf, _ := utils.StructToReadCloser(user)
+			context := &gin.Context{
+				Request: &http.Request{
+					Body: buf,
+				},
+			}
+
+			value.setupMock(UserMock, context)
 
 			result, err := ui.Create(context)
 

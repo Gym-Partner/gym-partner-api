@@ -11,13 +11,13 @@ type Mock[T model.User] struct {
 }
 
 func (m *Mock[T]) HashPassword(password string) (string, *Error) {
-    //TODO implement me
-    panic("implement me")
+    args := m.Called(password)
+    return args.Get(0).(string), args.Error(1).(*Error)
 }
 
 func (m *Mock[T]) InjectBodyInModel(ctx *gin.Context) (T, *Error) {
-    //TODO implement me
-    panic("implement me")
+    args := m.Called(ctx)
+    return args.Get(0).(T), args.Error(1).(*Error)
 }
 
 func (m *Mock[T]) Bind(target, patch interface{}) *Error {

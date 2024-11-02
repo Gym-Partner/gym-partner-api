@@ -99,7 +99,7 @@ func IsEmptyValue(v reflect.Value) bool {
 	return false
 }
 
-func (u Utils[T]) StructToReadCloser(data interface{}) (io.ReadCloser, error) {
+func StructToReadCloser(data interface{}) (io.ReadCloser, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
