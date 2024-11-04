@@ -64,3 +64,10 @@ func (db *Database) DatabasePing() error {
 	db.Logger.Info(InfoPingDatabase)
 	return nil
 }
+
+func (db *Database) ModelMigrate(model ...interface{}) error {
+	if err := db.Handler.AutoMigrate(model...); err != nil {
+		return err
+	}
+	return nil
+}

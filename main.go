@@ -1,10 +1,11 @@
 package main
 
 import (
-    "fmt"
-    "github.com/spf13/viper"
-    "gitlab.com/gym-partner1/api/gym-partner-api/core"
-    "gitlab.com/gym-partner1/api/gym-partner-api/router"
+	"fmt"
+	"github.com/spf13/viper"
+	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
+	"gitlab.com/gym-partner1/api/gym-partner-api/router"
 )
 
 func main() {
@@ -15,15 +16,16 @@ func main() {
 	log.ChargeLog()
 
 	db := core.NewDatabase(log)
+	if err := db.ModelMigrate(model.User{}); err != nil {
+		log.Error(fmt.Sprintf(core.ErrMigrateModel, err.Error()))
+		return
+	}
 
 	route := router.Router(db)
 	address := viper.GetString("API_SERVER_HOST") + ":" + viper.GetString("API_SERVER_PORT")
 
-//	if err := http.ListenAndServeTLS(address, viper.GetString("API_FULLCHAIN"), viper.GetString("API_PRIVKEY"), route.Handler()); err != nil {
-//		log.Error(fmt.Sprintf("[RUN] %s", err.Error()))
-//	}
-
 	if err := route.RunTLS(address, viper.GetString("API_FULLCHAIN"), viper.GetString("API_PRIVKEY")); err != nil {
 		log.Error(fmt.Sprintf("[RUN] %s", err.Error()))
+		return
 	}
 }

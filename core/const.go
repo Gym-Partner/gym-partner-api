@@ -1,10 +1,6 @@
 package core
 
 const (
-	InternalErrCode = 500
-)
-
-const (
 	ErrDBUserNotFound = "[USER][REPOSITORY] User not found in database"
 	ErrDBCreateUser   = "[USER][REPOSITORY] Failed to create user in database"
 	ErrDBGetAllUser   = "[USER][REPOSITORY] Failed to recover all users"
@@ -26,6 +22,7 @@ const (
 
 	ErrConnectDatabase = "[DB CONNECT][PostgreSQL] "
 	ErrPingDatabase    = "[DB PING][PostgreSQL] "
+	ErrMigrateModel    = "[DB][Postgres] %s"
 
 	ErrEnvParseStart   = "[ENV] Error while parsing START argument: "
 	ErrEnvLoad         = "[ENV] Error while loading config file: "

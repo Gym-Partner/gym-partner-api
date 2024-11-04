@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
-	"gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"reflect"
@@ -18,9 +19,14 @@ type IUtils[T model.User] interface {
 	HashPassword(password string) (string, *core.Error)
 	InjectBodyInModel(ctx *gin.Context) (T, *core.Error)
 	Bind(target, patch interface{}) *core.Error
+	GenerateUUID() string
 }
 
 type Utils[T model.User] struct{}
+
+func (u Utils[T]) GenerateUUID() string {
+	return uuid.New().String()
+}
 
 func (u Utils[T]) HashPassword(password string) (string, *core.Error) {
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

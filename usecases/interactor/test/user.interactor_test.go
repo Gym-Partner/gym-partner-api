@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
-	"gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
 func TestUserInteractor_INSERT(t *testing.T) {
@@ -28,8 +28,11 @@ func TestUserInteractor_INSERT(t *testing.T) {
 			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
 				mock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				mock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
+				mock.On("GenerateUUID").Return(user.Id).Once()
 				mock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
 				mock.On("Create", user).Return(user, (*core.Error)(nil)).Once()
+				mock.On("NewCognito").Return(&core.CognitoService{}, (*core.Error)(nil)).Once()
+				mock.On("SignUp", user).Return((*core.Error)(nil)).Once()
 			},
 			expectedRes: &user,
 			expectedErr: nil,
@@ -37,22 +40,22 @@ func TestUserInteractor_INSERT(t *testing.T) {
 		{
 			name: core.TestUserExistFailed,
 			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
-				mock.On("InjectBodyInModel", ctx).Return(user, nil).Once()
+				mock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				mock.On("IsExist", user.Email, "EMAIL").Return(true).Once()
 			},
 			expectedRes: &model.User{},
-			expectedErr: core.NewError(core.InternalErrCode, core.ErrDBUserExist),
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBUserExist),
 		},
 		{
 			name: core.TestInternalErrorFailed,
 			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
-				mock.On("InjectBodyInModel", ctx).Return(user, nil).Once()
+				mock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				mock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
 				mock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
-				mock.On("Create", user).Return(nil, core.NewError(core.InternalErrCode, core.ErrDBCreateUser)).Once()
+				mock.On("Create", user).Return(nil, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser)).Once()
 			},
 			expectedRes: &model.User{},
-			expectedErr: core.NewError(core.InternalErrCode, core.ErrDBCreateUser),
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser),
 		},
 	}
 
@@ -67,6 +70,7 @@ func TestUserInteractor_INSERT(t *testing.T) {
 					Body: buf,
 				},
 			}
+			context.Set("aws", &core.AWS{})
 
 			value.setupMock(UserMock, context)
 

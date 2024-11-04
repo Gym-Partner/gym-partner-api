@@ -2,11 +2,11 @@ package interactor
 
 import (
 	"fmt"
-	"github.com/google/uuid"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
-	"gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
@@ -14,12 +14,14 @@ import (
 type UserInteractor struct {
 	IUserRepository repository.IUserRepository
 	IUtils          utils.IUtils[model.User]
+	IAWS            core.IAWS
 }
 
 func MockUserInteractor(mock *core.Mock[model.User]) *UserInteractor {
 	return &UserInteractor{
 		IUserRepository: mock,
 		IUtils:          mock,
+		IAWS:            mock,
 	}
 }
 
@@ -34,21 +36,21 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
 	exist := ui.IUserRepository.IsExist(data.Email, "EMAIL")
 	if exist {
-		return model.User{}, core.NewError(core.InternalErrCode, fmt.Sprintf(core.ErrIntUserExist, data.Email))
+		return model.User{}, core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserExist, data.Email))
 	}
 
-	data.Id = uuid.New().String()
+	data.Id = ui.IUtils.GenerateUUID()
 	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
 
 	cognito, err := aws.(*core.AWS).NewCognito()
 	if err != nil {
-		return user, core.NewError(core.InternalErrCode, core.ErrIntInitAWS, err)
+		return user, core.NewError(http.StatusInternalServerError, core.ErrIntInitAWS, err)
 	}
 
 	data.Id = user.Id
 	if err = cognito.SignUp(data); err != nil {
-		return user, core.NewError(core.InternalErrCode, core.ErrIntCreateUserAWS, err)
+		return user, core.NewError(http.StatusBadRequest, core.ErrIntCreateUserAWS, err)
 	}
 
 	return user, err
@@ -87,7 +89,7 @@ func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
 
 	exist := ui.IUserRepository.IsExist(patch.Id, "ID")
 	if !exist {
-		return core.NewError(core.InternalErrCode, fmt.Sprintf(core.ErrIntUserNotExist, patch.Id))
+		return core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, patch.Id))
 	}
 
 	target, err := ui.IUserRepository.GetOneById(patch.Id)
@@ -114,7 +116,7 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
 
 	exist := ui.IUserRepository.IsExist(*uid.(*string), "ID")
 	if !exist {
-		return core.NewError(core.InternalErrCode, fmt.Sprintf(core.ErrIntUserNotExist, uid))
+		return core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, uid))
 	}
 
 	if err = ui.IUserRepository.Delete(*uid.(*string)); err != nil {

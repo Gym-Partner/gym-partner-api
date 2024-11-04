@@ -1,14 +1,20 @@
 package core
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"github.com/spf13/viper"
-	"gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
+
+type IAWS interface {
+	NewCognito() (*CognitoService, *Error)
+	SignUp(user model.User) *Error
+}
 
 type AWS struct {
 	Cognito *CognitoService
@@ -33,7 +39,7 @@ func (a *AWS) NewCognito() (*CognitoService, *Error) {
 	}
 	sess, err := session.NewSession(config)
 	if err != nil {
-		return nil, NewError(InternalErrCode, ErrAWSCognitoCreateSession, err)
+		return nil, NewError(http.StatusInternalServerError, ErrAWSCognitoCreateSession, err)
 	}
 
 	client := cognitoidentityprovider.New(sess)
@@ -65,7 +71,7 @@ func (cs *CognitoService) SignUp(user model.User) *Error {
 	_, err := cs.CognitoProvider.SignUp(userCognito)
 	if err != nil {
 		cs.Log.Error(ErrAWSCognitoCreateUser)
-		return NewError(InternalErrCode, ErrAWSCognitoCreateUser, err)
+		return NewError(http.StatusBadRequest, ErrAWSCognitoCreateUser, err)
 	}
 
 	return nil
@@ -84,7 +90,7 @@ func (cs *CognitoService) SignIn(user model.User) (string, *Error) {
 	result, err := cs.CognitoProvider.InitiateAuth(authInput)
 	if err != nil {
 		cs.Log.Error(ErrAWSCognitoAuthUser)
-		return "", NewError(InternalErrCode, ErrAWSCognitoAuthUser, err)
+		return "", NewError(http.StatusBadRequest, ErrAWSCognitoAuthUser, err)
 	}
 
 	return *result.AuthenticationResult.AccessToken, nil
@@ -98,7 +104,7 @@ func (cs *CognitoService) GetUserByToken(token string) (*string, *Error) {
 	result, err := cs.CognitoProvider.GetUser(input)
 	if err != nil {
 		cs.Log.Error(ErrAWSCognitoGetUserByToken)
-		return nil, NewError(InternalErrCode, ErrAWSCognitoGetUserByToken, err)
+		return nil, NewError(http.StatusBadRequest, ErrAWSCognitoGetUserByToken, err)
 	}
 
 	return result.Username, nil
@@ -112,7 +118,7 @@ func (cs *CognitoService) DeleteUser(token string) *Error {
 	_, err := cs.CognitoProvider.DeleteUser(input)
 	if err != nil {
 		cs.Log.Error(ErrAWSCognitoDeleteUser)
-		return NewError(InternalErrCode, ErrAWSCognitoDeleteUser, err)
+		return NewError(http.StatusBadRequest, ErrAWSCognitoDeleteUser, err)
 	}
 
 	return nil

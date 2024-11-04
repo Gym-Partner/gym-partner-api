@@ -3,11 +3,26 @@ package core
 import (
     "github.com/gin-gonic/gin"
     "github.com/stretchr/testify/mock"
-    "gitlab.com/gym-partner1/api/gym-partner-api/domain/model"
+    "gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
 type Mock[T model.User] struct {
     mock.Mock
+}
+
+func (m *Mock[T]) GenerateUUID() string {
+    args := m.Called()
+    return args.Get(0).(string)
+}
+
+func (m *Mock[T]) NewCognito() (*CognitoService, *Error) {
+    args := m.Called()
+    return args.Get(0).(*CognitoService), args.Error(1).(*Error)
+}
+
+func (m *Mock[T]) SignUp(user model.User) *Error {
+    args := m.Called(user)
+    return args.Error(0).(*Error)
 }
 
 func (m *Mock[T]) HashPassword(password string) (string, *Error) {
@@ -21,8 +36,8 @@ func (m *Mock[T]) InjectBodyInModel(ctx *gin.Context) (T, *Error) {
 }
 
 func (m *Mock[T]) Bind(target, patch interface{}) *Error {
-    //TODO implement me
-    panic("implement me")
+    args := m.Called(&target, patch)
+    return args.Error(0).(*Error)
 }
 
 func (m *Mock[T]) IsExist(data, OPT string) bool {
