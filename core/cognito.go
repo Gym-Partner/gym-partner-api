@@ -11,49 +11,41 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
-type IAWS interface {
-	NewCognito() (*CognitoService, *Error)
+type ICognito interface {
 	SignUp(user model.User) *Error
+	SignIn(user model.User) (string, *Error)
+	GetUserByToken(token string) (*string, *Error)
+	DeleteUser(token string) *Error
 }
 
-type AWS struct {
-	Cognito *CognitoService
-	Log     *Log
-}
-
-type CognitoService struct {
+type Cognito struct {
 	CognitoProvider    *cognitoidentityprovider.CognitoIdentityProvider
 	CognitoAppIdClient string
 	Log                *Log
 }
 
-func NewAWS(log *Log) *AWS {
-	return &AWS{
-		Log: log,
-	}
-}
-
-func (a *AWS) NewCognito() (*CognitoService, *Error) {
+func NewCognito(log *Log) *Cognito {
 	config := &aws.Config{
 		Region: aws.String(viper.GetString("AWS_REGION")),
 	}
 	sess, err := session.NewSession(config)
 	if err != nil {
-		return nil, NewError(http.StatusInternalServerError, ErrAWSCognitoCreateSession, err)
+		log.Error(ErrAWSCognitoCreateSession)
+		return nil
 	}
 
 	client := cognitoidentityprovider.New(sess)
 
-	return &CognitoService{
+	return &Cognito{
 		CognitoProvider:    client,
 		CognitoAppIdClient: viper.GetString("APP_CLIENT_ID"),
-		Log:                a.Log,
-	}, nil
+		Log:                log,
+	}
 }
 
-func (cs *CognitoService) SignUp(user model.User) *Error {
+func (c *Cognito) SignUp(user model.User) *Error {
 	userCognito := &cognitoidentityprovider.SignUpInput{
-		ClientId: aws.String(cs.CognitoAppIdClient),
+		ClientId: aws.String(c.CognitoAppIdClient),
 		Username: aws.String(user.Id),
 		Password: aws.String(strings.TrimSpace(user.Password)),
 		UserAttributes: []*cognitoidentityprovider.AttributeType{
@@ -68,56 +60,56 @@ func (cs *CognitoService) SignUp(user model.User) *Error {
 		},
 	}
 
-	_, err := cs.CognitoProvider.SignUp(userCognito)
+	_, err := c.CognitoProvider.SignUp(userCognito)
 	if err != nil {
-		cs.Log.Error(ErrAWSCognitoCreateUser)
+		c.Log.Error(ErrAWSCognitoCreateUser)
 		return NewError(http.StatusBadRequest, ErrAWSCognitoCreateUser, err)
 	}
 
 	return nil
 }
 
-func (cs *CognitoService) SignIn(user model.User) (string, *Error) {
+func (c *Cognito) SignIn(user model.User) (string, *Error) {
 	authInput := &cognitoidentityprovider.InitiateAuthInput{
 		AuthFlow: aws.String("USER_PASSWORD_AUTH"),
 		AuthParameters: aws.StringMap(map[string]string{
 			"USERNAME": user.Id,
 			"PASSWORD": user.Password,
 		}),
-		ClientId: aws.String(cs.CognitoAppIdClient),
+		ClientId: aws.String(c.CognitoAppIdClient),
 	}
 
-	result, err := cs.CognitoProvider.InitiateAuth(authInput)
+	result, err := c.CognitoProvider.InitiateAuth(authInput)
 	if err != nil {
-		cs.Log.Error(ErrAWSCognitoAuthUser)
+		c.Log.Error(ErrAWSCognitoAuthUser)
 		return "", NewError(http.StatusBadRequest, ErrAWSCognitoAuthUser, err)
 	}
 
 	return *result.AuthenticationResult.AccessToken, nil
 }
 
-func (cs *CognitoService) GetUserByToken(token string) (*string, *Error) {
+func (c *Cognito) GetUserByToken(token string) (*string, *Error) {
 	input := &cognitoidentityprovider.GetUserInput{
 		AccessToken: aws.String(token),
 	}
 
-	result, err := cs.CognitoProvider.GetUser(input)
+	result, err := c.CognitoProvider.GetUser(input)
 	if err != nil {
-		cs.Log.Error(ErrAWSCognitoGetUserByToken)
+		c.Log.Error(ErrAWSCognitoGetUserByToken)
 		return nil, NewError(http.StatusBadRequest, ErrAWSCognitoGetUserByToken, err)
 	}
 
 	return result.Username, nil
 }
 
-func (cs *CognitoService) DeleteUser(token string) *Error {
+func (c *Cognito) DeleteUser(token string) *Error {
 	input := &cognitoidentityprovider.DeleteUserInput{
 		AccessToken: aws.String(token),
 	}
 
-	_, err := cs.CognitoProvider.DeleteUser(input)
+	_, err := c.CognitoProvider.DeleteUser(input)
 	if err != nil {
-		cs.Log.Error(ErrAWSCognitoDeleteUser)
+		c.Log.Error(ErrAWSCognitoDeleteUser)
 		return NewError(http.StatusBadRequest, ErrAWSCognitoDeleteUser, err)
 	}
 

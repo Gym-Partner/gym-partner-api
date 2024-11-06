@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"

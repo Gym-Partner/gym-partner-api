@@ -1,9 +1,12 @@
 package test
 
 import (
-	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 	"net/http"
 	"testing"
+
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
+
+	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
@@ -19,50 +22,52 @@ func TestUserInteractor_INSERT(t *testing.T) {
 
 	setupTest := []struct {
 		name        string
-		setupMock   func(mock *core.Mock[model.User], ctx *gin.Context)
-		expectedRes *model.User
+		setupMock   func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context)
+		expectedRes model.User
 		expectedErr *core.Error
 	}{
 		{
 			name: core.TestCreateSuccess,
-			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
-				mock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
-				mock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
-				mock.On("GenerateUUID").Return(user.Id).Once()
-				mock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
-				mock.On("Create", user).Return(user, (*core.Error)(nil)).Once()
-				mock.On("NewCognito").Return(&core.CognitoService{}, (*core.Error)(nil)).Once()
-				mock.On("SignUp", user).Return((*core.Error)(nil)).Once()
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context) {
+				utilsMock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
+				userMock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
+				utilsMock.On("GenerateUUID").Return(user.Id).Once()
+				utilsMock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil)).Once()
+				userMock.On("Create", user).Return(user, (*core.Error)(nil)).Once()
+				cognitoMock.On("SignUp", user).Return((*core.Error)(nil)).Once()
 			},
-			expectedRes: &user,
+			expectedRes: user,
 			expectedErr: nil,
 		},
 		{
 			name: core.TestUserExistFailed,
-			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
-				mock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
-				mock.On("IsExist", user.Email, "EMAIL").Return(true).Once()
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context) {
+				utilsMock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
+				userMock.On("IsExist", user.Email, "EMAIL").Return(true).Once()
 			},
-			expectedRes: &model.User{},
+			expectedRes: model.User{},
 			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBUserExist),
 		},
 		{
 			name: core.TestInternalErrorFailed,
-			setupMock: func(mock *core.Mock[model.User], ctx *gin.Context) {
-				mock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
-				mock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
-				mock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
-				mock.On("Create", user).Return(nil, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser)).Once()
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context) {
+				utilsMock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
+				userMock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
+				utilsMock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
+				userMock.On("Create", user).Return(nil, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser)).Once()
 			},
-			expectedRes: &model.User{},
+			expectedRes: model.User{},
 			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser),
 		},
 	}
 
 	for _, value := range setupTest {
 		t.Run(value.name, func(t *testing.T) {
-			UserMock := new(core.Mock[model.User])
-			ui := interactor.MockUserInteractor(UserMock)
+			UserMock := new(mock.UserMock)
+			UtilsMock := new(mock.UtilsMock[model.User])
+			CognitoMock := new(mock.CognitoMock)
+
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
 
 			buf, _ := utils.StructToReadCloser(user)
 			context := &gin.Context{
@@ -70,9 +75,8 @@ func TestUserInteractor_INSERT(t *testing.T) {
 					Body: buf,
 				},
 			}
-			context.Set("aws", &core.AWS{})
 
-			value.setupMock(UserMock, context)
+			value.setupMock(UserMock, UtilsMock, CognitoMock, context)
 
 			result, err := ui.Create(context)
 

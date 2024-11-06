@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
@@ -14,21 +15,20 @@ import (
 type UserInteractor struct {
 	IUserRepository repository.IUserRepository
 	IUtils          utils.IUtils[model.User]
-	IAWS            core.IAWS
+	ICognito        core.ICognito
 }
 
-func MockUserInteractor(mock *core.Mock[model.User]) *UserInteractor {
+func MockUserInteractor(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock) *UserInteractor {
 	return &UserInteractor{
-		IUserRepository: mock,
-		IUtils:          mock,
-		IAWS:            mock,
+		IUserRepository: userMock,
+		IUtils:          utilsMock,
+		ICognito:        cognitoMock,
 	}
 }
 
 // -------------------------- CRUD ------------------------------
 
 func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
-	aws, _ := ctx.Get("aws")
 	data, err := ui.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return model.User{}, err
@@ -42,14 +42,12 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 	data.Id = ui.IUtils.GenerateUUID()
 	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
-
-	cognito, err := aws.(*core.AWS).NewCognito()
 	if err != nil {
-		return user, core.NewError(http.StatusInternalServerError, core.ErrIntInitAWS, err)
+		return user, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser, err)
 	}
 
 	data.Id = user.Id
-	if err = cognito.SignUp(data); err != nil {
+	if err = ui.ICognito.SignUp(data); err != nil {
 		return user, core.NewError(http.StatusBadRequest, core.ErrIntCreateUserAWS, err)
 	}
 
@@ -108,22 +106,17 @@ func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
 func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
 	token, _ := ctx.Get("token")
 	uid, _ := ctx.Get("uid")
-	aws, _ := ctx.Get("aws")
-	cognito, err := aws.(*core.AWS).NewCognito()
-	if err != nil {
-		return err
-	}
 
 	exist := ui.IUserRepository.IsExist(*uid.(*string), "ID")
 	if !exist {
 		return core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, uid))
 	}
 
-	if err = ui.IUserRepository.Delete(*uid.(*string)); err != nil {
+	if err := ui.IUserRepository.Delete(*uid.(*string)); err != nil {
 		return err
 	}
 
-	if err = cognito.DeleteUser(token.(string)); err != nil {
+	if err := ui.ICognito.DeleteUser(token.(string)); err != nil {
 		return err
 	}
 
@@ -131,13 +124,7 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
 }
 
 func (ui *UserInteractor) Login(ctx *gin.Context, user model.User) (string, *core.Error) {
-	aws, _ := ctx.Get("aws")
-	cognito, err := aws.(*core.AWS).NewCognito()
-	if err != nil {
-		return "", err
-	}
-
-	token, err := cognito.SignIn(user)
+	token, err := ui.ICognito.SignIn(user)
 	if err != nil {
 		return "", err
 	}
