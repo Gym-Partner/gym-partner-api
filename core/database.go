@@ -1,21 +1,22 @@
 package core
 
 import (
-    "fmt"
-    "github.com/spf13/viper"
-    "gorm.io/driver/postgres"
-    "gorm.io/gorm"
+	"fmt"
+
+	"github.com/spf13/viper"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type IDatabase interface {
-    DatabaseConnect() error
+	DatabaseConnect() error
 	DatabasePing() error
 	DatabaseDisconnect() error
 }
 
 type Database struct {
-    Handler *gorm.DB
-	Logger *Log
+	Handler *gorm.DB
+	Logger  *Log
 }
 
 func NewDatabase(logger *Log) *Database {
@@ -24,11 +25,11 @@ func NewDatabase(logger *Log) *Database {
 	}
 
 	if err := db.DatabaseConnect(); err != nil {
-		db.Logger.Error("[DB CONNECT][PostgreSQL] " + err.Error())
+		db.Logger.Error(ErrConnectDatabase + err.Error())
 	}
 
 	if err := db.DatabasePing(); err != nil {
-		db.Logger.Error("[DB PING][PostgreSQL] " + err.Error())
+		db.Logger.Error(ErrPingDatabase + err.Error())
 	}
 
 	return db
@@ -60,6 +61,13 @@ func (db *Database) DatabasePing() error {
 		return err
 	}
 
-	db.Logger.Info("[DB PING][PostgreSQL] Connected to the Database")
+	db.Logger.Info(InfoPingDatabase)
+	return nil
+}
+
+func (db *Database) ModelMigrate(model ...interface{}) error {
+	if err := db.Handler.AutoMigrate(model...); err != nil {
+		return err
+	}
 	return nil
 }

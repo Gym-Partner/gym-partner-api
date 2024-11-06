@@ -284,22 +284,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "test@test.com"
                 },
                 "first_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "test"
                 },
                 "last_name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "test"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "aaaAAA111"
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "test_test"
                 }
             }
         }
