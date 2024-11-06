@@ -17,7 +17,7 @@ func main() {
 	log.ChargeLog()
 
 	db := core.NewDatabase(log)
-	if err := db.ModelMigrate(model.User{}); err != nil {
+	if err := db.ModelMigrate(model.User{}, model.Workout{}, model.UnityOfWorkout{}, model.Exercice{}, model.Serie{}); err != nil {
 		log.Error(fmt.Sprintf(core.ErrMigrateModel, err.Error()))
 		return
 	}
@@ -25,8 +25,7 @@ func main() {
 	route := router.Router(db)
 	address := viper.GetString("API_SERVER_HOST") + ":" + viper.GetString("API_SERVER_PORT")
 
-	if err := route.RunTLS(address, viper.GetString("API_FULLCHAIN"), viper.GetString("API_PRIVKEY")); err != nil {
+	if err := route.Run(address); err != nil {
 		log.Error(fmt.Sprintf("[RUN] %s", err.Error()))
-		return
 	}
 }
