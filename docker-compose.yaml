@@ -1,7 +1,22 @@
 version: '3'
 services:
-    gyp-partner-api:
+    gym-partner-api:
         build:
             context: .
         ports:
             - "4200:4200"
+        volumes:
+            - ~/Documents/gym-partner-docker-volume/api:/app/env/logs
+        depends_on:
+            - postgresql-db
+
+    postgresql-db:
+        image: postgres:14-alpine
+        ports:
+            - "5432:5432"
+        volumes:
+            - ~/Documents/gym-partner-docker-volume/postgres:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_DB=postgres

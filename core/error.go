@@ -1,15 +1,16 @@
 package core
 
 import (
-    "fmt"
-    "github.com/gin-gonic/gin"
-    "time"
+	"fmt"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Error struct {
-	Code int
-	Message string
-	OccurredAt time.Time
+	Code        int
+	Message     string
+	OccurredAt  time.Time
 	OriginalErr error
 }
 
@@ -20,9 +21,9 @@ func NewError(code int, msg string, origin ...error) *Error {
 	}
 
 	return &Error{
-		Code: code,
-		Message: msg,
-		OccurredAt: time.Now(),
+		Code:        code,
+		Message:     msg,
+		OccurredAt:  time.Now(),
 		OriginalErr: originErr,
 	}
 }
@@ -33,9 +34,9 @@ func (e *Error) Error() string {
 
 func (e *Error) Respons() gin.H {
 	return gin.H{
-		"code": e.Code,
-		"message": e.Message,
-		"occurredAt": e.OccurredAt,
+		"code":        e.Code,
+		"message":     e.Message,
+		"occurredAt":  e.OccurredAt,
 		"originalErr": e.OriginalErr,
 	}
 }

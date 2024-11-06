@@ -19,16 +19,19 @@ definitions:
   model.User:
     properties:
       email:
+        example: test@test.com
         type: string
       first_name:
-        type: string
-      id:
+        example: test
         type: string
       last_name:
+        example: test
         type: string
       password:
+        example: aaaAAA111
         type: string
       username:
+        example: test_test
         type: string
     type: object
 info:
