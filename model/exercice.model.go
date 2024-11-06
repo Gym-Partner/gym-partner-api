@@ -1,7 +1,7 @@
 package model
 
 type Exercice struct {
-	Id         int    `json:"id"`
+	Id         string `json:"id" gorm:"primaryKey, not null"`
 	Name       string `json:"name"`
 	Equipement bool   `json:"equipement"`
 }

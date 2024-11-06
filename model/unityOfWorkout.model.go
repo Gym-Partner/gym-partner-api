@@ -3,10 +3,10 @@ package model
 import "time"
 
 type UnityOfWorkout struct {
-	Id          int       `json:"id"`
-	ExerciceId  int       `json:"exercice_id"`
-	SerieId     int       `json:"serie_id"`
-	NbSerie     int       `json:"nb_serie"`
+	Id          string    `json:"id" gorm:"primaryKey, not null"`
+	ExerciceId  string    `json:"exercice_id" gorm:"not null"`
+	SerieId     string    `json:"serie_id" gorm:"not null"`
+	NbSerie     int       `json:"nb_serie" gorm:"not null"`
 	Comment     string    `json:"comment"`
 	RestTimeSec time.Time `json:"rest_time_sec"`
 }

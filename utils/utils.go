@@ -3,16 +3,17 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"gitlab.com/gym-partner1/api/gym-partner-api/core"
-	"gitlab.com/gym-partner1/api/gym-partner-api/model"
-	"golang.org/x/crypto/bcrypt"
 	"io"
 	"reflect"
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type IUtils[T model.User] interface {

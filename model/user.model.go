@@ -1,17 +1,20 @@
 package model
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type User struct {
-	Id        string `json:"id" gorm:"index:idx_name,unique" swaggerignore:"true"`
-	FirstName string `json:"first_name" example:"test"`
-	LastName  string `json:"last_name" example:"test"`
-	UserName  string `json:"username" gorm:"column:username" example:"test_test"`
-	Email     string `json:"email" example:"test@test.com"`
-	Password  string `json:"password" example:"aaaAAA111"`
+	Id        string    `json:"id" gorm:"primaryKey, not null" swaggerignore:"true"`
+	FirstName string    `json:"first_name" example:"test"`
+	LastName  string    `json:"last_name" example:"test"`
+	UserName  string    `json:"username" gorm:"column:username, not null" example:"test_test"`
+	Email     string    `json:"email" gorm:"not null" example:"test@test.com"`
+	Password  string    `json:"password" gorm:"not null" example:"aaaAAA111"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 
 type Login struct {

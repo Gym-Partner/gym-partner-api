@@ -3,11 +3,11 @@ package model
 import "time"
 
 type Workout struct {
-	Id       int       `json:"id"`
-	UserId   string    `json:"user_id"`
-	UnitieId int       `json:"unitie_id"`
+	Id       string    `json:"id" gorm:"primaryKey, not null"`
+	UserId   string    `json:"user_id" gorm:"not null"`
+	UnitieId string    `json:"unitie_id" gorm:"not null"`
 	Day      time.Time `json:"day"`
-	Name     string    `json:"name"`
+	Name     string    `json:"name" gorm:"not null"`
 	Comment  string    `json:"comment"`
 }
 
