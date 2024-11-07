@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"net/http"
+
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gorm.io/gorm"
@@ -12,21 +14,39 @@ type WorkoutRepository struct {
 }
 
 func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
-	// Implement me
-	panic("implement me")
+	newData := data.ModelToDbSchema()
+
+	if retour := wr.DB.Table("workout").Create(&newData); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, retour.Error)
+	}
+
+	return nil
 }
 
 func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *core.Error {
-	// Implement me
-	panic("implement me")
+	// fmt.Println("UNITY")
+	// fmt.Println("#################################################################")
+	// b, _ := json.MarshalIndent(data, "", " ")
+	// fmt.Println(string(b))
+
+	return nil
 }
 
 func (wr WorkoutRepository) CreateExcercice(data model.Exercice) *core.Error {
-	// Implement me
-	panic("implement me")
+	// fmt.Println("EXERCICE")
+	// fmt.Println("#################################################################")
+	// b, _ := json.MarshalIndent(data, "", " ")
+	// fmt.Println(string(b))
+
+	return nil
 }
 
 func (wr WorkoutRepository) CreateSerie(data model.Serie) *core.Error {
-	// Implement me
-	panic("implement me")
+	// fmt.Println("SERIE")
+	// fmt.Println("#################################################################")
+	// b, _ := json.MarshalIndent(data, "", " ")
+	// fmt.Println(string(b))
+
+	return nil
 }

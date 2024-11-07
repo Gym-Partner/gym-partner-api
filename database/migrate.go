@@ -1,46 +1,50 @@
 package database
 
-import "time"
+import (
+	"time"
+
+	"github.com/lib/pq"
+)
 
 type MigrateUser struct {
-	Id        string `gorm:"primaryKey, not null`
-	FirstName string
-	LastName  string
-	Username  string    `gorm:"column:username; not null"`
-	Email     string    `gorm:"not null"`
-	Password  string    `gorm:"not null"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
+	Id        string    `json:"id" gorm:"primaryKey, not null`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Username  string    `json:"username" gorm:"column:username; not null"`
+	Email     string    `json:"email" gorm:"not null"`
+	Password  string    `json:"password" gorm:"not null"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 
 type MigrateWorkout struct {
-	Id       string    `gorm:"primaryKey, not null"`
-	UserId   string    `gorm:"not null"`
-	UnitieId string    `gorm:"not null"`
-	Day      time.Time `gorm:"autoCreateTime"`
-	Name     string    `gorm:"not null"`
-	Comment  string
+	Id        string         `json:"id" gorm:"primaryKey, not null"`
+	UserId    string         `json:"user_id" gorm:"not null"`
+	UnitiesId pq.StringArray `json:"unities_id" gorm:"type:text[]; not null"`
+	Day       time.Time      `json:"day" gorm:"autoCreateTime"`
+	Name      string         `json:"name" gorm:"not null"`
+	Comment   string         `json:"comment"`
 }
 
 type MigrateUnityOfWorkout struct {
-	Id          string `gorm:"primaryKey, not null"`
-	ExerciceId  string `gorm:"not null"`
-	SerieId     string `gorm:"not null"`
-	NbSerie     int    `gorm:"not null"`
-	Comment     string
-	RestTimeSec time.Time
+	Id          string    `json:"id" gorm:"primaryKey, not null"`
+	ExerciceId  string    `json:"exercice_id" gorm:"not null"`
+	SerieId     string    `json:"serie_id" gorm:"not null"`
+	NbSerie     int       `json:"nb_serie" gorm:"not null"`
+	Comment     string    `json:"comment"`
+	RestTimeSec time.Time `json:"rest_time_sec"`
 }
 
 type MigrateSerie struct {
-	Id          string `gorm:"primaryKey, not null"`
-	Weight      int    `gorm:"not null"`
-	Repetitions int    `gorm:"not null"`
-	IsWarmUp    bool   `gorm:"not null"`
+	Id          string `json:"id" gorm:"primaryKey, not null"`
+	Weight      int    `json:"weight" gorm:"not null"`
+	Repetitions int    `json:"repitions" gorm:"not null"`
+	IsWarmUp    bool   `json:"is_warm_up" gorm:"not null"`
 }
 
 type MigrateExercice struct {
-	Id         string `gorm:"primaryKey, not null"`
-	Name       string `gorm:"not null"`
-	Equipement bool   `gorm:"not null"`
+	Id         string `json:"id" gorm:"primaryKey, not null"`
+	Name       string `json:"name" gorm:"not null"`
+	Equipement bool   `json:"equipement" gorm:"not null"`
 }
 
 func (MigrateUser) TableName() string {
