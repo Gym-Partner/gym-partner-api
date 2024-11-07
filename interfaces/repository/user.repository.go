@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const TABLE_NAME = "user"
+
 type UserRepository struct {
 	DB  *gorm.DB
 	Log *core.Log
@@ -25,7 +27,7 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 		queryColumn = "email"
 	}
 
-	if retour := u.DB.Table("users").Where(queryColumn+" = ?", data).First(&user); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Where(queryColumn+" = ?", data).First(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return false
 	}
@@ -39,7 +41,7 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 }
 
 func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
-	if retour := u.DB.Table("users").Create(&data); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Create(&data); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return model.User{}, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser, retour.Error)
 	}
@@ -50,7 +52,7 @@ func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
 func (u UserRepository) GetAll() (model.Users, *core.Error) {
 	var users model.Users
 
-	if retour := u.DB.Table("users").Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return model.Users{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetAllUser, retour.Error)
 	}
@@ -61,7 +63,7 @@ func (u UserRepository) GetAll() (model.Users, *core.Error) {
 func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 	var user model.User
 
-	if retour := u.DB.Table("users").Where("id = ?", uid).First(&user); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).First(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, uid), retour.Error)
 	}
@@ -72,7 +74,7 @@ func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 	var user model.User
 
-	if retour := u.DB.Table("users").Where("email = ?", email).Select("id").First(&user); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Where("email = ?", email).Select("id").First(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, email), retour.Error)
 	}
@@ -81,7 +83,7 @@ func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 }
 
 func (u UserRepository) Update(data model.User) *core.Error {
-	if retour := u.DB.Table("users").Save(&data); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Save(&data); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBUpdateUser, data.Id), retour.Error)
 	}
@@ -92,7 +94,7 @@ func (u UserRepository) Update(data model.User) *core.Error {
 func (u UserRepository) Delete(uid string) *core.Error {
 	var user model.User
 
-	if retour := u.DB.Table("users").Where("id = ?", uid).Delete(&user); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).Delete(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBDeleteUser, uid), retour.Error)
 	}
