@@ -6,5 +6,8 @@ import (
 )
 
 type IWorkoutRepository interface {
-	Create(data model.Workout) *core.Error
+	CreateWorkout(data model.Workout) *core.Error
+	CreateUnityOfWorkout(data model.UnityOfWorkout) *core.Error
+	CreateExcercice(data model.Exercice) *core.Error
+	CreateSerie(data model.Serie) *core.Error
 }
