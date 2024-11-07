@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -79,6 +80,7 @@ func (c *Cognito) SignIn(user model.User) (string, *Error) {
 		ClientId: aws.String(c.CognitoAppIdClient),
 	}
 
+	fmt.Println(user)
 	result, err := c.CognitoProvider.InitiateAuth(authInput)
 	if err != nil {
 		c.Log.Error(ErrAWSCognitoAuthUser)

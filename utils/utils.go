@@ -16,14 +16,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type IUtils[T model.User] interface {
+type IUtils[T model.User | model.Workout] interface {
 	HashPassword(password string) (string, *core.Error)
 	InjectBodyInModel(ctx *gin.Context) (T, *core.Error)
 	Bind(target, patch interface{}) *core.Error
 	GenerateUUID() string
 }
 
-type Utils[T model.User] struct{}
+type Utils[T model.User | model.Workout] struct{}
 
 func (u Utils[T]) GenerateUUID() string {
 	return uuid.New().String()
@@ -42,7 +42,7 @@ func (u Utils[T]) InjectBodyInModel(ctx *gin.Context) (T, *core.Error) {
 	var data T
 
 	if err := ctx.ShouldBind(&data); err != nil {
-		return data, core.NewError(500, "Error to inject Resquest Body to model")
+		return data, core.NewError(500, err.Error())
 	}
 
 	return data, nil
