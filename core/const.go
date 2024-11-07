@@ -9,6 +9,8 @@ const (
 	ErrDBDeleteUser   = "[USER][REPOSITORY] Failed to delete user [%s]"
 	ErrDBUserExist    = "[USER][REPOSITORY] User already exist"
 
+	ErrDBCreateWorkout = "[WORKOUT][REPOSITORY] Failed to create user's workout"
+
 	ErrIntUserExist     = "[USER][INTERACTOR] User %s alredy exist in database"
 	ErrIntInitAWS       = "[USER][INTERACTOR] Failed to init AWS service"
 	ErrIntCreateUserAWS = "[USER][INTERACTOR] Failed to create user in AWS Cognito service"
