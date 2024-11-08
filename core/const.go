@@ -11,6 +11,8 @@ const (
 
 	ErrDBCreateWorkout        = "[WORKOUT][REPOSITORY] Failed to create user's workout"
 	ErrDBCreateUnityOfWorkout = "[WORKOUT][REPOSITORY] Failed to create workout's unity"
+	ErrDBCreateExercice       = "[WORKOUT][REPOSITORY] Failed to create unity's exercice"
+	ErrDBCreateSerie          = "[WORKOUT][REPOSITORY] Failed to create unity's serie"
 
 	ErrIntUserExist     = "[USER][INTERACTOR] User %s alredy exist in database"
 	ErrIntInitAWS       = "[USER][INTERACTOR] Failed to init AWS service"

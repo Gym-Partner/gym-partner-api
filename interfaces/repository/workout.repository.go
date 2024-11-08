@@ -36,19 +36,19 @@ func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *cor
 }
 
 func (wr WorkoutRepository) CreateExcercice(data model.Exercice) *core.Error {
-	// fmt.Println("EXERCICE")
-	// fmt.Println("#################################################################")
-	// b, _ := json.MarshalIndent(data, "", " ")
-	// fmt.Println(string(b))
+	if retour := wr.DB.Table("exercice").Create(&data); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice, retour.Error)
+	}
 
 	return nil
 }
 
 func (wr WorkoutRepository) CreateSerie(data model.Serie) *core.Error {
-	// fmt.Println("SERIE")
-	// fmt.Println("#################################################################")
-	// b, _ := json.MarshalIndent(data, "", " ")
-	// fmt.Println(string(b))
+	if retour := wr.DB.Table("serie").Create(&data); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie, retour.Error)
+	}
 
 	return nil
 }

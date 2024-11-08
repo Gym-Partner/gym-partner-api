@@ -30,11 +30,10 @@ func NewWorkoutController(db *core.Database) *WorkoutController {
 }
 
 func (wc *WorkoutController) Create(ctx *gin.Context) {
-	workout, err := wc.WorkoutInteractor.Create(ctx)
-	if err != nil {
+	if err := wc.WorkoutInteractor.Create(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, workout.Respons())
+	ctx.JSON(http.StatusCreated, nil)
 }
