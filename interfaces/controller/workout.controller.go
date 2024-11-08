@@ -29,6 +29,18 @@ func NewWorkoutController(db *core.Database) *WorkoutController {
 	}
 }
 
+// Create godoc
+// @Summary Create user's workout
+// @Schemes
+// @Description Create new user's workout in database and return code created
+// @Tags Workout
+// @Accept json
+// @Produce application/json
+// @Param Authorization header string true "User's token"
+// @Param user_workout body model.Workout{} true "User's workout"
+// @Success 201 {object} nil "User's workout created"
+// @Failure 500 {object} core.Error{} "Internal server error"
+// @Router /workout/create [post]
 func (wc *WorkoutController) Create(ctx *gin.Context) {
 	if err := wc.WorkoutInteractor.Create(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())
@@ -36,4 +48,8 @@ func (wc *WorkoutController) Create(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, nil)
+}
+
+func (wc *WorkoutController) GetOneByUserId(ctx *gin.Context) {
+
 }

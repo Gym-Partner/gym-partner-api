@@ -24,6 +24,7 @@ type MigrateWorkout struct {
 	Name      string         `json:"name" gorm:"not null"`
 	Comment   string         `json:"comment"`
 }
+type MigrateWorkouts []MigrateWorkout
 
 type MigrateUnityOfWorkout struct {
 	Id          string         `json:"id" gorm:"primaryKey, not null"`
@@ -33,6 +34,7 @@ type MigrateUnityOfWorkout struct {
 	Comment     string         `json:"comment"`
 	RestTimeSec time.Time      `json:"rest_time_sec"`
 }
+type MigrateUnitiesOfWorkout []MigrateUnityOfWorkout
 
 type MigrateSerie struct {
 	Id          string `json:"id" gorm:"primaryKey, not null"`
@@ -40,12 +42,14 @@ type MigrateSerie struct {
 	Repetitions int    `json:"repitions" gorm:"not null"`
 	IsWarmUp    bool   `json:"is_warm_up" gorm:"not null"`
 }
+type MigrateSeries []MigrateSerie
 
 type MigrateExercice struct {
 	Id         string `json:"id" gorm:"primaryKey, not null"`
 	Name       string `json:"name" gorm:"not null"`
 	Equipement bool   `json:"equipement" gorm:"not null"`
 }
+type MigrateExercices []MigrateExercice
 
 func (MigrateUser) TableName() string {
 	return "user"
