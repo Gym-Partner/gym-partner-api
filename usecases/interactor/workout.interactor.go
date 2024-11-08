@@ -27,6 +27,7 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) (model.Workout, *core.Erro
 		return workout, err
 	}
 
+	// First version
 	for _, unity := range data.UnitiesOfWorkout {
 		if err := wi.IWorkoutRepository.CreateUnityOfWorkout(unity); err != nil {
 			return workout, err
@@ -44,6 +45,47 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) (model.Workout, *core.Erro
 			}
 		}
 	}
+
+	// Second version
+	// var wg sync.WaitGroup
+	// errChan := make(chan *core.Error, len(data.UnitiesOfWorkout)*2)
+
+	// for _, unity := range data.UnitiesOfWorkout {
+	// 	if err := wi.IWorkoutRepository.CreateUnityOfWorkout(unity); err != nil {
+	// 		return workout, err
+	// 	}
+
+	// 	for _, exercice := range unity.Exercices {
+	// 		wg.Add(1)
+
+	// 		go func(exercice model.Exercice) {
+	// 			defer wg.Done()
+
+	// 			if err := wi.IWorkoutRepository.CreateExcercice(exercice); err != nil {
+	// 				errChan <- err
+	// 			}
+	// 		}(exercice)
+	// 	}
+
+	// 	for _, serie := range unity.Series {
+	// 		wg.Add(1)
+
+	// 		go func(serie model.Serie) {
+	// 			defer wg.Done()
+
+	// 			if err := wi.IWorkoutRepository.CreateSerie(serie); err != nil {
+	// 				errChan <- err
+	// 			}
+	// 		}(serie)
+	// 	}
+	// }
+
+	// wg.Wait()
+	// close(errChan)
+
+	// if len(errChan) > 0 {
+	// 	return workout, <-errChan
+	// }
 
 	return data, nil
 }
