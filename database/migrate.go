@@ -26,12 +26,12 @@ type MigrateWorkout struct {
 }
 
 type MigrateUnityOfWorkout struct {
-	Id          string    `json:"id" gorm:"primaryKey, not null"`
-	ExerciceId  string    `json:"exercice_id" gorm:"not null"`
-	SerieId     string    `json:"serie_id" gorm:"not null"`
-	NbSerie     int       `json:"nb_serie" gorm:"not null"`
-	Comment     string    `json:"comment"`
-	RestTimeSec time.Time `json:"rest_time_sec"`
+	Id          string         `json:"id" gorm:"primaryKey, not null"`
+	ExerciceId  pq.StringArray `json:"exercice_id" gorm:"type:text[]; not null"`
+	SerieId     pq.StringArray `json:"serie_id" gorm:"type:text[]; not null"`
+	NbSerie     int            `json:"nb_serie" gorm:"not null"`
+	Comment     string         `json:"comment"`
+	RestTimeSec time.Time      `json:"rest_time_sec"`
 }
 
 type MigrateSerie struct {
