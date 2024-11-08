@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"encoding/json"
-	"fmt"
+	"net/http"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
@@ -15,25 +14,23 @@ type WorkoutRepository struct {
 }
 
 func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
-	// newData := data.ModelToDbSchema()
+	newData := data.ModelToDbSchema()
 
-	// if retour := wr.DB.Table("workout").Create(&newData); retour.Error != nil {
-	// 	wr.Log.Error(retour.Error.Error())
-	// 	return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, retour.Error)
-	// }
+	if retour := wr.DB.Table("workout").Create(&newData); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, retour.Error)
+	}
 
 	return nil
 }
 
 func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *core.Error {
-	// fmt.Println("UNITY")
-	// fmt.Println("#################################################################")
-	// b, _ := json.MarshalIndent(data, "", " ")
-	// fmt.Println(string(b))
 	newData := data.ModelToDbSchema()
 
-	b, _ := json.MarshalIndent(newData, "", " ")
-	fmt.Println(string(b))
+	if retour := wr.DB.Table("unity_of_workout").Create(&newData); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateUnityOfWorkout, retour.Error)
+	}
 
 	return nil
 }
