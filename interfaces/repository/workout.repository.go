@@ -1,7 +1,8 @@
 package repository
 
 import (
-	"net/http"
+	"encoding/json"
+	"fmt"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
@@ -14,12 +15,12 @@ type WorkoutRepository struct {
 }
 
 func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
-	newData := data.ModelToDbSchema()
+	// newData := data.ModelToDbSchema()
 
-	if retour := wr.DB.Table("workout").Create(&newData); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, retour.Error)
-	}
+	// if retour := wr.DB.Table("workout").Create(&newData); retour.Error != nil {
+	// 	wr.Log.Error(retour.Error.Error())
+	// 	return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, retour.Error)
+	// }
 
 	return nil
 }
@@ -29,6 +30,10 @@ func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *cor
 	// fmt.Println("#################################################################")
 	// b, _ := json.MarshalIndent(data, "", " ")
 	// fmt.Println(string(b))
+	newData := data.ModelToDbSchema()
+
+	b, _ := json.MarshalIndent(newData, "", " ")
+	fmt.Println(string(b))
 
 	return nil
 }
