@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gorm.io/gorm"
 )
@@ -12,6 +13,8 @@ type WorkoutRepository struct {
 	DB  *gorm.DB
 	Log *core.Log
 }
+
+// ------------------------------ CREATE------------------------------
 
 func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
 	newData := data.ModelToDbSchema()
@@ -51,4 +54,28 @@ func (wr WorkoutRepository) CreateSerie(data model.Serie) *core.Error {
 	}
 
 	return nil
+}
+
+// ------------------------------ READ ONE ------------------------------
+
+func (wr WorkoutRepository) GetOneWorkoutByUserId(uid string) (database.MigrateWorkout, *core.Error) {
+	panic("implement me")
+}
+
+func (wr WorkoutRepository) GetUntiesById(ids []string) (database.MigrateUnitiesOfWorkout, *core.Error) {
+	panic("implement me")
+}
+
+func (wr WorkoutRepository) GetExercicesById(ids []string) (database.MigrateExercices, *core.Error) {
+	panic("implement me")
+}
+
+func (wr WorkoutRepository) GetSeriesById(ids []string) (database.MigrateSeries, *core.Error) {
+	panic("implement me")
+}
+
+// ------------------------------ READ ALL ------------------------------
+
+func (wr WorkoutRepository) GetAllWorkoutByUserId(uid string) (database.MigrateWorkouts, *core.Error) {
+	panic("implement me")
 }
