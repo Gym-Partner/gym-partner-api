@@ -9,6 +9,13 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	WORKOUT_TABLE_NAME  = "workout"
+	UNITY_TABLE_NAME    = "unity_of_workout"
+	EXERCICE_TABLE_NAME = "exercice"
+	SERIE_TABLE_NAME    = "serie"
+)
+
 type WorkoutRepository struct {
 	DB  *gorm.DB
 	Log *core.Log
@@ -19,7 +26,7 @@ type WorkoutRepository struct {
 func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
 	newData := data.ModelToDbSchema()
 
-	if retour := wr.DB.Table("workout").Create(&newData); retour.Error != nil {
+	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Create(&newData); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, retour.Error)
 	}
@@ -30,7 +37,7 @@ func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
 func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *core.Error {
 	newData := data.ModelToDbSchema()
 
-	if retour := wr.DB.Table("unity_of_workout").Create(&newData); retour.Error != nil {
+	if retour := wr.DB.Table(UNITY_TABLE_NAME).Create(&newData); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateUnityOfWorkout, retour.Error)
 	}
@@ -39,7 +46,7 @@ func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *cor
 }
 
 func (wr WorkoutRepository) CreateExcercice(data model.Exercice) *core.Error {
-	if retour := wr.DB.Table("exercice").Create(&data); retour.Error != nil {
+	if retour := wr.DB.Table(EXERCICE_TABLE_NAME).Create(&data); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice, retour.Error)
 	}
@@ -48,7 +55,7 @@ func (wr WorkoutRepository) CreateExcercice(data model.Exercice) *core.Error {
 }
 
 func (wr WorkoutRepository) CreateSerie(data model.Serie) *core.Error {
-	if retour := wr.DB.Table("serie").Create(&data); retour.Error != nil {
+	if retour := wr.DB.Table(SERIE_TABLE_NAME).Create(&data); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie, retour.Error)
 	}
@@ -59,23 +66,52 @@ func (wr WorkoutRepository) CreateSerie(data model.Serie) *core.Error {
 // ------------------------------ READ ONE ------------------------------
 
 func (wr WorkoutRepository) GetOneWorkoutByUserId(uid string) (database.MigrateWorkout, *core.Error) {
-	panic("implement me")
+	var workout database.MigrateWorkout
+
+	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Where("user_id = ?", uid).First(&workout); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return database.MigrateWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout, retour.Error)
+	}
+
+	return workout, nil
 }
 
-func (wr WorkoutRepository) GetUntiesById(ids []string) (database.MigrateUnitiesOfWorkout, *core.Error) {
-	panic("implement me")
+func (wr WorkoutRepository) GetUntyById(id string) (database.MigrateUnityOfWorkout, *core.Error) {
+	var unity database.MigrateUnityOfWorkout
+
+	if retour := wr.DB.Table(UNITY_TABLE_NAME).Where("id = ?", id).First(&unity); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return database.MigrateUnityOfWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetUnityOfWorkout, retour.Error)
+	}
+
+	return unity, nil
 }
 
-func (wr WorkoutRepository) GetExercicesById(ids []string) (database.MigrateExercices, *core.Error) {
-	panic("implement me")
+func (wr WorkoutRepository) GetExerciceById(id string) (database.MigrateExercice, *core.Error) {
+	var exercice database.MigrateExercice
+
+	if retour := wr.DB.Table(EXERCICE_TABLE_NAME).Where("id = ?", id).First(&exercice); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return database.MigrateExercice{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice, retour.Error)
+	}
+
+	return exercice, nil
 }
 
-func (wr WorkoutRepository) GetSeriesById(ids []string) (database.MigrateSeries, *core.Error) {
-	panic("implement me")
+func (wr WorkoutRepository) GetSerieById(id string) (database.MigrateSerie, *core.Error) {
+	var serie database.MigrateSerie
+
+	if retour := wr.DB.Table(SERIE_TABLE_NAME).Where("id = ?", id).First(&serie); retour.Error != nil {
+		wr.Log.Error(retour.Error.Error())
+		return database.MigrateSerie{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie, retour.Error)
+	}
+
+	return serie, nil
 }
 
 // ------------------------------ READ ALL ------------------------------
 
 func (wr WorkoutRepository) GetAllWorkoutByUserId(uid string) (database.MigrateWorkouts, *core.Error) {
+	//TODO implement me
 	panic("implement me")
 }

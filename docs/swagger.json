@@ -241,13 +241,45 @@
                 }
             }
         },
+        "/user/workout/getOne": {
+            "get": {
+                "description": "Get one workout with user id from database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workout"
+                ],
+                "summary": "Get one workout with user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User's workout",
+                        "schema": {
+                            "$ref": "#/definitions/model.Workout"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/workout/create": {
             "post": {
                 "description": "Create new user's workout in database and return code created",
                 "consumes": [
-                    "application/json"
-                ],
-                "produces": [
                     "application/json"
                 ],
                 "tags": [
