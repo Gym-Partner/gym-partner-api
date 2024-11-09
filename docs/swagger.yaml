@@ -251,6 +251,29 @@ paths:
       summary: Update one user
       tags:
       - User
+  /user/workout/getOne:
+    get:
+      description: Get one workout with user id from database
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User's workout
+          schema:
+            $ref: '#/definitions/model.Workout'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Get one workout with user id
+      tags:
+      - Workout
   /workout/create:
     post:
       consumes:
@@ -268,8 +291,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/model.Workout'
-      produces:
-      - application/json
       responses:
         "201":
           description: User's workout created

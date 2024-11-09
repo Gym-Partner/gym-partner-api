@@ -13,9 +13,9 @@ type IWorkoutRepository interface {
 	CreateSerie(data model.Serie) *core.Error
 
 	GetOneWorkoutByUserId(uid string) (database.MigrateWorkout, *core.Error)
-	GetUntiesById(ids []string) (database.MigrateUnitiesOfWorkout, *core.Error)
-	GetExercicesById(ids []string) (database.MigrateExercices, *core.Error)
-	GetSeriesById(ids []string) (database.MigrateSeries, *core.Error)
+	GetUntyById(id string) (database.MigrateUnityOfWorkout, *core.Error)
+	GetExerciceById(id string) (database.MigrateExercice, *core.Error)
+	GetSerieById(id string) (database.MigrateSerie, *core.Error)
 
 	GetAllWorkoutByUserId(uid string) (database.MigrateWorkouts, *core.Error)
 }

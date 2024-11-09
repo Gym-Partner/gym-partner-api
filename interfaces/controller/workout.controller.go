@@ -35,7 +35,6 @@ func NewWorkoutController(db *core.Database) *WorkoutController {
 // @Description Create new user's workout in database and return code created
 // @Tags Workout
 // @Accept json
-// @Produce application/json
 // @Param Authorization header string true "User's token"
 // @Param user_workout body model.Workout{} true "User's workout"
 // @Success 201 {object} nil "User's workout created"
@@ -50,6 +49,22 @@ func (wc *WorkoutController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, nil)
 }
 
+// GetOneByUserId godoc
+// @Summary Get one workout with user id
+// @Schemes
+// @Description Get one workout with user id from database
+// @Tags Workout
+// @Produce application/json
+// @Param Authorization header string true "User's token"
+// @Success 200 {object} model.Workout{} "User's workout"
+// @Failure 500 {object} core.Error{} "Internal server error"
+// @Router /user/workout/getOne [get]
 func (wc *WorkoutController) GetOneByUserId(ctx *gin.Context) {
+	workout, err := wc.WorkoutInteractor.GetOneByUserId(ctx)
+	if err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
 
+	ctx.JSON(http.StatusOK, workout.Respons())
 }
