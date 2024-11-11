@@ -16,6 +16,7 @@ func Router(db *core.Database) *gin.Engine {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	userController := controller.NewUserController(db)
+	workoutController := controller.NewWorkoutController(db)
 
 	api := route.Group("/api")
 	{
@@ -25,6 +26,9 @@ func Router(db *core.Database) *gin.Engine {
 			v1Auth.GET("/user/getOne", userController.GetOne)
 			v1Auth.PATCH("/user/update", userController.Update)
 			v1Auth.DELETE("/user/delete", userController.Delete)
+			v1Auth.GET("/user/workout/getOne", workoutController.GetOneByUserId)
+
+			v1Auth.POST("/workout/create", workoutController.Create)
 		}
 
 		v1NoAuth := api.Group("/v1")

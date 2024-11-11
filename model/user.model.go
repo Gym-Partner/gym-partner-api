@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
+type Users []User
 type User struct {
 	Id        string    `json:"id" gorm:"primaryKey, not null" swaggerignore:"true"`
 	FirstName string    `json:"first_name" example:"test"`
@@ -22,8 +23,6 @@ type Login struct {
 	Password string `json:"password"`
 }
 
-type Users []User
-
 func (u *User) Respons() gin.H {
 	return gin.H{
 		"data": gin.H{
@@ -36,6 +35,10 @@ func (u *User) Respons() gin.H {
 	}
 }
 
+func (u *User) GenerateUID() {
+	u.Id = uuid.New().String()
+}
+
 func (u *User) GenerateTestStruct() {
 	u.Id = uuid.New().String()
 	u.FirstName = "Test"
@@ -43,6 +46,15 @@ func (u *User) GenerateTestStruct() {
 	u.UserName = "test_test"
 	u.Email = "test@gmail.com"
 	u.Password = "aaaAAA111"
+}
+
+func (u *User) UserToAnother(data User) {
+	u.Id = data.Id
+	u.FirstName = data.FirstName
+	u.LastName = data.LastName
+	u.UserName = data.UserName
+	u.Email = data.Email
+	u.Password = data.Password
 }
 
 func (u *Users) Respons() gin.H {

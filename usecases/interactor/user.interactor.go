@@ -29,6 +29,8 @@ func MockUserInteractor(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model
 // -------------------------- CRUD ------------------------------
 
 func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
+	var userCognito model.User
+
 	data, err := ui.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return model.User{}, err
@@ -40,14 +42,16 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 	}
 
 	data.Id = ui.IUtils.GenerateUUID()
+
+	userCognito.UserToAnother(data)
+
 	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
 	if err != nil {
 		return user, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser, err)
 	}
 
-	data.Id = user.Id
-	if err = ui.ICognito.SignUp(data); err != nil {
+	if err = ui.ICognito.SignUp(userCognito); err != nil {
 		return user, core.NewError(http.StatusBadRequest, core.ErrIntCreateUserAWS, err)
 	}
 

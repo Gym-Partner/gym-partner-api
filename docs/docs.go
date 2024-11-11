@@ -251,6 +251,82 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/workout/getOne": {
+            "get": {
+                "description": "Get one workout with user id from database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workout"
+                ],
+                "summary": "Get one workout with user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User's workout",
+                        "schema": {
+                            "$ref": "#/definitions/model.Workout"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/workout/create": {
+            "post": {
+                "description": "Create new user's workout in database and return code created",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workout"
+                ],
+                "summary": "Create user's workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User's workout",
+                        "name": "user_workout",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Workout"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User's workout created"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -269,6 +345,20 @@ const docTemplate = `{
                 "originalErr": {}
             }
         },
+        "model.Exercice": {
+            "type": "object",
+            "properties": {
+                "equipement": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Login": {
             "type": "object",
             "properties": {
@@ -280,9 +370,58 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Serie": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "is_warm_up": {
+                    "type": "boolean"
+                },
+                "repetitions": {
+                    "type": "integer"
+                },
+                "weight": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.UnityOfWorkout": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "exercices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Exercice"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nb_serie": {
+                    "type": "integer"
+                },
+                "rest_time_sec": {
+                    "type": "string"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Serie"
+                    }
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string",
                     "example": "test@test.com"
@@ -302,6 +441,32 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "test_test"
+                }
+            }
+        },
+        "model.Workout": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "day": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "unities_of_workout": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.UnityOfWorkout"
+                    }
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         }

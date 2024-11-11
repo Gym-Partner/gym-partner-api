@@ -9,6 +9,15 @@ definitions:
         type: string
       originalErr: {}
     type: object
+  model.Exercice:
+    properties:
+      equipement:
+        type: boolean
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   model.Login:
     properties:
       email:
@@ -16,8 +25,40 @@ definitions:
       password:
         type: string
     type: object
+  model.Serie:
+    properties:
+      id:
+        type: string
+      is_warm_up:
+        type: boolean
+      repetitions:
+        type: integer
+      weight:
+        type: integer
+    type: object
+  model.UnityOfWorkout:
+    properties:
+      comment:
+        type: string
+      exercices:
+        items:
+          $ref: '#/definitions/model.Exercice'
+        type: array
+      id:
+        type: string
+      nb_serie:
+        type: integer
+      rest_time_sec:
+        type: string
+      series:
+        items:
+          $ref: '#/definitions/model.Serie'
+        type: array
+    type: object
   model.User:
     properties:
+      created_at:
+        type: string
       email:
         example: test@test.com
         type: string
@@ -32,6 +73,23 @@ definitions:
         type: string
       username:
         example: test_test
+        type: string
+    type: object
+  model.Workout:
+    properties:
+      comment:
+        type: string
+      day:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      unities_of_workout:
+        items:
+          $ref: '#/definitions/model.UnityOfWorkout'
+        type: array
+      user_id:
         type: string
     type: object
 info:
@@ -193,4 +251,54 @@ paths:
       summary: Update one user
       tags:
       - User
+  /user/workout/getOne:
+    get:
+      description: Get one workout with user id from database
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User's workout
+          schema:
+            $ref: '#/definitions/model.Workout'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Get one workout with user id
+      tags:
+      - Workout
+  /workout/create:
+    post:
+      consumes:
+      - application/json
+      description: Create new user's workout in database and return code created
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User's workout
+        in: body
+        name: user_workout
+        required: true
+        schema:
+          $ref: '#/definitions/model.Workout'
+      responses:
+        "201":
+          description: User's workout created
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Create user's workout
+      tags:
+      - Workout
 swagger: "2.0"

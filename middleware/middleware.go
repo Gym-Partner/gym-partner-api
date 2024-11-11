@@ -16,21 +16,23 @@ func InitMiddleware(log *core.Log) gin.HandlerFunc {
 
 func Auth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		cognito, _ := ctx.Get("")
+		cognito, _ := ctx.Get("cognito")
 
 		token := ctx.Request.Header["Authorization"]
 		newToken := strings.Join(token, "")
-		if len(token) <= 0 {
+		if len(newToken) <= 0 {
 			ctx.JSON(500, gin.H{
 				"message": "Token undefined in request's headers",
 			})
 			ctx.Abort()
+			return
 		}
 
 		uid, err := cognito.(*core.Cognito).GetUserByToken(newToken)
 		if err != nil {
 			ctx.JSON(err.Code, err.Respons())
 			ctx.Abort()
+			return
 		}
 
 		ctx.Set("uid", uid)

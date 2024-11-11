@@ -9,8 +9,17 @@ const (
 	ErrDBDeleteUser   = "[USER][REPOSITORY] Failed to delete user [%s]"
 	ErrDBUserExist    = "[USER][REPOSITORY] User already exist"
 
+	ErrDBCreateWorkout        = "[WORKOUT][REPOSITORY] Failed to create user's workout"
+	ErrDBCreateUnityOfWorkout = "[UNITY OF WORKOUT][REPOSITORY] Failed to create workout's unity"
+	ErrDBCreateExercice       = "[EXERCICE][REPOSITORY] Failed to create unity's exercice"
+	ErrDBCreateSerie          = "[SERIE][REPOSITORY] Failed to create unity's serie"
+
+	ErrDBGetWorkout        = "[WORKOUT][REPOSITORY] Failed to recover user's workout with his id"
+	ErrDBGetUnityOfWorkout = "[UNITY OF WORKOUT][REPOSITORY] Failed to recover workout's unity with his id"
+	ErrDBGetExercice       = "[EXERCICE][REPOSITORY] Failed to recover unity's exercice with his id"
+	ErrDBGetSerie          = "[SERIE][REPOSITORY] Failed to recover unity's serie with his id"
+
 	ErrIntUserExist     = "[USER][INTERACTOR] User %s alredy exist in database"
-	ErrIntInitAWS       = "[USER][INTERACTOR] Failed to init AWS service"
 	ErrIntCreateUserAWS = "[USER][INTERACTOR] Failed to create user in AWS Cognito service"
 	ErrIntUserNotExist  = "[USER][INTERACTOR] User %s not found, or not exist in database"
 
