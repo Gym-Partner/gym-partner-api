@@ -41,7 +41,6 @@ type MigrateSerie struct {
 	Weight      int    `json:"weight" gorm:"not null"`
 	Repetitions int    `json:"repitions" gorm:"not null"`
 	IsWarmUp    bool   `json:"is_warm_up" gorm:"not null"`
-	Order       int    `json:"order" gorm:"not null"`
 }
 type MigrateSeries []MigrateSerie
 
@@ -49,7 +48,6 @@ type MigrateExercice struct {
 	Id         string `json:"id" gorm:"primaryKey;not null"`
 	Name       string `json:"name" gorm:"not null"`
 	Equipement bool   `json:"equipement" gorm:"not null"`
-	Order      int    `json:"order" gorm:"not null"`
 }
 type MigrateExercices []MigrateExercice
 
