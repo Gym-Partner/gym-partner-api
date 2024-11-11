@@ -108,33 +108,13 @@ func (uw *UnityOfWorkout) GenerateUID() {
 func (uow *UnityOfWorkout) ModelToDbSchema() database.MigrateUnityOfWorkout {
 	var exerciceId, serieId []string
 
-	exerciceChan := make(chan []string)
-	serieChan := make(chan []string)
+	for _, exercice := range uow.Exercices {
+		exerciceId = append(exerciceId, exercice.Id)
+	}
 
-	go func() {
-		var ids []string
-
-		for _, exercice := range uow.Exercices {
-			ids = append(ids, exercice.Id)
-		}
-
-		exerciceChan <- ids
-		close(exerciceChan)
-	}()
-
-	go func() {
-		var ids []string
-
-		for _, serie := range uow.Series {
-			ids = append(ids, serie.Id)
-		}
-
-		serieChan <- ids
-		close(serieChan)
-	}()
-
-	exerciceId = <-exerciceChan
-	serieId = <-serieChan
+	for _, serie := range uow.Series {
+		serieId = append(serieId, serie.Id)
+	}
 
 	return database.MigrateUnityOfWorkout{
 		Id:          uow.Id,
@@ -153,7 +133,6 @@ type Serie struct {
 	Weight      int    `json:"weight"`
 	Repetitions int    `json:"repetitions"`
 	IsWarmUp    bool   `json:"is_warm_up"`
-	Order       int    `json:"order"`
 }
 type Series []Serie
 
@@ -167,7 +146,6 @@ type Exercice struct {
 	Id         string `json:"id"`
 	Name       string `json:"name"`
 	Equipement bool   `json:"equipement"`
-	Order      int    `json:"order"`
 }
 type Exercices []Exercice
 
