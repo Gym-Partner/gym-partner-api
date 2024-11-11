@@ -1,11 +1,11 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 )
 
@@ -21,14 +21,14 @@ type Workout struct {
 }
 type Workouts []Workout
 
-func (w *Workout) GenerateUID() {
-	w.Id = uuid.New().String()
-}
-
 func (w *Workout) Respons() gin.H {
 	return gin.H{
 		"data": w,
 	}
+}
+
+func (w *Workout) GenerateUID() {
+	w.Id = uuid.New().String()
 }
 
 func (w *Workout) ChargeData(uid string) {
@@ -101,8 +101,8 @@ type UnityOfWorkout struct {
 }
 type UnitiesOfWorkout []UnityOfWorkout
 
-func (uow *UnityOfWorkout) GenerateUID() {
-	uow.Id = uuid.New().String()
+func (uw *UnityOfWorkout) GenerateUID() {
+	uw.Id = uuid.New().String()
 }
 
 func (uow *UnityOfWorkout) ModelToDbSchema() database.MigrateUnityOfWorkout {

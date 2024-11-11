@@ -129,6 +129,6 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 		return emptyWorkout, <-errChan
 	}
 
-	newData := workout.SchemaToModel(unities, exercices, series)
+	newData := wi.IUtils.SchemaToModel(workout, unities, exercices, series)
 	return newData, nil
 }
