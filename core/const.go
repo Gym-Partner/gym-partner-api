@@ -49,8 +49,10 @@ const (
 	TestGetOneSuccess = "[TEST]GET_ONE_SUCCESS"
 	TestUdateSuccess  = "[TEST]UPDATE_SUCCESS"
 	TestDeleteSuccess = "[TEST]DELETE_SUCCESS"
+	TestLoginSuccess  = "[TEST]LOGIN_SUCCESS"
 
 	TestUserExistFailed     = "[TEST]USER_EXIST_FAILED"
 	TestUserNotExistFailed  = "[TEST]USER_NOT_EXIST_FAILED"
 	TestInternalErrorFailed = "[TEST]INTERNAL_ERROR_FAILED"
+	TestUsersNotFound       = "[TEST]USERS_NOT_FOUND_FAILED"
 )

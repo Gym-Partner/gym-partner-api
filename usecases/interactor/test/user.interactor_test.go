@@ -91,14 +91,81 @@ func TestUserInteractor_INSERT(t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Empty(t, result)
 				assert.Equal(t, result, value.expectedRes)
-				//assert.Equal(t, err, value.expectedErr)
+				assert.Equal(t, err, value.expectedErr)
 			case core.TestInternalErrorFailed:
 				assert.NotNil(t, err)
 				assert.Empty(t, result)
 				assert.Equal(t, result, value.expectedRes)
-				//assert.Equal(t, err, value.expectedErr)
+				assert.Equal(t, err, value.expectedErr)
+			}
+			UserMock.AssertExpectations(t)
+			UtilsMock.AssertExpectations(t)
+			CognitoMock.AssertExpectations(t)
+		})
+	}
+}
+
+func TestUserInteractor_GETALL(t *testing.T) {
+	var users model.Users
+	users.GenerateTestStruct()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(userMock *mock.UserMock)
+		expectedRes model.Users
+		expectedErr *core.Error
+	}{
+		{
+			name: core.TestGetAllSuccess,
+			setupMock: func(userMock *mock.UserMock) {
+				userMock.On("GetAll").Return(users, (*core.Error)(nil)).Once()
+			},
+			expectedRes: users,
+			expectedErr: nil,
+		},
+		{
+			name: core.TestUsersNotFound,
+			setupMock: func(userMock *mock.UserMock) {
+				userMock.On("GetAll").Return(model.Users{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetAllUser)).Once()
+			},
+			expectedRes: model.Users{},
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetAllUser),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserMock := new(mock.UserMock)
+			UtilsMock := new(mock.UtilsMock[model.User])
+			CognitoMock := new(mock.CognitoMock)
+
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+
+			value.setupMock(UserMock)
+
+			result, err := ui.GetAll()
+
+			switch value.name {
+			case core.TestGetAllSuccess:
+				assert.Nil(t, err)
+				assert.NotEmpty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			case core.TestUsersNotFound:
+				assert.NotNil(t, err)
+				assert.Empty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
 			}
 			UserMock.AssertExpectations(t)
 		})
 	}
 }
+
+func TestUserInteractor_GETONE(t *testing.T) {}
+
+func TestUserInteractor_UPDATE(t *testing.T) {}
+
+func TestUserInteractor_DELETE(t *testing.T) {}
+
+func TestUserInteractor_LOGIN(t *testing.T) {}
