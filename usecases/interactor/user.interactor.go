@@ -38,7 +38,7 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
 	exist := ui.IUserRepository.IsExist(data.Email, "EMAIL")
 	if exist {
-		return model.User{}, core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserExist, data.Email))
+		return model.User{}, core.NewError(http.StatusBadRequest, core.ErrIntUserExist)
 	}
 
 	data.Id = ui.IUtils.GenerateUUID()

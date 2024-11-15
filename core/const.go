@@ -19,7 +19,7 @@ const (
 	ErrDBGetExercice       = "[EXERCICE][REPOSITORY] Failed to recover unity's exercice with his id"
 	ErrDBGetSerie          = "[SERIE][REPOSITORY] Failed to recover unity's serie with his id"
 
-	ErrIntUserExist     = "[USER][INTERACTOR] User %s alredy exist in database"
+	ErrIntUserExist     = "[USER][INTERACTOR] User already exist in database"
 	ErrIntCreateUserAWS = "[USER][INTERACTOR] Failed to create user in AWS Cognito service"
 	ErrIntUserNotExist  = "[USER][INTERACTOR] User %s not found, or not exist in database"
 
