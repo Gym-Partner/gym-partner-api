@@ -34,8 +34,6 @@ func NewUserController(db *core.Database) *UserController {
 
 // ------------------------------ CRUD ------------------------------
 
-// @BasePath /api/v1
-
 // Create godoc
 // @Summary Create a new user
 // @Schemes
