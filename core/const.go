@@ -55,4 +55,5 @@ const (
 	TestUserNotExistFailed  = "[TEST]USER_NOT_EXIST_FAILED"
 	TestInternalErrorFailed = "[TEST]INTERNAL_ERROR_FAILED"
 	TestUsersNotFound       = "[TEST]USERS_NOT_FOUND_FAILED"
+	TestUserNotFound        = "[TEST]USER_NOT_FOUND_FAILED"
 )

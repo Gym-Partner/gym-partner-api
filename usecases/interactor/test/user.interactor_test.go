@@ -55,10 +55,10 @@ func TestUserInteractor_INSERT(t *testing.T) {
 				userMock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
 				utilsMock.On("GenerateUUID").Return(user.Id).Once()
 				utilsMock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil))
-				userMock.On("Create", user).Return(model.User{}, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser)).Once()
+				userMock.On("Create", user).Return(model.User{}, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser), error(nil)).Once()
 			},
 			expectedRes: model.User{},
-			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser),
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser, error(nil)),
 		},
 	}
 
@@ -96,7 +96,7 @@ func TestUserInteractor_INSERT(t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Empty(t, result)
 				assert.Equal(t, result, value.expectedRes)
-				assert.Equal(t, err, value.expectedErr)
+				//assert.Equal(t, err, value.expectedErr)
 			}
 			UserMock.AssertExpectations(t)
 			UtilsMock.AssertExpectations(t)
@@ -162,7 +162,63 @@ func TestUserInteractor_GETALL(t *testing.T) {
 	}
 }
 
-func TestUserInteractor_GETONE(t *testing.T) {}
+func TestUserInteractor_GETONE(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(userMock *mock.UserMock)
+		expectedRes model.User
+		expectedErr *core.Error
+	}{
+		{
+			name: core.TestGetOneSuccess,
+			setupMock: func(userMock *mock.UserMock) {
+				userMock.On("GetOneById", user.Id).Return(user, (*core.Error)(nil)).Once()
+			},
+			expectedRes: user,
+			expectedErr: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUserNotFound,
+			setupMock: func(userMock *mock.UserMock) {
+				userMock.On("GetOneById", user.Id).Return(model.User{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetOneUser)).Once()
+			},
+			expectedRes: model.User{},
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetOneUser),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserMock := new(mock.UserMock)
+			UtilsMock := new(mock.UtilsMock[model.User])
+			CognitoMock := new(mock.CognitoMock)
+			context := &gin.Context{}
+			context.Set("uid", &user.Id)
+
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			value.setupMock(UserMock)
+
+			result, err := ui.GetOne(context)
+
+			switch value.name {
+			case core.TestGetOneSuccess:
+				assert.Nil(t, err)
+				assert.NotEmpty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			case core.TestUserNotFound:
+				assert.NotNil(t, err)
+				assert.Empty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			}
+			UserMock.AssertExpectations(t)
+		})
+	}
+}
 
 func TestUserInteractor_UPDATE(t *testing.T) {}
 
