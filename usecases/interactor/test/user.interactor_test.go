@@ -221,7 +221,68 @@ func TestUserInteractor_GETONE(t *testing.T) {
 	}
 }
 
-func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {}
+func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context)
+		expectedRes model.User
+		expectedErr *core.Error
+	}{
+		{
+			name: core.TestGetOneSuccess,
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
+				utilsMock.On("InjectBodyInModel", context).Return(user, (*core.Error)(nil)).Once()
+				userMock.On("GetOneByEmail", user.Email).Return(user, (*core.Error)(nil)).Once()
+			},
+			expectedRes: user,
+			expectedErr: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUserNotFound,
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
+				utilsMock.On("InjectBodyInModel", context).Return(user, (*core.Error)(nil)).Once()
+				userMock.On("GetOneByEmail", user.Email).Return(model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, user.Email)))
+			},
+			expectedRes: model.User{Password: user.Password},
+			expectedErr: core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, user.Email)),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserMock := new(mock.UserMock)
+			UtilsMock := new(mock.UtilsMock[model.User])
+			CognitoMock := new(mock.CognitoMock)
+			buf, _ := utils.StructToReadCloser(user)
+
+			context := &gin.Context{
+				Request: &http.Request{
+					Body: buf,
+				},
+			}
+
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			value.setupMock(UserMock, UtilsMock, context)
+
+			result, err := ui.GetOneByEmail(context)
+
+			switch value.name {
+			case core.TestGetOneSuccess:
+				assert.Nil(t, err)
+				assert.NotEmpty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			case core.TestUserNotFound:
+				assert.NotNil(t, err)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			}
+		})
+	}
+}
 
 func TestUserInteractor_UPDATE(t *testing.T) {
 	var target, patch model.User
