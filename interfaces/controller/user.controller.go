@@ -151,7 +151,7 @@ func (uc *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	token, err := uc.UserInteractor.Login(ctx, user)
+	token, err := uc.UserInteractor.Login(user)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Respons())
 		return

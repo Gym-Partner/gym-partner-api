@@ -457,4 +457,57 @@ func TestUserInteractor_DELETE(t *testing.T) {
 	}
 }
 
-func TestUserInteractor_LOGIN(t *testing.T) {}
+func TestUserInteractor_LOGIN(t *testing.T) {
+	var token string
+	var user model.User
+	user.GenerateTestStruct()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(cognitoMock *mock.CognitoMock)
+		expectedRes string
+		expectedErr *core.Error
+	}{
+		{
+			name: core.TestLoginSuccess,
+			setupMock: func(cognitoMock *mock.CognitoMock) {
+				cognitoMock.On("SignIn", user).Return(token, (*core.Error)(nil)).Once()
+			},
+			expectedRes: token,
+			expectedErr: (*core.Error)(nil),
+		},
+		{
+			name: core.ErrAWSCognitoAuthUser,
+			setupMock: func(cognitoMock *mock.CognitoMock) {
+				cognitoMock.On("SignIn", user).Return("", core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser))
+			},
+			expectedRes: "",
+			expectedErr: core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserMock := new(mock.UserMock)
+			UtilsMock := new(mock.UtilsMock[model.User])
+			CognitoMock := new(mock.CognitoMock)
+
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			value.setupMock(CognitoMock)
+
+			result, err := ui.Login(user)
+
+			switch value.name {
+			case core.TestLoginSuccess:
+				assert.Nil(t, err)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			case core.ErrAWSCognitoAuthUser:
+				assert.NotNil(t, err)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			}
+			CognitoMock.AssertExpectations(t)
+		})
+	}
+}

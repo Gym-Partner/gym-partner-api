@@ -127,7 +127,7 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
 	return nil
 }
 
-func (ui *UserInteractor) Login(ctx *gin.Context, user model.User) (string, *core.Error) {
+func (ui *UserInteractor) Login(user model.User) (string, *core.Error) {
 	token, err := ui.ICognito.SignIn(user)
 	if err != nil {
 		return "", err
