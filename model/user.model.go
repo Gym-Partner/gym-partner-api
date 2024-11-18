@@ -39,8 +39,19 @@ func (u *User) GenerateUID() {
 	u.Id = uuid.New().String()
 }
 
-func (u *User) GenerateTestStruct() {
-	u.Id = uuid.New().String()
+func (u *User) GenerateTestStruct(uid ...string) {
+
+	newUid := ""
+	for _, v := range uid {
+		newUid = v
+	}
+
+	if len(newUid) > 0 {
+		u.Id = newUid
+	} else {
+		u.Id = uuid.New().String()
+	}
+
 	u.FirstName = "Test"
 	u.LastName = "Test"
 	u.UserName = "test_test"

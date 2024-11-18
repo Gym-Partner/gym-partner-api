@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -220,7 +221,96 @@ func TestUserInteractor_GETONE(t *testing.T) {
 	}
 }
 
-func TestUserInteractor_UPDATE(t *testing.T) {}
+func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {}
+
+func TestUserInteractor_UPDATE(t *testing.T) {
+	var target, patch model.User
+	target.GenerateTestStruct()
+	patch.GenerateTestStruct(target.Id)
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context)
+		expectedRes *core.Error
+	}{
+		{
+			name: core.TestUdateSuccess,
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
+				utilsMock.On("InjectBodyInModel", context).Return(patch, (*core.Error)(nil)).Once()
+				userMock.On("IsExist", patch.Id, "ID").Return(true).Once()
+				userMock.On("GetOneById", patch.Id).Return(target, (*core.Error)(nil)).Once()
+				utilsMock.On("Bind", &target, patch).Return((*core.Error)(nil)).Once()
+				userMock.On("Update", target).Return((*core.Error)(nil)).Once()
+			},
+			expectedRes: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUserNotExistFailed,
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
+				utilsMock.On("InjectBodyInModel", context).Return(patch, (*core.Error)(nil)).Once()
+				userMock.On("IsExist", patch.Id, "ID").Return(false).Once()
+			},
+			expectedRes: core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, target.Id)),
+		},
+		{
+			name: core.TestUserNotFound,
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
+				utilsMock.On("InjectBodyInModel", context).Return(patch, (*core.Error)(nil)).Once()
+				userMock.On("IsExist", patch.Id, "ID").Return(true).Once()
+				userMock.On("GetOneById", patch.Id).Return(model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, target.Email))).Once()
+			},
+			expectedRes: core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, target.Email)),
+		},
+		{
+			name: core.TestInternalErrorFailed,
+			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
+				utilsMock.On("InjectBodyInModel", context).Return(patch, (*core.Error)(nil)).Once()
+				userMock.On("IsExist", patch.Id, "ID").Return(true).Once()
+				userMock.On("GetOneById", patch.Id).Return(target, (*core.Error)(nil)).Once()
+				utilsMock.On("Bind", &target, patch).Return((*core.Error)(nil)).Once()
+				userMock.On("Update", target).Return(core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBUpdateUser, target.Id))).Once()
+			},
+			expectedRes: core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBUpdateUser, target.Id)),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserMock := new(mock.UserMock)
+			UtilsMock := new(mock.UtilsMock[model.User])
+			CognitoMock := new(mock.CognitoMock)
+			buf, _ := utils.StructToReadCloser(patch)
+
+			context := &gin.Context{
+				Request: &http.Request{
+					Body: buf,
+				},
+			}
+			context.Set("uid", &patch.Id)
+
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+
+			value.setupMock(UserMock, UtilsMock, context)
+
+			result := ui.Update(context)
+
+			switch value.name {
+			case core.TestGetOneSuccess:
+				assert.Nil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			case core.TestUserNotExistFailed:
+				assert.NotNil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			case core.TestUserNotFound:
+				assert.NotNil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			case core.TestInternalErrorFailed:
+				assert.NotNil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			}
+		})
+	}
+}
 
 func TestUserInteractor_DELETE(t *testing.T) {}
 

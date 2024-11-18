@@ -28,7 +28,7 @@ func (u *UtilsMock[T]) InjectBodyInModel(ctx *gin.Context) (T, *core.Error) {
 }
 
 func (u *UtilsMock[T]) Bind(target, patch interface{}) *core.Error {
-	args := u.Called(&target, patch)
+	args := u.Called(target, patch)
 	return args.Error(0).(*core.Error)
 }
 
