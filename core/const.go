@@ -44,12 +44,12 @@ const (
 )
 
 const (
-	TestCreateSuccess = "[TEST]CREATE_SUCCESS"
-	TestGetAllSuccess = "[TEST]GET_ALL_SUCCESS"
-	TestGetOneSuccess = "[TEST]GET_ONE_SUCCESS"
-	TestUdateSuccess  = "[TEST]UPDATE_SUCCESS"
-	TestDeleteSuccess = "[TEST]DELETE_SUCCESS"
-	TestLoginSuccess  = "[TEST]LOGIN_SUCCESS"
+	TestINTCreateSuccess = "[TEST][INTERACTOR]CREATE_SUCCESS"
+	TestINTGetAllSuccess = "[TEST][INTERACTOR]GET_ALL_SUCCESS"
+	TestINTGetOneSuccess = "[TEST][INTERACTOR]GET_ONE_SUCCESS"
+	TestINTUdateSuccess  = "[TEST][INTERACTOR]UPDATE_SUCCESS"
+	TestINTDeleteSuccess = "[TEST][INTERACTOR]DELETE_SUCCESS"
+	TestINTLoginSuccess  = "[TEST][INTERACTOR]LOGIN_SUCCESS"
 
 	TestUserExistFailed       = "[TEST]USER_EXIST_FAILED"
 	TestUserNotExistFailed    = "[TEST]USER_NOT_EXIST_FAILED"
