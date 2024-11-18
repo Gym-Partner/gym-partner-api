@@ -51,9 +51,10 @@ const (
 	TestDeleteSuccess = "[TEST]DELETE_SUCCESS"
 	TestLoginSuccess  = "[TEST]LOGIN_SUCCESS"
 
-	TestUserExistFailed     = "[TEST]USER_EXIST_FAILED"
-	TestUserNotExistFailed  = "[TEST]USER_NOT_EXIST_FAILED"
-	TestInternalErrorFailed = "[TEST]INTERNAL_ERROR_FAILED"
-	TestUsersNotFound       = "[TEST]USERS_NOT_FOUND_FAILED"
-	TestUserNotFound        = "[TEST]USER_NOT_FOUND_FAILED"
+	TestUserExistFailed       = "[TEST]USER_EXIST_FAILED"
+	TestUserNotExistFailed    = "[TEST]USER_NOT_EXIST_FAILED"
+	TestInternalErrorFailed   = "[TEST]INTERNAL_ERROR_FAILED"
+	TestUsersNotFound         = "[TEST]USERS_NOT_FOUND_FAILED"
+	TestUserNotFound          = "[TEST]USER_NOT_FOUND_FAILED"
+	TestUserNotDeletedCognito = "[TEST]USER_NOT_DELETED_COGNITO_FAILED"
 )

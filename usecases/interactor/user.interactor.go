@@ -113,7 +113,7 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
 
 	exist := ui.IUserRepository.IsExist(*uid.(*string), "ID")
 	if !exist {
-		return core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, uid))
+		return core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, *uid.(*string)))
 	}
 
 	if err := ui.IUserRepository.Delete(*uid.(*string)); err != nil {

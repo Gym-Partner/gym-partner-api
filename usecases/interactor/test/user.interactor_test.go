@@ -280,6 +280,8 @@ func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
 				assert.Equal(t, result, value.expectedRes)
 				assert.Equal(t, err, value.expectedErr)
 			}
+			UserMock.AssertExpectations(t)
+			UtilsMock.AssertExpectations(t)
 		})
 	}
 }
@@ -369,10 +371,90 @@ func TestUserInteractor_UPDATE(t *testing.T) {
 				assert.NotNil(t, result)
 				assert.Equal(t, result, value.expectedRes)
 			}
+			UserMock.AssertExpectations(t)
+			UtilsMock.AssertExpectations(t)
 		})
 	}
 }
 
-func TestUserInteractor_DELETE(t *testing.T) {}
+func TestUserInteractor_DELETE(t *testing.T) {
+	var token string
+	var user model.User
+	user.GenerateTestStruct()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(userMock *mock.UserMock, cognitoMock *mock.CognitoMock)
+		expectedRes *core.Error
+	}{
+		{
+			name: core.TestDeleteSuccess,
+			setupMock: func(userMock *mock.UserMock, cognitoMock *mock.CognitoMock) {
+				userMock.On("IsExist", user.Id, "ID").Return(true).Once()
+				userMock.On("Delete", user.Id).Return((*core.Error)(nil)).Once()
+				cognitoMock.On("DeleteUser", token).Return((*core.Error)(nil)).Once()
+			},
+			expectedRes: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUserNotExistFailed,
+			setupMock: func(userMock *mock.UserMock, cognitoMock *mock.CognitoMock) {
+				userMock.On("IsExist", user.Id, "ID").Return(false).Once()
+			},
+			expectedRes: core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, user.Id)),
+		},
+		{
+			name: core.TestInternalErrorFailed,
+			setupMock: func(userMock *mock.UserMock, cognitoMock *mock.CognitoMock) {
+				userMock.On("IsExist", user.Id, "ID").Return(true).Once()
+				userMock.On("Delete", user.Id).Return(core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBDeleteUser, user.Id)))
+			},
+			expectedRes: core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBDeleteUser, user.Id)),
+		},
+		{
+			name: core.TestUserNotDeletedCognito,
+			setupMock: func(userMock *mock.UserMock, cognitoMock *mock.CognitoMock) {
+				userMock.On("IsExist", user.Id, "ID").Return(true).Once()
+				userMock.On("Delete", user.Id).Return((*core.Error)(nil)).Once()
+				cognitoMock.On("DeleteUser", token).Return(core.NewError(http.StatusBadRequest, core.ErrAWSCognitoDeleteUser)).Once()
+			},
+			expectedRes: core.NewError(http.StatusBadRequest, core.ErrAWSCognitoDeleteUser),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserMock := new(mock.UserMock)
+			UtilsMock := new(mock.UtilsMock[model.User])
+			CognitoMock := new(mock.CognitoMock)
+			context := &gin.Context{}
+
+			context.Set("uid", &user.Id)
+			context.Set("token", token)
+
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			value.setupMock(UserMock, CognitoMock)
+
+			result := ui.Delete(context)
+
+			switch value.name {
+			case core.TestDeleteSuccess:
+				assert.Nil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			case core.TestUserNotExistFailed:
+				assert.NotNil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			case core.TestInternalErrorFailed:
+				assert.NotNil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			case core.TestUserNotDeletedCognito:
+				assert.NotNil(t, result)
+				assert.Equal(t, result, value.expectedRes)
+			}
+			UserMock.AssertExpectations(t)
+			CognitoMock.AssertExpectations(t)
+		})
+	}
+}
 
 func TestUserInteractor_LOGIN(t *testing.T) {}
