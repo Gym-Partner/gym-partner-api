@@ -16,6 +16,16 @@ type UserRepository struct {
 	Log *core.Log
 }
 
+func MockUserRepository(db *gorm.DB) *UserRepository {
+	log := core.NewLog("/Users/oscar/Documents/gym-partner-env", true)
+	log.ChargeLog()
+
+	return &UserRepository{
+		DB:  db,
+		Log: log,
+	}
+}
+
 func (u UserRepository) IsExist(data, OPT string) bool {
 	var user model.User
 	var queryColumn string

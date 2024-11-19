@@ -14,7 +14,7 @@ func main() {
 	env := core.NewEnv()
 	env.LoadEnv()
 
-	log := core.NewLog(env.FilePath)
+	log := core.NewLog(env.FilePath, false)
 	log.ChargeLog()
 
 	db := core.NewDatabase(log)

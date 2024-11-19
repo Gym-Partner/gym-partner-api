@@ -57,6 +57,7 @@ func (u *User) GenerateTestStruct(uid ...string) {
 	u.UserName = "test_test"
 	u.Email = "test@gmail.com"
 	u.Password = "aaaAAA111"
+	u.CreatedAt = time.Now()
 }
 
 func (u *User) UserToAnother(data User) {

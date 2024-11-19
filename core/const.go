@@ -51,10 +51,13 @@ const (
 	TestINTDeleteSuccess = "[TEST][INTERACTOR]DELETE_SUCCESS"
 	TestINTLoginSuccess  = "[TEST][INTERACTOR]LOGIN_SUCCESS"
 
+	TestREPCreateSuccess = "[TEST][REPOSITORY]CREATE_SUCCESS"
+
 	TestUserExistFailed       = "[TEST]USER_EXIST_FAILED"
 	TestUserNotExistFailed    = "[TEST]USER_NOT_EXIST_FAILED"
 	TestInternalErrorFailed   = "[TEST]INTERNAL_ERROR_FAILED"
 	TestUsersNotFound         = "[TEST]USERS_NOT_FOUND_FAILED"
 	TestUserNotFound          = "[TEST]USER_NOT_FOUND_FAILED"
 	TestUserNotDeletedCognito = "[TEST]USER_NOT_DELETED_COGNITO_FAILED"
+	TestUserCreateFailed      = "[TEST]USER_CREATE_FAILED"
 )
