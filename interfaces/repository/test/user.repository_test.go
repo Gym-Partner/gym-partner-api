@@ -11,18 +11,26 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"testing"
+	"time"
 )
 
-func TestUserRepository_INSERT(t *testing.T) {
-	var user model.User
-	user.GenerateTestStruct()
-
+func SetupDb() (*gorm.DB, sqlmock.Sqlmock) {
 	mockDB, mock, _ := sqlmock.New()
 	dialector := postgres.New(postgres.Config{
 		Conn:       mockDB,
 		DriverName: "postgres",
 	})
 	db, _ := gorm.Open(dialector, &gorm.Config{})
+
+	return db, mock
+}
+
+func TestUserRepository_INSERT(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
+	user.CreatedAt = time.Now()
+
+	db, mock := SetupDb()
 
 	setupTest := []struct {
 		name        string
@@ -92,5 +100,74 @@ func TestUserRepository_INSERT(t *testing.T) {
 				assert.Equal(t, err, value.expectedErr)
 			}
 		})
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %v", err)
+		}
+	}
+}
+
+func TestUserRepository_GETALL(t *testing.T) {
+	var users model.Users
+	users.GenerateTestStruct().AddCreatedAt()
+
+	db, mock := SetupDb()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(mock sqlmock.Sqlmock)
+		expectedRes model.Users
+		expectedErr *core.Error
+	}{
+		{
+			name: core.TestREPGetAllSuccess,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "username", "email"})
+
+				for _, value := range users {
+					rows.AddRow(value.Id, value.FirstName, value.LastName, value.UserName, value.Email)
+				}
+
+				mock.ExpectQuery(`SELECT id, first_name, last_name, username, email FROM "user"`).
+					WillReturnRows(rows)
+			},
+			expectedRes: users,
+			expectedErr: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUsersNotFound,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(`SELECT id, first_name, last_name, username, email FROM "user"`).
+					WillReturnError(fmt.Errorf("database error"))
+			},
+			expectedRes: model.Users{},
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetAllUser, fmt.Errorf("database error")),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			up := repository.MockUserRepository(db)
+			value.setupMock(mock)
+
+			result, err := up.GetAll()
+
+			switch value.name {
+			case core.TestREPGetAllSuccess:
+				assert.Nil(t, err)
+				assert.NotEmpty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			case core.TestUsersNotFound:
+				assert.NotNil(t, err)
+				assert.Empty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			}
+		})
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %v", err)
+		}
 	}
 }

@@ -163,7 +163,7 @@ func TestUserInteractor_GETALL(t *testing.T) {
 	}
 }
 
-func TestUserInteractor_GETONE(t *testing.T) {
+func TestUserInteractor_GETONEBYID(t *testing.T) {
 	var user model.User
 	user.GenerateTestStruct()
 
@@ -174,7 +174,7 @@ func TestUserInteractor_GETONE(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestINTGetOneSuccess,
+			name: core.TestINTGetOneByIdSuccess,
 			setupMock: func(userMock *mock.UserMock) {
 				userMock.On("GetOneById", user.Id).Return(user, (*core.Error)(nil)).Once()
 			},
@@ -205,7 +205,7 @@ func TestUserInteractor_GETONE(t *testing.T) {
 			result, err := ui.GetOne(context)
 
 			switch value.name {
-			case core.TestINTGetOneSuccess:
+			case core.TestINTGetOneByIdSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -232,7 +232,7 @@ func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestINTGetOneSuccess,
+			name: core.TestINTGetOneByEmailSuccess,
 			setupMock: func(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
 				utilsMock.On("InjectBodyInModel", context).Return(user, (*core.Error)(nil)).Once()
 				userMock.On("GetOneByEmail", user.Email).Return(user, (*core.Error)(nil)).Once()
@@ -270,7 +270,7 @@ func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
 			result, err := ui.GetOneByEmail(context)
 
 			switch value.name {
-			case core.TestINTGetOneSuccess:
+			case core.TestINTGetOneByEmailSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -358,7 +358,7 @@ func TestUserInteractor_UPDATE(t *testing.T) {
 			result := ui.Update(context)
 
 			switch value.name {
-			case core.TestINTGetOneSuccess:
+			case core.TestINTUdateSuccess:
 				assert.Nil(t, result)
 				assert.Equal(t, result, value.expectedRes)
 			case core.TestUserNotExistFailed:

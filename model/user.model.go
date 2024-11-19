@@ -18,6 +18,10 @@ type User struct {
 }
 type Users []User
 
+type NewUsers struct {
+	Users Users
+}
+
 type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -57,7 +61,6 @@ func (u *User) GenerateTestStruct(uid ...string) {
 	u.UserName = "test_test"
 	u.Email = "test@gmail.com"
 	u.Password = "aaaAAA111"
-	u.CreatedAt = time.Now()
 }
 
 func (u *User) UserToAnother(data User) {
@@ -75,7 +78,7 @@ func (u *Users) Respons() gin.H {
 	}
 }
 
-func (u *Users) GenerateTestStruct() {
+func (u *Users) GenerateTestStruct() *NewUsers {
 	*u = Users{
 		{
 			Id:        uuid.New().String(),
@@ -83,7 +86,7 @@ func (u *Users) GenerateTestStruct() {
 			LastName:  "Test1",
 			UserName:  "test_test1",
 			Email:     "test1@test.com",
-			Password:  "aaaAAA111",
+			//Password:  "aaaAAA111",
 		},
 		{
 			Id:        uuid.New().String(),
@@ -91,7 +94,7 @@ func (u *Users) GenerateTestStruct() {
 			LastName:  "Test2",
 			UserName:  "test_test2",
 			Email:     "test2@test.com",
-			Password:  "aaaAAA222",
+			//Password:  "aaaAAA222",
 		},
 		{
 			Id:        uuid.New().String(),
@@ -99,7 +102,17 @@ func (u *Users) GenerateTestStruct() {
 			LastName:  "Test3",
 			UserName:  "test_test3",
 			Email:     "test3@test.com",
-			Password:  "aaaAAA333",
+			//Password:  "aaaAAA333",
 		},
+	}
+
+	return &NewUsers{
+		Users: *u,
+	}
+}
+
+func (u *NewUsers) AddCreatedAt() {
+	for _, user := range u.Users {
+		user.CreatedAt = time.Now()
 	}
 }
