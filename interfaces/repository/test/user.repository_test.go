@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
@@ -314,7 +315,69 @@ func TestUserRepository_GETONEBYID(t *testing.T) {
 	}
 }
 
-func TestUserRepository_GETONEBYEMAIL(t *testing.T) {}
+func TestUserRepository_GETONEBYEMAIL(t *testing.T) {
+	var user model.User
+	user.Id = uuid.New().String()
+
+	db, mock := SetupDb()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(mock sqlmock.Sqlmock)
+		expectedRes model.User
+		expectedErr *core.Error
+	}{
+		{
+			name: core.TestREPGetOneByEmailSuccess,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"id"}).
+					AddRow(user.Id)
+
+				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE email =(.+)`).
+					WithArgs(user.Email).
+					WillReturnRows(rows)
+			},
+			expectedRes: user,
+			expectedErr: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUserNotFound,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE email =(.+)`).
+					WithArgs(user.Email).
+					WillReturnError(fmt.Errorf("database error"))
+			},
+			expectedRes: model.User{},
+			expectedErr: core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, user.Email), fmt.Errorf("database error")),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			up := repository.MockUserRepository(db)
+			value.setupMock(mock)
+
+			result, err := up.GetOneByEmail(user.Email)
+
+			switch value.name {
+			case core.TestREPGetOneByEmailSuccess:
+				assert.Nil(t, err)
+				assert.NotEmpty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			case core.TestUserNotFound:
+				assert.NotNil(t, err)
+				assert.Empty(t, result)
+				assert.Equal(t, result, value.expectedRes)
+				assert.Equal(t, err, value.expectedErr)
+			}
+		})
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %v", err)
+		}
+	}
+}
 
 func TestUserRepository_UPDATE(t *testing.T) {}
 
