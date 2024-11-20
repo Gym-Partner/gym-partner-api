@@ -12,6 +12,16 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
 
+type IUserInteractor interface {
+	Create(ctx *gin.Context) (model.User, *core.Error)
+	GetAll() (model.Users, *core.Error)
+	GetOne(c *gin.Context) (model.User, *core.Error)
+	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
+	Update(ctx *gin.Context) *core.Error
+	Delete(ctx *gin.Context) *core.Error
+	Login(user model.User) (string, *core.Error)
+}
+
 type UserInteractor struct {
 	IUserRepository repository.IUserRepository
 	IUtils          utils.IUtils[model.User]
