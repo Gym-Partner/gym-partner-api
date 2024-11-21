@@ -28,7 +28,7 @@ type UserInteractor struct {
 	ICognito        core.ICognito
 }
 
-func MockUserInteractor(userMock *mock.UserMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock) *UserInteractor {
+func MockUserInteractor(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock) *UserInteractor {
 	return &UserInteractor{
 		IUserRepository: userMock,
 		IUtils:          utilsMock,
