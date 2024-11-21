@@ -379,6 +379,100 @@ func TestUserRepository_GETONEBYEMAIL(t *testing.T) {
 	}
 }
 
-func TestUserRepository_UPDATE(t *testing.T) {}
+func TestUserRepository_UPDATE(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
 
-func TestUserRepository_DELETE(t *testing.T) {}
+	db, mock := SetupDb()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(mock sqlmock.Sqlmock)
+		expectedRes *core.Error
+	}{
+		{
+			name: core.TestREPUpdateSuccess,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec(`UPDATE \"user\" SET .+`).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
+			},
+			expectedRes: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUserUpdateFailed,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec(`UPDATE \"user\" SET .+`).
+					WillReturnError(fmt.Errorf("database error"))
+				mock.ExpectRollback()
+			},
+			expectedRes: core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBUpdateUser, user.Id), fmt.Errorf("database error")),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			up := repository.MockUserRepository(db)
+			value.setupMock(mock)
+
+			err := up.Update(user)
+			assert.Equal(t, err, value.expectedRes)
+		})
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %v", err)
+		}
+	}
+}
+
+func TestUserRepository_DELETE(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
+
+	db, mock := SetupDb()
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(mock sqlmock.Sqlmock)
+		expectedRes *core.Error
+	}{
+		{
+			name: core.TestREPDeleteSuccess,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec(`DELETE FROM \"user\" WHERE id=?`).
+					WithArgs(user.Id).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
+			},
+			expectedRes: (*core.Error)(nil),
+		},
+		{
+			name: core.TestUserDeleteFailed,
+			setupMock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec(`DELETE FROM \"user\" WHERE id=?`).
+					WithArgs(user.Id).
+					WillReturnError(fmt.Errorf("database error"))
+				mock.ExpectRollback()
+			},
+			expectedRes: core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBDeleteUser, user.Id), fmt.Errorf("database error")),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			up := repository.MockUserRepository(db)
+			value.setupMock(mock)
+
+			err := up.Delete(user.Id)
+			assert.Equal(t, err, value.expectedRes)
+		})
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %v", err)
+		}
+	}
+}
