@@ -12,8 +12,8 @@ type UserControllerMock struct {
 }
 
 func (u *UserControllerMock) Create(ctx *gin.Context) (model.User, *core.Error) {
-	//TODO implement me
-	panic("implement me")
+	args := u.Called(ctx)
+	return args.Get(0).(model.User), args.Error(1).(*core.Error)
 }
 
 func (u *UserControllerMock) GetAll() (model.Users, *core.Error) {

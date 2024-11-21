@@ -1,1 +1,85 @@
 package test
+
+import (
+	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/controller"
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
+	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+func transformResponse(response gin.H) {
+	if code, ok := response["code"].(float64); ok {
+		response["code"] = int(code)
+	}
+
+	if data, ok := response["data"].(map[string]interface{}); ok {
+		response["data"] = gin.H(data)
+	}
+}
+
+func TestUserController_CREATE(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
+
+	setupTest := []struct {
+		name         string
+		setupMock    func(uc *mock.UserControllerMock, ctx *gin.Context)
+		expectedCode int
+		expectedBody gin.H
+	}{
+		{
+			name: core.TestCONCreateSuccess,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("Create", ctx).Return(user, (*core.Error)(nil)).Once()
+			},
+			expectedCode: http.StatusCreated,
+			expectedBody: user.Respons(),
+		},
+		{
+			name: core.TestUserCreateFailed,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("Create", ctx).Return(model.User{}, core.NewError(http.StatusInternalServerError, core.TestUserCreateFailed)).Once()
+			},
+			expectedCode: http.StatusInternalServerError,
+			expectedBody: core.NewError(http.StatusInternalServerError, core.TestUserCreateFailed).Respons(),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserControllerMock := new(mock.UserControllerMock)
+
+			uc := controller.MockUserController(UserControllerMock)
+
+			gin.SetMode(gin.TestMode)
+			res := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(res)
+
+			buf, _ := utils.StructToReadCloser(user)
+			ctx.Request = &http.Request{
+				Body: buf,
+			}
+
+			value.setupMock(UserControllerMock, ctx)
+
+			uc.Create(ctx)
+			assert.Equal(t, value.expectedCode, res.Code)
+
+			var response gin.H
+			err := json.Unmarshal(res.Body.Bytes(), &response)
+			transformResponse(response)
+
+			assert.NoError(t, err)
+			assert.Equal(t, value.expectedBody, response)
+
+			UserControllerMock.AssertExpectations(t)
+		})
+	}
+}
