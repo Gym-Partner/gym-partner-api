@@ -17,8 +17,8 @@ func (u *UserControllerMock) Create(ctx *gin.Context) (model.User, *core.Error) 
 }
 
 func (u *UserControllerMock) GetAll() (model.Users, *core.Error) {
-	//TODO implement me
-	panic("implement me")
+	args := u.Called()
+	return args.Get(0).(model.Users), args.Error(1).(*core.Error)
 }
 
 func (u *UserControllerMock) GetOne(c *gin.Context) (model.User, *core.Error) {

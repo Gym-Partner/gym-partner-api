@@ -62,6 +62,7 @@ const (
 	TestREPIsExistByEmailSuccess = "[TEST][REPOSITORY]IS_EXIST_BY_EMAIL_SUCCESS"
 
 	TestCONCreateSuccess = "[TEST][CONTROLLER]CREATE_SUCCESS"
+	TestCONGetAllSuccess = "[TEST][CONTROLLER]GET_ALL_SUCCESS"
 
 	TestUserExistFailed       = "[TEST][FAILED]USER_EXIST"
 	TestUserNotExistFailed    = "[TEST][FAILED]USER_NOT_EXIST"

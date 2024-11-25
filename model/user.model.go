@@ -73,9 +73,22 @@ func (u *User) UserToAnother(data User) {
 }
 
 func (u *Users) Respons() gin.H {
-	return gin.H{
-		"data": u,
+	var result []gin.H
+
+	for _, user := range *u {
+		result = append(result, gin.H{
+			"id":         user.Id,
+			"first_name": user.FirstName,
+			"last_name":  user.LastName,
+			"username":   user.UserName,
+			"email":      user.Email,
+		})
 	}
+
+	return gin.H{
+		"data": result,
+	}
+
 }
 
 func (u *Users) GenerateTestStruct() *NewUsers {

@@ -14,9 +14,24 @@ import (
 	"testing"
 )
 
+const TOKEN = "test@gmail.com"
+
 func transformResponse(response gin.H) {
 	if code, ok := response["code"].(float64); ok {
 		response["code"] = int(code)
+	}
+
+	if dataArray, ok := response["data"].([]interface{}); ok {
+		var transformedArray []gin.H
+		for _, item := range dataArray {
+			// Convertir chaque élément en gin.H si possible
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				transformedArray = append(transformedArray, gin.H(itemMap))
+			} else if itemGinH, ok := item.(gin.H); ok {
+				transformedArray = append(transformedArray, itemGinH)
+			}
+		}
+		response["data"] = transformedArray
 	}
 
 	if data, ok := response["data"].(map[string]interface{}); ok {
@@ -45,10 +60,10 @@ func TestUserController_CREATE(t *testing.T) {
 		{
 			name: core.TestUserCreateFailed,
 			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
-				uc.On("Create", ctx).Return(model.User{}, core.NewError(http.StatusInternalServerError, core.TestUserCreateFailed)).Once()
+				uc.On("Create", ctx).Return(model.User{}, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser)).Once()
 			},
 			expectedCode: http.StatusInternalServerError,
-			expectedBody: core.NewError(http.StatusInternalServerError, core.TestUserCreateFailed).Respons(),
+			expectedBody: core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser).Respons(),
 		},
 	}
 
@@ -70,6 +85,67 @@ func TestUserController_CREATE(t *testing.T) {
 			value.setupMock(UserControllerMock, ctx)
 
 			uc.Create(ctx)
+			assert.Equal(t, value.expectedCode, res.Code)
+
+			var response gin.H
+			err := json.Unmarshal(res.Body.Bytes(), &response)
+			transformResponse(response)
+
+			assert.NoError(t, err)
+			assert.Equal(t, value.expectedBody, response)
+
+			UserControllerMock.AssertExpectations(t)
+		})
+	}
+}
+
+func TestUserController_GETALL(t *testing.T) {
+	var users model.Users
+	users.GenerateTestStruct()
+
+	setupTest := []struct {
+		name         string
+		setupMock    func(uc *mock.UserControllerMock, ctx *gin.Context)
+		expectedCode int
+		expectedBody gin.H
+	}{
+		{
+			name: core.TestCONGetAllSuccess,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("GetAll").Return(users, (*core.Error)(nil)).Once()
+			},
+			expectedCode: http.StatusOK,
+			expectedBody: users.Respons(),
+		},
+		{
+			name: core.TestUsersNotFound,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("GetAll").Return(model.Users{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetAllUser)).Once()
+			},
+			expectedCode: http.StatusInternalServerError,
+			expectedBody: core.NewError(http.StatusInternalServerError, core.ErrDBGetAllUser).Respons(),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserControllerMock := new(mock.UserControllerMock)
+
+			uc := controller.MockUserController(UserControllerMock)
+
+			gin.SetMode(gin.TestMode)
+			res := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(res)
+
+			ctx.Request = &http.Request{
+				Header: http.Header{
+					"Authorization": []string{TOKEN},
+				},
+			}
+
+			value.setupMock(UserControllerMock, ctx)
+
+			uc.GetAll(ctx)
 			assert.Equal(t, value.expectedCode, res.Code)
 
 			var response gin.H
