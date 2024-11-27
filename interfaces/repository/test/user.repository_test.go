@@ -37,7 +37,7 @@ func TestUserRepository_ISEXIST(t *testing.T) {
 		expectedRes bool
 	}{
 		{
-			name: core.TestREPIsExistByIdSuccess,
+			name: core.TestREPUserIsExistByIdSuccess,
 			data: "1234",
 			OPT:  "ID",
 			setupMock: func(mock sqlmock.Sqlmock) {
@@ -63,7 +63,7 @@ func TestUserRepository_ISEXIST(t *testing.T) {
 			expectedRes: false,
 		},
 		{
-			name: core.TestREPIsExistByEmailSuccess,
+			name: core.TestREPUserIsExistByEmailSuccess,
 			data: "test@gmail.com",
 			OPT:  "EMAIL",
 			setupMock: func(mock sqlmock.Sqlmock) {
@@ -119,7 +119,7 @@ func TestUserRepository_INSERT(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestREPCreateSuccess,
+			name: core.TestREPUserCreateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(`INSERT INTO "user"`).
@@ -168,7 +168,7 @@ func TestUserRepository_INSERT(t *testing.T) {
 			result, err := up.Create(user)
 
 			switch value.name {
-			case core.TestREPCreateSuccess:
+			case core.TestREPUserCreateSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -200,7 +200,7 @@ func TestUserRepository_GETALL(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestREPGetAllSuccess,
+			name: core.TestREPUserGetAllSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "username", "email"})
 
@@ -233,7 +233,7 @@ func TestUserRepository_GETALL(t *testing.T) {
 			result, err := up.GetAll()
 
 			switch value.name {
-			case core.TestREPGetAllSuccess:
+			case core.TestREPUserGetAllSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -265,7 +265,7 @@ func TestUserRepository_GETONEBYID(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestREPGetOneByIdSuccess,
+			name: core.TestREPUserGetOneByIdSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "username", "email", "password", "created_at"}).
 					AddRow(user.Id, user.FirstName, user.LastName, user.UserName, user.Email, user.Password, user.CreatedAt)
@@ -296,7 +296,7 @@ func TestUserRepository_GETONEBYID(t *testing.T) {
 			result, err := up.GetOneById(user.Id)
 
 			switch value.name {
-			case core.TestREPGetOneByIdSuccess:
+			case core.TestREPUserGetOneByIdSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -328,7 +328,7 @@ func TestUserRepository_GETONEBYEMAIL(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestREPGetOneByEmailSuccess,
+			name: core.TestREPUserGetOneByEmailSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id"}).
 					AddRow(user.Id)
@@ -360,7 +360,7 @@ func TestUserRepository_GETONEBYEMAIL(t *testing.T) {
 			result, err := up.GetOneByEmail(user.Email)
 
 			switch value.name {
-			case core.TestREPGetOneByEmailSuccess:
+			case core.TestREPUserGetOneByEmailSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -391,7 +391,7 @@ func TestUserRepository_UPDATE(t *testing.T) {
 		expectedRes *core.Error
 	}{
 		{
-			name: core.TestREPUpdateSuccess,
+			name: core.TestREPUserUpdateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(`UPDATE \"user\" SET .+`).
@@ -439,7 +439,7 @@ func TestUserRepository_DELETE(t *testing.T) {
 		expectedRes *core.Error
 	}{
 		{
-			name: core.TestREPDeleteSuccess,
+			name: core.TestREPUserDeleteSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(`DELETE FROM \"user\" WHERE id=?`).

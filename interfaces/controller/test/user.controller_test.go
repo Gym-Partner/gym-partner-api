@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -50,7 +51,7 @@ func TestUserController_CREATE(t *testing.T) {
 		expectedBody gin.H
 	}{
 		{
-			name: core.TestCONCreateSuccess,
+			name: core.TestCONUserCreateSuccess,
 			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
 				uc.On("Create", ctx).Return(user, (*core.Error)(nil)).Once()
 			},
@@ -110,7 +111,7 @@ func TestUserController_GETALL(t *testing.T) {
 		expectedBody gin.H
 	}{
 		{
-			name: core.TestCONGetAllSuccess,
+			name: core.TestCONUserGetAllSuccess,
 			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
 				uc.On("GetAll").Return(users, (*core.Error)(nil)).Once()
 			},
@@ -171,7 +172,7 @@ func TestUserController_GETONE(t *testing.T) {
 		expectedBody gin.H
 	}{
 		{
-			name: core.TestCONGetOneSuccess,
+			name: core.TestCONUserGetOneSuccess,
 			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
 				uc.On("GetOne", ctx).Return(user, (*core.Error)(nil)).Once()
 			},
@@ -231,7 +232,7 @@ func TestUserController_UPDATE(t *testing.T) {
 		expectedBody gin.H
 	}{
 		{
-			name: core.TestCONUpdateSuccess,
+			name: core.TestCONUserUpdateSuccess,
 			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
 				uc.On("Update", ctx).Return((*core.Error)(nil)).Once()
 			},
@@ -288,7 +289,7 @@ func TestUserController_DELETE(t *testing.T) {
 		expectedBody gin.H
 	}{
 		{
-			name: core.TestCONDeleteSuccess,
+			name: core.TestCONUserDeleteSuccess,
 			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
 				uc.On("Delete", ctx).Return((*core.Error)(nil)).Once()
 			},
@@ -323,6 +324,77 @@ func TestUserController_DELETE(t *testing.T) {
 			value.setupMock(UserControllerMock, ctx)
 
 			uc.Delete(ctx)
+			assert.Equal(t, value.expectedCode, res.Code)
+
+			var response gin.H
+			err := json.Unmarshal(res.Body.Bytes(), &response)
+			transformResponse(response)
+
+			assert.NoError(t, err)
+			assert.Equal(t, value.expectedBody, response)
+
+			UserControllerMock.AssertExpectations(t)
+		})
+	}
+}
+
+func TestUserController_LOGIN(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
+
+	setupTest := []struct {
+		name         string
+		setupMock    func(uc *mock.UserControllerMock, ctx *gin.Context)
+		expectedCode int
+		expectedBody gin.H
+	}{
+		{
+			name: core.TestCONUserLoginSuccess,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("GetOneByEmail", ctx).Return(user, (*core.Error)(nil)).Once()
+				uc.On("Login", user).Return(TOKEN, (*core.Error)(nil)).Once()
+			},
+			expectedCode: http.StatusOK,
+			expectedBody: gin.H{
+				"token": TOKEN,
+			},
+		},
+		{
+			name: core.TestUserNotFound,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("GetOneByEmail", ctx).Return(model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, user.Email))).Once()
+			},
+			expectedCode: http.StatusNotFound,
+			expectedBody: core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, user.Email)).Respons(),
+		},
+		{
+			name: core.TestUserLoginFailed,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("GetOneByEmail", ctx).Return(user, (*core.Error)(nil)).Once()
+				uc.On("Login", user).Return("", core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser))
+			},
+			expectedCode: http.StatusUnauthorized,
+			expectedBody: core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser).Respons(),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserControllerMock := new(mock.UserControllerMock)
+			uc := controller.MockUserController(UserControllerMock)
+
+			gin.SetMode(gin.TestMode)
+			res := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(res)
+			ctx.Request = &http.Request{
+				Header: http.Header{
+					"Authorization": []string{TOKEN},
+				},
+			}
+
+			value.setupMock(UserControllerMock, ctx)
+
+			uc.Login(ctx)
 			assert.Equal(t, value.expectedCode, res.Code)
 
 			var response gin.H

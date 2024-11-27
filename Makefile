@@ -9,3 +9,4 @@ build:
 test-all:
 	go test ./usecases/interactor/test -v
 	go test ./interfaces/repository/test -v
+	go test ./interfaces/controller/test -v

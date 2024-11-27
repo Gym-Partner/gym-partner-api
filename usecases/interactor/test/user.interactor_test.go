@@ -28,7 +28,7 @@ func TestUserInteractor_INSERT(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestINTCreateSuccess,
+			name: core.TestINTUserCreateSuccess,
 			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context) {
 				utilsMock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				userMock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
@@ -83,7 +83,7 @@ func TestUserInteractor_INSERT(t *testing.T) {
 			result, err := ui.Create(context)
 
 			switch value.name {
-			case core.TestINTCreateSuccess:
+			case core.TestINTUserCreateSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -117,7 +117,7 @@ func TestUserInteractor_GETALL(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestINTGetAllSuccess,
+			name: core.TestINTUserGetAllSuccess,
 			setupMock: func(userMock *mock.UserInteractorMock) {
 				userMock.On("GetAll").Return(users, (*core.Error)(nil)).Once()
 			},
@@ -147,7 +147,7 @@ func TestUserInteractor_GETALL(t *testing.T) {
 			result, err := ui.GetAll()
 
 			switch value.name {
-			case core.TestINTGetAllSuccess:
+			case core.TestINTUserGetAllSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -174,7 +174,7 @@ func TestUserInteractor_GETONEBYID(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestINTGetOneByIdSuccess,
+			name: core.TestINTUserGetOneByIdSuccess,
 			setupMock: func(userMock *mock.UserInteractorMock) {
 				userMock.On("GetOneById", user.Id).Return(user, (*core.Error)(nil)).Once()
 			},
@@ -205,7 +205,7 @@ func TestUserInteractor_GETONEBYID(t *testing.T) {
 			result, err := ui.GetOne(context)
 
 			switch value.name {
-			case core.TestINTGetOneByIdSuccess:
+			case core.TestINTUserGetOneByIdSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -232,7 +232,7 @@ func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestINTGetOneByEmailSuccess,
+			name: core.TestINTUserGetOneByEmailSuccess,
 			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
 				utilsMock.On("InjectBodyInModel", context).Return(user, (*core.Error)(nil)).Once()
 				userMock.On("GetOneByEmail", user.Email).Return(user, (*core.Error)(nil)).Once()
@@ -270,7 +270,7 @@ func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
 			result, err := ui.GetOneByEmail(context)
 
 			switch value.name {
-			case core.TestINTGetOneByEmailSuccess:
+			case core.TestINTUserGetOneByEmailSuccess:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
@@ -297,7 +297,7 @@ func TestUserInteractor_UPDATE(t *testing.T) {
 		expectedRes *core.Error
 	}{
 		{
-			name: core.TestINTUdateSuccess,
+			name: core.TestINTUserUdateSuccess,
 			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], context *gin.Context) {
 				utilsMock.On("InjectBodyInModel", context).Return(patch, (*core.Error)(nil)).Once()
 				userMock.On("IsExist", patch.Id, "ID").Return(true).Once()
@@ -358,7 +358,7 @@ func TestUserInteractor_UPDATE(t *testing.T) {
 			result := ui.Update(context)
 
 			switch value.name {
-			case core.TestINTUdateSuccess:
+			case core.TestINTUserUdateSuccess:
 				assert.Nil(t, result)
 				assert.Equal(t, result, value.expectedRes)
 			case core.TestUserNotExistFailed:
@@ -388,7 +388,7 @@ func TestUserInteractor_DELETE(t *testing.T) {
 		expectedRes *core.Error
 	}{
 		{
-			name: core.TestINTDeleteSuccess,
+			name: core.TestINTUserDeleteSuccess,
 			setupMock: func(userMock *mock.UserInteractorMock, cognitoMock *mock.CognitoMock) {
 				userMock.On("IsExist", user.Id, "ID").Return(true).Once()
 				userMock.On("Delete", user.Id).Return((*core.Error)(nil)).Once()
@@ -438,7 +438,7 @@ func TestUserInteractor_DELETE(t *testing.T) {
 			result := ui.Delete(context)
 
 			switch value.name {
-			case core.TestINTDeleteSuccess:
+			case core.TestINTUserDeleteSuccess:
 				assert.Nil(t, result)
 				assert.Equal(t, result, value.expectedRes)
 			case core.TestUserNotExistFailed:
@@ -469,7 +469,7 @@ func TestUserInteractor_LOGIN(t *testing.T) {
 		expectedErr *core.Error
 	}{
 		{
-			name: core.TestINTLoginSuccess,
+			name: core.TestINTUserLoginSuccess,
 			setupMock: func(cognitoMock *mock.CognitoMock) {
 				cognitoMock.On("SignIn", user).Return(token, (*core.Error)(nil)).Once()
 			},
@@ -498,7 +498,7 @@ func TestUserInteractor_LOGIN(t *testing.T) {
 			result, err := ui.Login(user)
 
 			switch value.name {
-			case core.TestINTLoginSuccess:
+			case core.TestINTUserLoginSuccess:
 				assert.Nil(t, err)
 				assert.Equal(t, result, value.expectedRes)
 				assert.Equal(t, err, value.expectedErr)
