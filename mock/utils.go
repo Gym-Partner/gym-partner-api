@@ -8,7 +8,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
-type UtilsMock[T model.User] struct {
+type UtilsMock[T model.User | model.Workout] struct {
 	mock.Mock
 }
 

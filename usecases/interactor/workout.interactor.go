@@ -4,16 +4,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
+
+type IWorkoutInteractor interface {
+	Create(ctx *gin.Context) *core.Error
+	GetOneByUserId(ctx *gin.Context) (model.Workout, *core.Error)
+}
 
 type WorkoutInteractor struct {
 	IWorkoutRepository repository.IWorkoutRepository
 	IUtils             utils.IUtils[model.Workout]
 }
 
+func MockWorkoutInteractor(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout]) *WorkoutInteractor {
+	return &WorkoutInteractor{
+		IWorkoutRepository: workoutMock,
+		IUtils:             utilsMock,
+	}
+}
 func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 	uid, _ := ctx.Get("uid")
 
