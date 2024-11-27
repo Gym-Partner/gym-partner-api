@@ -21,9 +21,9 @@ func (u *UserControllerMock) GetAll() (model.Users, *core.Error) {
 	return args.Get(0).(model.Users), args.Error(1).(*core.Error)
 }
 
-func (u *UserControllerMock) GetOne(c *gin.Context) (model.User, *core.Error) {
-	//TODO implement me
-	panic("implement me")
+func (u *UserControllerMock) GetOne(ctx *gin.Context) (model.User, *core.Error) {
+	args := u.Called(ctx)
+	return args.Get(0).(model.User), args.Error(1).(*core.Error)
 }
 
 func (u *UserControllerMock) GetOneByEmail(ctx *gin.Context) (model.User, *core.Error) {

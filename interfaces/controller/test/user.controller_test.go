@@ -159,3 +159,63 @@ func TestUserController_GETALL(t *testing.T) {
 		})
 	}
 }
+
+func TestUserController_GETONE(t *testing.T) {
+	var user model.User
+	user.GenerateTestStruct()
+
+	setupTest := []struct {
+		name         string
+		setupMock    func(uc *mock.UserControllerMock, ctx *gin.Context)
+		expectedCode int
+		expectedBody gin.H
+	}{
+		{
+			name: core.TestCONGetOneSuccess,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("GetOne", ctx).Return(user, (*core.Error)(nil)).Once()
+			},
+			expectedCode: http.StatusOK,
+			expectedBody: user.Respons(),
+		},
+		{
+			name: core.TestUserNotFound,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("GetOne", ctx).Return(model.User{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetOneUser)).Once()
+			},
+			expectedCode: http.StatusInternalServerError,
+			expectedBody: core.NewError(http.StatusInternalServerError, core.ErrDBGetOneUser).Respons(),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserControllerMock := new(mock.UserControllerMock)
+			uc := controller.MockUserController(UserControllerMock)
+
+			gin.SetMode(gin.TestMode)
+			res := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(res)
+
+			ctx.Request = &http.Request{
+				Header: http.Header{
+					"Authorization": []string{TOKEN},
+				},
+			}
+
+			value.setupMock(UserControllerMock, ctx)
+
+			uc.GetOne(ctx)
+			assert.Equal(t, value.expectedCode, res.Code)
+
+			var response gin.H
+			err := json.Unmarshal(res.Body.Bytes(), &response)
+			transformResponse(response)
+
+			assert.NoError(t, err)
+			assert.Equal(t, value.expectedBody, response)
+
+			UserControllerMock.AssertExpectations(t)
+		})
+	}
+}
