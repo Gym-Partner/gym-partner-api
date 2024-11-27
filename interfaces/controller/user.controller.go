@@ -17,6 +17,8 @@ type UserController struct {
 	Log             *core.Log
 }
 
+// ------------------------------ Constructor ------------------------------
+
 func NewUserController(db *core.Database) *UserController {
 	cognito := core.NewCognito(db.Logger)
 
@@ -32,6 +34,8 @@ func NewUserController(db *core.Database) *UserController {
 		Log: db.Logger,
 	}
 }
+
+// ------------------------------ Mock Constructor ------------------------------
 
 func MockUserController(UCMock *mock.UserControllerMock) *UserController {
 	log := core.NewLog("/Users/oscar/Documents/gym-partner-env", true)
@@ -170,21 +174,5 @@ func (uc *UserController) Login(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"token": token,
-	})
-}
-
-// ------------------------------ PING ------------------------------
-
-// PING godoc
-// @Summary Do ping
-// @Schemes
-// @Description Do ping for test connection with the API
-// @Tags PING
-// @Produce application/json
-// @Success 200 {string} json "PONG"
-// @Router /ping [get]
-func (uc *UserController) PING(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{
-		"message": "PONG",
 	})
 }
