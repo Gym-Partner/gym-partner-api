@@ -65,6 +65,7 @@ const (
 	TestCONGetAllSuccess = "[TEST][CONTROLLER]GET_ALL_SUCCESS"
 	TestCONGetOneSuccess = "[TEST][CONTROLLER]GET_ONE_SUCCESS"
 	TestCONUpdateSuccess = "[TEST][CONTROLLER]UPDATE_SUCCESS"
+	TestCONDeleteSuccess = "[TEST][CONTROLLER]DELETE_SUCCESS"
 
 	TestUserExistFailed       = "[TEST][FAILED]USER_EXIST"
 	TestUserNotExistFailed    = "[TEST][FAILED]USER_NOT_EXIST"

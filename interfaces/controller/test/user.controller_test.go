@@ -279,3 +279,60 @@ func TestUserController_UPDATE(t *testing.T) {
 		})
 	}
 }
+
+func TestUserController_DELETE(t *testing.T) {
+	setupTest := []struct {
+		name         string
+		setupMock    func(uc *mock.UserControllerMock, ctx *gin.Context)
+		expectedCode int
+		expectedBody gin.H
+	}{
+		{
+			name: core.TestCONDeleteSuccess,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("Delete", ctx).Return((*core.Error)(nil)).Once()
+			},
+			expectedCode: http.StatusOK,
+			expectedBody: nil,
+		},
+		{
+			name: core.TestUserDeleteFailed,
+			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
+				uc.On("Delete", ctx).Return(core.NewError(http.StatusInternalServerError, core.ErrDBDeleteUser)).Once()
+			},
+			expectedCode: http.StatusInternalServerError,
+			expectedBody: core.NewError(http.StatusInternalServerError, core.ErrDBDeleteUser).Respons(),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			UserControllerMock := new(mock.UserControllerMock)
+			uc := controller.MockUserController(UserControllerMock)
+
+			gin.SetMode(gin.TestMode)
+			res := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(res)
+
+			ctx.Request = &http.Request{
+				Header: http.Header{
+					"Authorization": []string{TOKEN},
+				},
+			}
+
+			value.setupMock(UserControllerMock, ctx)
+
+			uc.Delete(ctx)
+			assert.Equal(t, value.expectedCode, res.Code)
+
+			var response gin.H
+			err := json.Unmarshal(res.Body.Bytes(), &response)
+			transformResponse(response)
+
+			assert.NoError(t, err)
+			assert.Equal(t, value.expectedBody, response)
+
+			UserControllerMock.AssertExpectations(t)
+		})
+	}
+}
