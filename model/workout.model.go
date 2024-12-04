@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"sync"
 	"time"
@@ -89,6 +90,25 @@ func (w *Workout) ModelToDbSchema() database.MigrateWorkout {
 	}
 }
 
+func (w *Workout) GenerateTestWorkout(uid ...string) {
+	newUid := ""
+	for _, v := range uid {
+		newUid = v
+	}
+
+	if len(newUid) > 0 {
+		w.UserId = newUid
+	} else {
+		w.UserId = "1234-5678-9123"
+	}
+
+	w.Id = uuid.New().String()
+	w.Day = time.Now()
+	w.UnitiesOfWorkout = generateTestUnities(2)
+	w.Name = "Name test"
+	w.Comment = "Comment test"
+}
+
 // ------------------------------ Unity Of Workout ------------------------------
 
 type UnityOfWorkout struct {
@@ -126,6 +146,25 @@ func (uow *UnityOfWorkout) ModelToDbSchema() database.MigrateUnityOfWorkout {
 	}
 }
 
+func generateTestUnities(iteration int) UnitiesOfWorkout {
+	var unities UnitiesOfWorkout
+
+	for i := 0; i < iteration; i++ {
+		unity := UnityOfWorkout{
+			Id:          uuid.New().String(),
+			Exercices:   generateTestExercices(iteration),
+			Series:      generateTestSeries(iteration),
+			NbSerie:     i,
+			Comment:     fmt.Sprintf("Comment test: %d", i),
+			RestTimeSec: time.Now(),
+		}
+
+		unities = append(unities, unity)
+	}
+
+	return unities
+}
+
 // ------------------------------ SERIE ------------------------------
 
 type Serie struct {
@@ -140,6 +179,23 @@ func (s *Serie) GenerateUID() {
 	s.Id = uuid.New().String()
 }
 
+func generateTestSeries(iteration int) Series {
+	var series Series
+
+	for i := 0; i < iteration; i++ {
+		serie := Serie{
+			Id:          uuid.New().String(),
+			Weight:      i,
+			Repetitions: i,
+			IsWarmUp:    false,
+		}
+
+		series = append(series, serie)
+	}
+
+	return series
+}
+
 // ------------------------------ EXERCICE ------------------------------
 
 type Exercice struct {
@@ -151,4 +207,20 @@ type Exercices []Exercice
 
 func (e *Exercice) GenerateUID() {
 	e.Id = uuid.New().String()
+}
+
+func generateTestExercices(iteration int) Exercices {
+	var exercices Exercices
+
+	for i := 0; i < iteration; i++ {
+		exercice := Exercice{
+			Id:         uuid.New().String(),
+			Name:       fmt.Sprintf("Exercice %d", i),
+			Equipement: true,
+		}
+
+		exercices = append(exercices, exercice)
+	}
+
+	return exercices
 }
