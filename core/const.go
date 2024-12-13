@@ -79,3 +79,12 @@ const (
 	TestUserDeleteFailed      = "[TEST][FAILED]USER_DELETE"
 	TestUserLoginFailed       = "[TEST][FAILED]USER_LOGIN"
 )
+
+const (
+	TestINTWorkoutCreateSuccess = "[TEST][INTERACTOR][WORKOUT][SUCCESS]CREATE"
+
+	TestWorkoutCreateFailed    = "[TEST][FAILED]WORKOUT_CREATE"
+	TestUnitiesOfWorkoutFailed = "[TEST][FAILED]UNITIES_OF_WORKOUT"
+	TestExercicesFailed        = "[TEST][FAILED]EXCERCICES"
+	TestSeriesFailed           = "[TEST][FAILED]SERIES"
+)
