@@ -51,7 +51,7 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout),
 		},
 		{
-			name: core.TestUnitiesOfWorkoutFailed,
+			name: core.TestUnitiesOfWorkoutCreateFailed,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
 				utilsMock.On("InjectBodyInModel", ctx).Return(workout, (*core.Error)(nil))
 				workoutMock.On("CreateWorkout", workout).Return((*core.Error)(nil))
@@ -64,7 +64,7 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateUnityOfWorkout),
 		},
 		{
-			name: core.TestExercicesFailed,
+			name: core.TestExercicesCreateFailed,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
 				utilsMock.On("InjectBodyInModel", ctx).Return(workout, (*core.Error)(nil))
 				workoutMock.On("CreateWorkout", workout).Return((*core.Error)(nil))
@@ -80,7 +80,7 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice),
 		},
 		{
-			name: core.TestExercicesFailed,
+			name: core.TestSeriesCreateFailed,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
 				utilsMock.On("InjectBodyInModel", ctx).Return(workout, (*core.Error)(nil))
 				workoutMock.On("CreateWorkout", workout).Return((*core.Error)(nil))
@@ -92,11 +92,11 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 					for _, serie := range unity.Series {
 						workoutMock.On("CreateSerie", serie).Return(
 							core.NewError(http.StatusInternalServerError,
-								core.ErrDBCreateExercice)).Maybe()
+								core.ErrDBCreateSerie)).Maybe()
 					}
 				}
 			},
-			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice),
+			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie),
 		},
 	}
 
@@ -104,9 +104,6 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 		t.Run(value.name, func(t *testing.T) {
 			workoutMock := new(mock.WorkoutInteractorMock)
 			utilsMock := new(mock.UtilsMock[model.Workout])
-
-			wi := interactor.MockWorkoutInteractor(workoutMock, utilsMock)
-
 			buf, _ := utils.StructToReadCloser(workout)
 			context := &gin.Context{
 				Request: &http.Request{
@@ -115,8 +112,8 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 			}
 			context.Set("uid", &userId)
 
+			wi := interactor.MockWorkoutInteractor(workoutMock, utilsMock)
 			value.setupMock(workoutMock, utilsMock, context)
-
 			result := wi.Create(context)
 
 			assert.Equal(t, result, value.expectedRes)
@@ -127,4 +124,70 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 	}
 }
 
-func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {}
+func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
+	userId := uuid.New().String()
+	var workout model.Workout
+	workout.GenerateTestWorkout(userId)
+
+	setupTest := []struct {
+		name        string
+		setupMock   func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context)
+		expectedRes model.Workout
+		expectedErr *core.Error
+	}{
+		{
+			name: core.TestINTWorkoutGetSuccess,
+			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+			},
+			expectedRes: workout,
+			expectedErr: (*core.Error)(nil),
+		},
+		{
+			name: core.TestWorkoutGetFailed,
+			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+			},
+			expectedRes: model.Workout{},
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout),
+		},
+		{
+			name: core.TestUnitiesOfWorkoutGetFailed,
+			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+			},
+			expectedRes: model.Workout{},
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetUnityOfWorkout),
+		},
+		{
+			name: core.TestExercicesGetFailed,
+			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+			},
+			expectedRes: model.Workout{},
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice),
+		},
+		{
+			name: core.TestSeriesGetFailed,
+			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+			},
+			expectedRes: model.Workout{},
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie),
+		},
+	}
+
+	for _, value := range setupTest {
+		t.Run(value.name, func(t *testing.T) {
+			workoutMock := new(mock.WorkoutInteractorMock)
+			utilsMock := new(mock.UtilsMock[model.Workout])
+			context := &gin.Context{}
+			context.Set("uid", &userId)
+
+			wi := interactor.MockWorkoutInteractor(workoutMock, utilsMock)
+			value.setupMock(workoutMock, utilsMock, context)
+			users, err := wi.GetOneByUserId(context)
+
+			assert.Equal(t, users, value.expectedRes)
+			assert.Equal(t, err, value.expectedErr)
+
+			workoutMock.AssertExpectations(t)
+			utilsMock.AssertExpectations(t)
+		})
+	}
+}

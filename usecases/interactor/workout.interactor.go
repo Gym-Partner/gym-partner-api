@@ -97,7 +97,6 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 				return emptyWorkout, err
 			}
 			series = append(series, serie)
-
 		}
 	}
 
