@@ -13,8 +13,8 @@ type UtilsMock[T model.User | model.Workout] struct {
 }
 
 func (u *UtilsMock[T]) SchemaToModel(workout database.MigrateWorkout, unitie database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout {
-	//TODO implement me
-	panic("implement me")
+	args := u.Called(workout, unitie, exercices, series)
+	return args.Get(0).(model.Workout)
 }
 
 func (u *UtilsMock[T]) HashPassword(password string) (string, *core.Error) {

@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
@@ -126,8 +127,25 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 
 func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 	userId := uuid.New().String()
+
 	var workout model.Workout
 	workout.GenerateTestWorkout(userId)
+
+	var migrateWorkout database.MigrateWorkout
+	migrateWorkout.GenerateForTest(userId)
+
+	var migrateUnityOfWorkout database.MigrateUnityOfWorkout
+	migrateUnityOfWorkout.GenerateForTest(migrateWorkout.UnitiesId)
+
+	var migrateExercice database.MigrateExercice
+	migrateExercice.GenerateForTest(migrateUnityOfWorkout.ExerciceId)
+
+	var migrateSerie database.MigrateSerie
+	migrateSerie.GenerateForTest(migrateUnityOfWorkout.SerieId)
+
+	var migrateUnitiesOfWorkout database.MigrateUnitiesOfWorkout
+	var migrateExercices database.MigrateExercices
+	var migrateSeries database.MigrateSeries
 
 	setupTest := []struct {
 		name        string
@@ -138,6 +156,20 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 		{
 			name: core.TestINTWorkoutGetSuccess,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+				workoutMock.On("GetOneWorkoutByUserId", userId).Return(migrateWorkout, (*core.Error)(nil))
+				for _, unityId := range migrateWorkout.UnitiesId {
+					workoutMock.On("GetUntyById", unityId).Return(migrateUnityOfWorkout, (*core.Error)(nil))
+					migrateUnitiesOfWorkout.GenerateForTest(migrateUnityOfWorkout)
+					for _, exerciceId := range migrateUnityOfWorkout.ExerciceId {
+						workoutMock.On("GetExerciceById", exerciceId).Return(migrateExercice, (*core.Error)(nil))
+						migrateExercices.GenerateForTest(migrateExercice)
+					}
+					for _, serieId := range migrateUnityOfWorkout.SerieId {
+						workoutMock.On("GetSerieById", serieId).Return(migrateSerie, (*core.Error)(nil))
+						migrateSeries.GenerateForTest(migrateSerie)
+					}
+				}
+				utilsMock.SchemaToModel(migrateWorkout, migrateUnitiesOfWorkout, migrateExercices, migrateSeries)
 			},
 			expectedRes: workout,
 			expectedErr: (*core.Error)(nil),
@@ -145,6 +177,9 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 		{
 			name: core.TestWorkoutGetFailed,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+				workoutMock.On("GetOneWorkoutByUserId", userId).Return(
+					database.MigrateWorkout{},
+					core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout)).Maybe()
 			},
 			expectedRes: model.Workout{},
 			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout),
@@ -152,6 +187,12 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 		{
 			name: core.TestUnitiesOfWorkoutGetFailed,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+				workoutMock.On("GetOneWorkoutByUserId", userId).Return(migrateWorkout, (*core.Error)(nil))
+				for _, unityId := range migrateWorkout.UnitiesId {
+					workoutMock.On("GetUntyById", unityId).Return(
+						database.MigrateUnityOfWorkout{},
+						core.NewError(http.StatusInternalServerError, core.ErrDBGetUnityOfWorkout)).Maybe()
+				}
 			},
 			expectedRes: model.Workout{},
 			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetUnityOfWorkout),
@@ -159,6 +200,15 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 		{
 			name: core.TestExercicesGetFailed,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+				workoutMock.On("GetOneWorkoutByUserId", userId).Return(migrateWorkout, (*core.Error)(nil))
+				for _, unityId := range migrateWorkout.UnitiesId {
+					workoutMock.On("GetUntyById", unityId).Return(migrateUnityOfWorkout, (*core.Error)(nil)).Maybe()
+					for _, exerciceId := range migrateUnityOfWorkout.ExerciceId {
+						workoutMock.On("GetExerciceById", exerciceId).Return(
+							database.MigrateExercice{},
+							core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice)).Maybe()
+					}
+				}
 			},
 			expectedRes: model.Workout{},
 			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice),
@@ -166,6 +216,18 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 		{
 			name: core.TestSeriesGetFailed,
 			setupMock: func(workoutMock *mock.WorkoutInteractorMock, utilsMock *mock.UtilsMock[model.Workout], ctx *gin.Context) {
+				workoutMock.On("GetOneWorkoutByUserId", userId).Return(migrateWorkout, (*core.Error)(nil))
+				for _, unityId := range migrateWorkout.UnitiesId {
+					workoutMock.On("GetUntyById", unityId).Return(migrateUnityOfWorkout, (*core.Error)(nil)).Maybe()
+					for _, exerciceId := range migrateUnityOfWorkout.ExerciceId {
+						workoutMock.On("GetExerciceById", exerciceId).Return(migrateExercice, (*core.Error)(nil)).Maybe()
+					}
+					for _, serieId := range migrateUnityOfWorkout.SerieId {
+						workoutMock.On("GetSerieById", serieId).Return(
+							database.MigrateSerie{},
+							core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie)).Maybe()
+					}
+				}
 			},
 			expectedRes: model.Workout{},
 			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie),
