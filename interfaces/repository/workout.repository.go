@@ -21,6 +21,16 @@ type WorkoutRepository struct {
 	Log *core.Log
 }
 
+func MockWorkoutRepository(db *gorm.DB) *WorkoutRepository {
+	log := core.NewLog("/Users/oscar/Documents/gym-partner-env", true)
+	log.ChargeLog()
+
+	return &WorkoutRepository{
+		DB:  db,
+		Log: log,
+	}
+}
+
 // ------------------------------ CREATE------------------------------
 
 func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {

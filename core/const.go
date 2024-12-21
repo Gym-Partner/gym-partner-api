@@ -84,13 +84,14 @@ const (
 	TestINTWorkoutCreateSuccess = "[TEST][INTERACTOR][WORKOUT][SUCCESS]CREATE"
 	TestINTWorkoutGetSuccess    = "[TEST][INTERACTOR][WORKOUT][SUCCESS]GET]"
 
+	TestREPWorkoutCreateSuccess = "[TEST][REPOSITORY][WORKOUT][SUCCESS]CREATE"
+
 	TestWorkoutCreateFailed          = "[TEST][FAILED]WORKOUT_CREATE"
 	TestUnitiesOfWorkoutCreateFailed = "[TEST][FAILED]UNITIES_OF_WORKOUT_CREATE"
 	TestExercicesCreateFailed        = "[TEST][FAILED]EXCERCICES_CREATE"
 	TestSeriesCreateFailed           = "[TEST][FAILED]SERIES_CREATE"
-
-	TestWorkoutGetFailed          = "[TEST][FAILED]WORKOUT_GET"
-	TestUnitiesOfWorkoutGetFailed = "[TEST][FAILED]UNITIES_OF_WORKOUT_GET"
-	TestExercicesGetFailed        = "[TEST][FAILED]EXERCICES_GET"
-	TestSeriesGetFailed           = "[TEST][FAILED]SERIES_GET"
+	TestWorkoutGetFailed             = "[TEST][FAILED]WORKOUT_GET"
+	TestUnitiesOfWorkoutGetFailed    = "[TEST][FAILED]UNITIES_OF_WORKOUT_GET"
+	TestExercicesGetFailed           = "[TEST][FAILED]EXERCICES_GET"
+	TestSeriesGetFailed              = "[TEST][FAILED]SERIES_GET"
 )

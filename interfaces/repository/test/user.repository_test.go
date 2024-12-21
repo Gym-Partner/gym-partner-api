@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func SetupDb() (*gorm.DB, sqlmock.Sqlmock) {
+func setUpDb() (*gorm.DB, sqlmock.Sqlmock) {
 	mockDB, mock, _ := sqlmock.New()
 	dialector := postgres.New(postgres.Config{
 		Conn:       mockDB,
@@ -27,7 +27,7 @@ func SetupDb() (*gorm.DB, sqlmock.Sqlmock) {
 }
 
 func TestUserRepository_ISEXIST(t *testing.T) {
-	db, mock := SetupDb()
+	db, mock := setUpDb()
 
 	setupTest := []struct {
 		name        string
@@ -110,7 +110,7 @@ func TestUserRepository_INSERT(t *testing.T) {
 	user.GenerateTestStruct()
 	user.CreatedAt = time.Now()
 
-	db, mock := SetupDb()
+	db, mock := setUpDb()
 
 	setupTest := []struct {
 		name        string
@@ -191,7 +191,7 @@ func TestUserRepository_GETALL(t *testing.T) {
 	var users model.Users
 	users.GenerateTestStruct().AddCreatedAt()
 
-	db, mock := SetupDb()
+	db, mock := setUpDb()
 
 	setupTest := []struct {
 		name        string
@@ -256,7 +256,7 @@ func TestUserRepository_GETONEBYID(t *testing.T) {
 	var user model.User
 	user.GenerateTestStruct()
 
-	db, mock := SetupDb()
+	db, mock := setUpDb()
 
 	setupTest := []struct {
 		name        string
@@ -319,7 +319,7 @@ func TestUserRepository_GETONEBYEMAIL(t *testing.T) {
 	var user model.User
 	user.Id = uuid.New().String()
 
-	db, mock := SetupDb()
+	db, mock := setUpDb()
 
 	setupTest := []struct {
 		name        string
@@ -383,7 +383,7 @@ func TestUserRepository_UPDATE(t *testing.T) {
 	var user model.User
 	user.GenerateTestStruct()
 
-	db, mock := SetupDb()
+	db, mock := setUpDb()
 
 	setupTest := []struct {
 		name        string
@@ -431,7 +431,7 @@ func TestUserRepository_DELETE(t *testing.T) {
 	var user model.User
 	user.GenerateTestStruct()
 
-	db, mock := SetupDb()
+	db, mock := setUpDb()
 
 	setupTest := []struct {
 		name        string
