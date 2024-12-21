@@ -33,7 +33,6 @@ func (mw *MigrateWorkout) GenerateForTest(userId string) {
 	mw.UnitiesId = pq.StringArray{
 		uuid.New().String(),
 		uuid.New().String(),
-		uuid.New().String(),
 	}
 	mw.Day = time.Now()
 	mw.Name = "Workout name test"
@@ -53,8 +52,14 @@ type MigrateUnitiesOfWorkout []MigrateUnityOfWorkout
 func (mu *MigrateUnityOfWorkout) GenerateForTest(ids pq.StringArray) {
 	for _, value := range ids {
 		mu.Id = value
-		mu.ExerciceId = pq.StringArray{}
-		mu.SerieId = pq.StringArray{}
+		mu.ExerciceId = pq.StringArray{
+			uuid.New().String(),
+			uuid.New().String(),
+		}
+		mu.SerieId = pq.StringArray{
+			uuid.New().String(),
+			uuid.New().String(),
+		}
 		mu.NbSerie = 0
 		mu.Comment = "Unity of workout comment test"
 		mu.RestTimeSec = time.Now()

@@ -169,7 +169,11 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 						migrateSeries.GenerateForTest(migrateSerie)
 					}
 				}
-				utilsMock.SchemaToModel(migrateWorkout, migrateUnitiesOfWorkout, migrateExercices, migrateSeries)
+				utilsMock.On("SchemaToModel",
+					migrateWorkout,
+					migrateUnitiesOfWorkout,
+					migrateExercices,
+					migrateSeries).Return(workout)
 			},
 			expectedRes: workout,
 			expectedErr: (*core.Error)(nil),
