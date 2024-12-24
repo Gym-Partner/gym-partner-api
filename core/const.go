@@ -10,12 +10,12 @@ const (
 	ErrDBUserExist    = "[USER][REPOSITORY] User already exist"
 
 	ErrDBCreateWorkout        = "[WORKOUT][REPOSITORY] Failed to create user's workout"
-	ErrDBCreateUnityOfWorkout = "[UNITY OF WORKOUT][REPOSITORY] Failed to create workout's unity"
+	ErrDBCreateUnityOfWorkout = "[UNITY_OF_WORKOUT][REPOSITORY] Failed to create workout's unity"
 	ErrDBCreateExercice       = "[EXERCICE][REPOSITORY] Failed to create unity's exercice"
 	ErrDBCreateSerie          = "[SERIE][REPOSITORY] Failed to create unity's serie"
 
 	ErrDBGetWorkout        = "[WORKOUT][REPOSITORY] Failed to recover user's workout with his id"
-	ErrDBGetUnityOfWorkout = "[UNITY OF WORKOUT][REPOSITORY] Failed to recover workout's unity with his id"
+	ErrDBGetUnityOfWorkout = "[UNITY_OF_WORKOUT][REPOSITORY] Failed to recover workout's unity with his id"
 	ErrDBGetExercice       = "[EXERCICE][REPOSITORY] Failed to recover unity's exercice with his id"
 	ErrDBGetSerie          = "[SERIE][REPOSITORY] Failed to recover unity's serie with his id"
 
@@ -29,8 +29,8 @@ const (
 	ErrAWSCognitoGetUserByToken = "[AWS][COGNITO] Failed to recover the user by his token"
 	ErrAWSCognitoDeleteUser     = "[AWS][COGNITO] Failed to delete user"
 
-	ErrConnectDatabase = "[DB CONNECT][PostgreSQL] "
-	ErrPingDatabase    = "[DB PING][PostgreSQL] "
+	ErrConnectDatabase = "[DB_CONNECT][PostgreSQL] "
+	ErrPingDatabase    = "[DB_PING][PostgreSQL] "
 	ErrMigrateModel    = "[DB][Postgres] %s"
 
 	ErrEnvParseStart   = "[ENV] Error while parsing START argument: "
@@ -84,7 +84,10 @@ const (
 	TestINTWorkoutCreateSuccess = "[TEST][INTERACTOR][WORKOUT][SUCCESS]CREATE"
 	TestINTWorkoutGetSuccess    = "[TEST][INTERACTOR][WORKOUT][SUCCESS]GET]"
 
-	TestREPWorkoutCreateSuccess = "[TEST][REPOSITORY][WORKOUT][SUCCESS]CREATE"
+	TestREPWorkoutCreateSuccess        = "[TEST][REPOSITORY][WORKOUT][SUCCESS]CREATE"
+	TestREPUnityOfWorkoutCreateSuccess = "[TEST][REPOSITORY][UNITY_OF_WORKOUT][SUCCESS]CREATE"
+	TestREPExerciceCreateSuccess       = "[TEST][REPOSITORY][EXERCICE][SUCCESS]CREATE"
+	TestREPSerieCreateSuccess          = "[TEST][REPOSITORY][SERIE][SUCCESS]CREATE"
 
 	TestWorkoutCreateFailed          = "[TEST][FAILED]WORKOUT_CREATE"
 	TestUnitiesOfWorkoutCreateFailed = "[TEST][FAILED]UNITIES_OF_WORKOUT_CREATE"

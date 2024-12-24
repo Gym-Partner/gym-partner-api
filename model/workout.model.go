@@ -146,6 +146,15 @@ func (uow *UnityOfWorkout) ModelToDbSchema() database.MigrateUnityOfWorkout {
 	}
 }
 
+func (uow *UnityOfWorkout) GenerateTestUnity() {
+	uow.Id = uuid.New().String()
+	uow.Exercices = generateTestExercices(2)
+	uow.Series = generateTestSeries(2)
+	uow.NbSerie = 2
+	uow.Comment = "Comment test unity of workout"
+	uow.RestTimeSec = time.Now()
+}
+
 func generateTestUnities(iteration int) UnitiesOfWorkout {
 	var unities UnitiesOfWorkout
 
@@ -179,6 +188,13 @@ func (s *Serie) GenerateUID() {
 	s.Id = uuid.New().String()
 }
 
+func (s *Serie) GenerateTest() {
+	s.Id = uuid.New().String()
+	s.Weight = 4
+	s.Repetitions = 4
+	s.IsWarmUp = true
+}
+
 func generateTestSeries(iteration int) Series {
 	var series Series
 
@@ -207,6 +223,12 @@ type Exercices []Exercice
 
 func (e *Exercice) GenerateUID() {
 	e.Id = uuid.New().String()
+}
+
+func (e *Exercice) GenerateTest() {
+	e.Id = uuid.New().String()
+	e.Name = "Name test exercice"
+	e.Equipement = true
 }
 
 func generateTestExercices(iteration int) Exercices {
