@@ -88,6 +88,10 @@ const (
 	TestREPUnityOfWorkoutCreateSuccess = "[TEST][REPOSITORY][UNITY_OF_WORKOUT][SUCCESS]CREATE"
 	TestREPExerciceCreateSuccess       = "[TEST][REPOSITORY][EXERCICE][SUCCESS]CREATE"
 	TestREPSerieCreateSuccess          = "[TEST][REPOSITORY][SERIE][SUCCESS]CREATE"
+	TestREPWorkoutGetSuccess           = "[TEST][REPOSITORY][WORKOUT][SUCCESS]GET"
+	TestREPUnityOfWorkoutGetSuccess    = "[TEST][REPOSITORY][UNITY_OF_WORKOUT][SUCCESS]GET"
+	TestREPExerciceGetSuccess          = "[TEST][REPOSITORY][EXERCICE][SUCCESS]GET"
+	TESTREPSerieGetSuccess             = "[TEST][REPOSITORY][SERIE][SUCCESS]GET"
 
 	TestWorkoutCreateFailed          = "[TEST][FAILED]WORKOUT_CREATE"
 	TestUnitiesOfWorkoutCreateFailed = "[TEST][FAILED]UNITIES_OF_WORKOUT_CREATE"

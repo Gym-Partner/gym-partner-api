@@ -73,7 +73,7 @@ func (mus *MigrateUnitiesOfWorkout) GenerateForTest(unity MigrateUnityOfWorkout)
 type MigrateSerie struct {
 	Id          string `json:"id" gorm:"primaryKey;not null"`
 	Weight      int    `json:"weight" gorm:"not null"`
-	Repetitions int    `json:"repitions" gorm:"not null"`
+	Repetitions int    `json:"repetitions" gorm:"not null"`
 	IsWarmUp    bool   `json:"is_warm_up" gorm:"not null"`
 }
 type MigrateSeries []MigrateSerie
