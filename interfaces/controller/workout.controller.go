@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,13 +13,13 @@ import (
 )
 
 type WorkoutController struct {
-	WorkoutInteractor interactor.WorkoutInteractor
-	Log               *core.Log
+	IWorkoutInteractor interactor.IWorkoutInteractor
+	Log                *core.Log
 }
 
 func NewWorkoutController(db *core.Database) *WorkoutController {
 	return &WorkoutController{
-		WorkoutInteractor: interactor.WorkoutInteractor{
+		IWorkoutInteractor: &interactor.WorkoutInteractor{
 			IWorkoutRepository: repository.WorkoutRepository{
 				DB:  db.Handler,
 				Log: db.Logger,
@@ -26,6 +27,16 @@ func NewWorkoutController(db *core.Database) *WorkoutController {
 			IUtils: utils.Utils[model.Workout]{},
 		},
 		Log: db.Logger,
+	}
+}
+
+func MockWorkoutController(WCMock *mock.WorkoutControllerMock) *WorkoutController {
+	log := core.NewLog("/Users/oscar/Documents/gym-partner-env", true)
+	log.ChargeLog()
+
+	return &WorkoutController{
+		IWorkoutInteractor: WCMock,
+		Log:                log,
 	}
 }
 
@@ -41,7 +52,7 @@ func NewWorkoutController(db *core.Database) *WorkoutController {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /workout/create [post]
 func (wc *WorkoutController) Create(ctx *gin.Context) {
-	if err := wc.WorkoutInteractor.Create(ctx); err != nil {
+	if err := wc.IWorkoutInteractor.Create(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
 	}
@@ -60,7 +71,7 @@ func (wc *WorkoutController) Create(ctx *gin.Context) {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/workout/getOne [get]
 func (wc *WorkoutController) GetOneByUserId(ctx *gin.Context) {
-	workout, err := wc.WorkoutInteractor.GetOneByUserId(ctx)
+	workout, err := wc.IWorkoutInteractor.GetOneByUserId(ctx)
 	if err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
