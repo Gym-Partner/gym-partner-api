@@ -34,7 +34,7 @@ func (mw *MigrateWorkout) GenerateForTest(userId string) {
 		uuid.New().String(),
 		uuid.New().String(),
 	}
-	mw.Day = time.Now()
+	//mw.Day = time.Now()
 	mw.Name = "Workout name test"
 	mw.Comment = "Workout comment test"
 }
@@ -62,7 +62,7 @@ func (mu *MigrateUnityOfWorkout) GenerateForTest(ids pq.StringArray) {
 		}
 		mu.NbSerie = 0
 		mu.Comment = "Unity of workout comment test"
-		mu.RestTimeSec = time.Now()
+		//mu.RestTimeSec = time.Now()
 	}
 }
 

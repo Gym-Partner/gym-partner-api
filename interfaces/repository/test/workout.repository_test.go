@@ -325,7 +325,7 @@ func TestWorkoutRepository_GET_WORKOUT(t *testing.T) {
 
 			switch value.name {
 			case core.TestREPWorkoutGetSuccess:
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
 				assert.Equal(t, err, value.expectedErr)
@@ -393,7 +393,7 @@ func TestWorkoutRepository_GET_UNITY_OF_WORKOUT(t *testing.T) {
 
 			switch value.name {
 			case core.TestREPUnityOfWorkoutGetSuccess:
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
 				assert.Equal(t, err, value.expectedErr)
@@ -461,7 +461,7 @@ func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
 
 			switch value.name {
 			case core.TestREPExerciceGetSuccess:
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
 				assert.Equal(t, err, value.expectedErr)
@@ -529,7 +529,7 @@ func TestWorkoutRepository_GET_SERIE(t *testing.T) {
 
 			switch value.name {
 			case core.TESTREPSerieGetSuccess:
-				assert.NoError(t, err)
+				assert.Nil(t, err)
 				assert.NotEmpty(t, result)
 				assert.Equal(t, result, value.expectedRes)
 				assert.Equal(t, err, value.expectedErr)

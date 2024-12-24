@@ -78,7 +78,7 @@ func (wr WorkoutRepository) CreateSerie(data model.Serie) *core.Error {
 func (wr WorkoutRepository) GetOneWorkoutByUserId(uid string) (database.MigrateWorkout, *core.Error) {
 	var workout database.MigrateWorkout
 
-	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Where("user_id = ?", uid).First(&workout); retour.Error != nil {
+	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Where("user_id = ?", uid).Find(&workout); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return database.MigrateWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout, retour.Error)
 	}
@@ -89,7 +89,7 @@ func (wr WorkoutRepository) GetOneWorkoutByUserId(uid string) (database.MigrateW
 func (wr WorkoutRepository) GetUntyById(id string) (database.MigrateUnityOfWorkout, *core.Error) {
 	var unity database.MigrateUnityOfWorkout
 
-	if retour := wr.DB.Table(UNITY_TABLE_NAME).Where("id = ?", id).First(&unity); retour.Error != nil {
+	if retour := wr.DB.Table(UNITY_TABLE_NAME).Where("id = ?", id).Find(&unity); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return database.MigrateUnityOfWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetUnityOfWorkout, retour.Error)
 	}
@@ -100,7 +100,7 @@ func (wr WorkoutRepository) GetUntyById(id string) (database.MigrateUnityOfWorko
 func (wr WorkoutRepository) GetExerciceById(id string) (database.MigrateExercice, *core.Error) {
 	var exercice database.MigrateExercice
 
-	if retour := wr.DB.Table(EXERCICE_TABLE_NAME).Where("id = ?", id).First(&exercice); retour.Error != nil {
+	if retour := wr.DB.Table(EXERCICE_TABLE_NAME).Where("id = ?", id).Find(&exercice); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return database.MigrateExercice{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice, retour.Error)
 	}
@@ -111,7 +111,7 @@ func (wr WorkoutRepository) GetExerciceById(id string) (database.MigrateExercice
 func (wr WorkoutRepository) GetSerieById(id string) (database.MigrateSerie, *core.Error) {
 	var serie database.MigrateSerie
 
-	if retour := wr.DB.Table(SERIE_TABLE_NAME).Where("id = ?", id).First(&serie); retour.Error != nil {
+	if retour := wr.DB.Table(SERIE_TABLE_NAME).Where("id = ?", id).Find(&serie); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return database.MigrateSerie{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie, retour.Error)
 	}
