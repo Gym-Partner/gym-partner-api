@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type Users []User
 type User struct {
 	Id        string    `json:"id" gorm:"primaryKey, not null" swaggerignore:"true"`
 	FirstName string    `json:"first_name" example:"test"`
@@ -16,6 +15,11 @@ type User struct {
 	Email     string    `json:"email" gorm:"not null" example:"test@test.com"`
 	Password  string    `json:"password" gorm:"not null" example:"aaaAAA111"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+}
+type Users []User
+
+type NewUsers struct {
+	Users Users
 }
 
 type Login struct {
@@ -39,8 +43,19 @@ func (u *User) GenerateUID() {
 	u.Id = uuid.New().String()
 }
 
-func (u *User) GenerateTestStruct() {
-	u.Id = uuid.New().String()
+func (u *User) GenerateTestStruct(uid ...string) {
+
+	newUid := ""
+	for _, v := range uid {
+		newUid = v
+	}
+
+	if len(newUid) > 0 {
+		u.Id = newUid
+	} else {
+		u.Id = uuid.New().String()
+	}
+
 	u.FirstName = "Test"
 	u.LastName = "Test"
 	u.UserName = "test_test"
@@ -58,7 +73,59 @@ func (u *User) UserToAnother(data User) {
 }
 
 func (u *Users) Respons() gin.H {
+	var result []gin.H
+
+	for _, user := range *u {
+		result = append(result, gin.H{
+			"id":         user.Id,
+			"first_name": user.FirstName,
+			"last_name":  user.LastName,
+			"username":   user.UserName,
+			"email":      user.Email,
+		})
+	}
+
 	return gin.H{
-		"data": u,
+		"data": result,
+	}
+
+}
+
+func (u *Users) GenerateTestStruct() *NewUsers {
+	*u = Users{
+		{
+			Id:        uuid.New().String(),
+			FirstName: "Test1",
+			LastName:  "Test1",
+			UserName:  "test_test1",
+			Email:     "test1@test.com",
+			//Password:  "aaaAAA111",
+		},
+		{
+			Id:        uuid.New().String(),
+			FirstName: "Test2",
+			LastName:  "Test2",
+			UserName:  "test_test2",
+			Email:     "test2@test.com",
+			//Password:  "aaaAAA222",
+		},
+		{
+			Id:        uuid.New().String(),
+			FirstName: "Test3",
+			LastName:  "Test3",
+			UserName:  "test_test3",
+			Email:     "test3@test.com",
+			//Password:  "aaaAAA333",
+		},
+	}
+
+	return &NewUsers{
+		Users: *u,
+	}
+}
+
+func (u *NewUsers) AddCreatedAt() {
+	for _, user := range u.Users {
+		user.CreatedAt = time.Now()
 	}
 }

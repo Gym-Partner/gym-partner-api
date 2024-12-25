@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"time"
 )
@@ -26,6 +27,18 @@ type MigrateWorkout struct {
 }
 type MigrateWorkouts []MigrateWorkout
 
+func (mw *MigrateWorkout) GenerateForTest(userId string) {
+	mw.Id = uuid.New().String()
+	mw.UserId = userId
+	mw.UnitiesId = pq.StringArray{
+		uuid.New().String(),
+		uuid.New().String(),
+	}
+	//mw.Day = time.Now()
+	mw.Name = "Workout name test"
+	mw.Comment = "Workout comment test"
+}
+
 type MigrateUnityOfWorkout struct {
 	Id          string         `json:"id" gorm:"primaryKey;not null"`
 	ExerciceId  pq.StringArray `json:"exercice_id" gorm:"type:text[]; not null"`
@@ -36,13 +49,47 @@ type MigrateUnityOfWorkout struct {
 }
 type MigrateUnitiesOfWorkout []MigrateUnityOfWorkout
 
+func (mu *MigrateUnityOfWorkout) GenerateForTest(ids pq.StringArray) {
+	for _, value := range ids {
+		mu.Id = value
+		mu.ExerciceId = pq.StringArray{
+			uuid.New().String(),
+			uuid.New().String(),
+		}
+		mu.SerieId = pq.StringArray{
+			uuid.New().String(),
+			uuid.New().String(),
+		}
+		mu.NbSerie = 0
+		mu.Comment = "Unity of workout comment test"
+		//mu.RestTimeSec = time.Now()
+	}
+}
+
+func (mus *MigrateUnitiesOfWorkout) GenerateForTest(unity MigrateUnityOfWorkout) {
+	*mus = append(*mus, unity)
+}
+
 type MigrateSerie struct {
 	Id          string `json:"id" gorm:"primaryKey;not null"`
 	Weight      int    `json:"weight" gorm:"not null"`
-	Repetitions int    `json:"repitions" gorm:"not null"`
+	Repetitions int    `json:"repetitions" gorm:"not null"`
 	IsWarmUp    bool   `json:"is_warm_up" gorm:"not null"`
 }
 type MigrateSeries []MigrateSerie
+
+func (ms *MigrateSerie) GenerateForTest(ids pq.StringArray) {
+	for _, value := range ids {
+		ms.Id = value
+		ms.Weight = 1
+		ms.Repetitions = 1
+		ms.IsWarmUp = true
+	}
+}
+
+func (mss *MigrateSeries) GenerateForTest(serie MigrateSerie) {
+	*mss = append(*mss, serie)
+}
 
 type MigrateExercice struct {
 	Id         string `json:"id" gorm:"primaryKey;not null"`
@@ -50,6 +97,18 @@ type MigrateExercice struct {
 	Equipement bool   `json:"equipement" gorm:"not null"`
 }
 type MigrateExercices []MigrateExercice
+
+func (me *MigrateExercice) GenerateForTest(ids pq.StringArray) {
+	for _, value := range ids {
+		me.Id = value
+		me.Name = "Exercice name test"
+		me.Equipement = true
+	}
+}
+
+func (mes *MigrateExercices) GenerateForTest(exercice MigrateExercice) {
+	*mes = append(*mes, exercice)
+}
 
 func (MigrateUser) TableName() string {
 	return "user"
