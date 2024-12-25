@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,15 +13,17 @@ import (
 )
 
 type UserController struct {
-	UserInteractor interactor.UserInteractor
-	Log            *core.Log
+	IUserInteractor interactor.IUserInteractor
+	Log             *core.Log
 }
+
+// ------------------------------ Constructor ------------------------------
 
 func NewUserController(db *core.Database) *UserController {
 	cognito := core.NewCognito(db.Logger)
 
 	return &UserController{
-		UserInteractor: interactor.UserInteractor{
+		IUserInteractor: &interactor.UserInteractor{
 			IUserRepository: repository.UserRepository{
 				DB:  db.Handler,
 				Log: db.Logger,
@@ -29,6 +32,18 @@ func NewUserController(db *core.Database) *UserController {
 			ICognito: cognito,
 		},
 		Log: db.Logger,
+	}
+}
+
+// ------------------------------ Mock Constructor ------------------------------
+
+func MockUserController(UCMock *mock.UserControllerMock) *UserController {
+	log := core.NewLog("/Users/oscar/Documents/gym-partner-env", true)
+	log.ChargeLog()
+
+	return &UserController{
+		IUserInteractor: UCMock,
+		Log:             log,
 	}
 }
 
@@ -46,7 +61,7 @@ func NewUserController(db *core.Database) *UserController {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/create [post]
 func (uc *UserController) Create(ctx *gin.Context) {
-	user, err := uc.UserInteractor.Create(ctx)
+	user, err := uc.IUserInteractor.Create(ctx)
 	if err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
@@ -66,7 +81,7 @@ func (uc *UserController) Create(ctx *gin.Context) {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/getAll [get]
 func (uc *UserController) GetAll(ctx *gin.Context) {
-	users, err := uc.UserInteractor.GetAll()
+	users, err := uc.IUserInteractor.GetAll()
 	if err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
@@ -86,7 +101,7 @@ func (uc *UserController) GetAll(ctx *gin.Context) {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/getOne [get]
 func (uc *UserController) GetOne(ctx *gin.Context) {
-	user, err := uc.UserInteractor.GetOne(ctx)
+	user, err := uc.IUserInteractor.GetOne(ctx)
 	if err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
@@ -106,7 +121,7 @@ func (uc *UserController) GetOne(ctx *gin.Context) {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/update [patch]
 func (uc *UserController) Update(ctx *gin.Context) {
-	if err := uc.UserInteractor.Update(ctx); err != nil {
+	if err := uc.IUserInteractor.Update(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
 	}
@@ -124,7 +139,7 @@ func (uc *UserController) Update(ctx *gin.Context) {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/delete [delete]
 func (uc *UserController) Delete(ctx *gin.Context) {
-	if err := uc.UserInteractor.Delete(ctx); err != nil {
+	if err := uc.IUserInteractor.Delete(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
 	}
@@ -145,35 +160,19 @@ func (uc *UserController) Delete(ctx *gin.Context) {
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/login [post]
 func (uc *UserController) Login(ctx *gin.Context) {
-	user, err := uc.UserInteractor.GetOneByEmail(ctx)
+	user, err := uc.IUserInteractor.GetOneByEmail(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Respons())
+		ctx.JSON(err.Code, err.Respons())
 		return
 	}
 
-	token, err := uc.UserInteractor.Login(ctx, user)
+	token, err := uc.IUserInteractor.Login(user)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Respons())
+		ctx.JSON(err.Code, err.Respons())
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"token": token,
-	})
-}
-
-// ------------------------------ PING ------------------------------
-
-// PING godoc
-// @Summary Do ping
-// @Schemes
-// @Description Do ping for test connection with the API
-// @Tags PING
-// @Produce application/json
-// @Success 200 {string} json "PONG"
-// @Router /ping [get]
-func (uc *UserController) PING(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{
-		"message": "PONG",
 	})
 }

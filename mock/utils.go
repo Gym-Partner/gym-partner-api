@@ -8,13 +8,13 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
-type UtilsMock[T model.User] struct {
+type UtilsMock[T model.User | model.Workout] struct {
 	mock.Mock
 }
 
 func (u *UtilsMock[T]) SchemaToModel(workout database.MigrateWorkout, unitie database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout {
-	//TODO implement me
-	panic("implement me")
+	args := u.Called(workout, unitie, exercices, series)
+	return args.Get(0).(model.Workout)
 }
 
 func (u *UtilsMock[T]) HashPassword(password string) (string, *core.Error) {
@@ -28,7 +28,7 @@ func (u *UtilsMock[T]) InjectBodyInModel(ctx *gin.Context) (T, *core.Error) {
 }
 
 func (u *UtilsMock[T]) Bind(target, patch interface{}) *core.Error {
-	args := u.Called(&target, patch)
+	args := u.Called(target, patch)
 	return args.Error(0).(*core.Error)
 }
 

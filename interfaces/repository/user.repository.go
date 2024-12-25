@@ -16,6 +16,16 @@ type UserRepository struct {
 	Log *core.Log
 }
 
+func MockUserRepository(db *gorm.DB) *UserRepository {
+	log := core.NewLog("/Users/oscar/Documents/gym-partner-env", true)
+	log.ChargeLog()
+
+	return &UserRepository{
+		DB:  db,
+		Log: log,
+	}
+}
+
 func (u UserRepository) IsExist(data, OPT string) bool {
 	var user model.User
 	var queryColumn string
@@ -27,7 +37,7 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 		queryColumn = "email"
 	}
 
-	if retour := u.DB.Table(TABLE_NAME).Where(queryColumn+" = ?", data).First(&user); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Where(queryColumn+" = ?", data).Find(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return false
 	}
@@ -63,7 +73,7 @@ func (u UserRepository) GetAll() (model.Users, *core.Error) {
 func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 	var user model.User
 
-	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).First(&user); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).Find(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, uid), retour.Error)
 	}
@@ -74,7 +84,7 @@ func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 	var user model.User
 
-	if retour := u.DB.Table(TABLE_NAME).Where("email = ?", email).Select("id").First(&user); retour.Error != nil {
+	if retour := u.DB.Table(TABLE_NAME).Where("email = ?", email).Select("id").Find(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, email), retour.Error)
 	}

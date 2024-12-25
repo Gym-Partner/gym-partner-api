@@ -82,7 +82,7 @@ func (c *Cognito) SignIn(user model.User) (string, *Error) {
 	result, err := c.CognitoProvider.InitiateAuth(authInput)
 	if err != nil {
 		c.Log.Error(ErrAWSCognitoAuthUser)
-		return "", NewError(http.StatusBadRequest, ErrAWSCognitoAuthUser, err)
+		return "", NewError(http.StatusUnauthorized, ErrAWSCognitoAuthUser, err)
 	}
 
 	return *result.AuthenticationResult.AccessToken, nil

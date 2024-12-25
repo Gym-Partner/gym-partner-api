@@ -35,7 +35,11 @@ func Router(db *core.Database) *gin.Engine {
 		{
 			v1NoAuth.POST("/user/create", userController.Create)
 			v1NoAuth.POST("/user/login", userController.Login)
-			v1NoAuth.GET("/ping", userController.PING)
+			v1NoAuth.GET("/ping", func(context *gin.Context) {
+				context.JSON(200, gin.H{
+					"message": "PONG",
+				})
+			})
 		}
 	}
 	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
