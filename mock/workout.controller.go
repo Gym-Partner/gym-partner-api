@@ -13,7 +13,7 @@ type WorkoutControllerMock struct {
 
 func (w *WorkoutControllerMock) Create(ctx *gin.Context) *core.Error {
 	args := w.Called(ctx)
-	return args.Get(0).(*core.Error)
+	return args.Error(0).(*core.Error)
 }
 
 func (w *WorkoutControllerMock) GetOneByUserId(ctx *gin.Context) (model.Workout, *core.Error) {

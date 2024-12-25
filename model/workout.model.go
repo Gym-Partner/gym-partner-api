@@ -24,7 +24,14 @@ type Workouts []Workout
 
 func (w *Workout) Respons() gin.H {
 	return gin.H{
-		"data": w,
+		"data": gin.H{
+			"id":                 w.Id,
+			"userId":             w.UserId,
+			"unities_of_workout": w.UnitiesOfWorkout.Response(),
+			"day":                w.Day.Format("2006-01-02"),
+			"name":               w.Name,
+			"comment":            w.Comment,
+		},
 	}
 }
 
@@ -103,7 +110,7 @@ func (w *Workout) GenerateTestWorkout(uid ...string) {
 	}
 
 	w.Id = uuid.New().String()
-	w.Day = time.Now()
+	//w.Day = time.Now()
 	w.UnitiesOfWorkout = generateTestUnities(2)
 	w.Name = "Name test"
 	w.Comment = "Comment test"
@@ -120,6 +127,23 @@ type UnityOfWorkout struct {
 	RestTimeSec time.Time `json:"rest_time_sec"`
 }
 type UnitiesOfWorkout []UnityOfWorkout
+
+func (uow *UnitiesOfWorkout) Response() []gin.H {
+	response := make([]gin.H, len(*uow))
+
+	for i, unity := range *uow {
+		response[i] = gin.H{
+			"id":            unity.Id,
+			"exercices":     unity.Exercices.Response(),
+			"series":        unity.Series.Response(),
+			"nb_serie":      unity.NbSerie,
+			"comment":       unity.Comment,
+			"rest_time_sec": unity.RestTimeSec.Format("2006-01-02"),
+		}
+	}
+
+	return response
+}
 
 func (uw *UnityOfWorkout) GenerateUID() {
 	uw.Id = uuid.New().String()
@@ -160,12 +184,12 @@ func generateTestUnities(iteration int) UnitiesOfWorkout {
 
 	for i := 0; i < iteration; i++ {
 		unity := UnityOfWorkout{
-			Id:          uuid.New().String(),
-			Exercices:   generateTestExercices(iteration),
-			Series:      generateTestSeries(iteration),
-			NbSerie:     i,
-			Comment:     fmt.Sprintf("Comment test: %d", i),
-			RestTimeSec: time.Now(),
+			Id:        uuid.New().String(),
+			Exercices: generateTestExercices(iteration),
+			Series:    generateTestSeries(iteration),
+			NbSerie:   i,
+			Comment:   fmt.Sprintf("Comment test: %d", i),
+			//RestTimeSec: time.Now(),
 		}
 
 		unities = append(unities, unity)
@@ -183,6 +207,21 @@ type Serie struct {
 	IsWarmUp    bool   `json:"is_warm_up"`
 }
 type Series []Serie
+
+func (s *Series) Response() []gin.H {
+	response := make([]gin.H, len(*s))
+
+	for i, serie := range *s {
+		response[i] = gin.H{
+			"id":          serie.Id,
+			"weight":      serie.Weight,
+			"repetitions": serie.Repetitions,
+			"is_warm_up":  serie.IsWarmUp,
+		}
+	}
+
+	return response
+}
 
 func (s *Serie) GenerateUID() {
 	s.Id = uuid.New().String()
@@ -220,6 +259,20 @@ type Exercice struct {
 	Equipement bool   `json:"equipement"`
 }
 type Exercices []Exercice
+
+func (e *Exercices) Response() []gin.H {
+	response := make([]gin.H, len(*e))
+
+	for i, exercice := range *e {
+		response[i] = gin.H{
+			"id":         exercice.Id,
+			"name":       exercice.Name,
+			"equipement": exercice.Equipement,
+		}
+	}
+
+	return response
+}
 
 func (e *Exercice) GenerateUID() {
 	e.Id = uuid.New().String()

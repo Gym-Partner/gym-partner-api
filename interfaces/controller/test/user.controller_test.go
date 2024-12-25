@@ -17,27 +17,84 @@ import (
 
 const TOKEN = "test@gmail.com"
 
-func transformResponse(response gin.H) {
+//func transformResponse(response gin.H) {
+//	if code, ok := response["code"].(float64); ok {
+//		response["code"] = int(code)
+//	}
+//
+//	if dataArray, ok := response["data"].([]interface{}); ok {
+//		var transformedArray []gin.H
+//		for _, item := range dataArray {
+//			// Convertir chaque élément en gin.H si possible
+//			if itemMap, ok := item.(map[string]interface{}); ok {
+//				transformedArray = append(transformedArray, gin.H(itemMap))
+//			} else if itemGinH, ok := item.(gin.H); ok {
+//				transformedArray = append(transformedArray, itemGinH)
+//			}
+//		}
+//		response["data"] = transformedArray
+//	}
+//
+//	if data, ok := response["data"].(map[string]interface{}); ok {
+//		response["data"] = gin.H(data)
+//	}
+//}
+
+func transformResponse(response gin.H) gin.H {
+	// Convertir "code" en int si c'est un float64
 	if code, ok := response["code"].(float64); ok {
 		response["code"] = int(code)
 	}
 
-	if dataArray, ok := response["data"].([]interface{}); ok {
-		var transformedArray []gin.H
-		for _, item := range dataArray {
-			// Convertir chaque élément en gin.H si possible
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				transformedArray = append(transformedArray, gin.H(itemMap))
-			} else if itemGinH, ok := item.(gin.H); ok {
-				transformedArray = append(transformedArray, itemGinH)
-			}
-		}
-		response["data"] = transformedArray
+	// Convertir "data" en gin.H si c'est un map
+	if data, ok := response["data"].(map[string]interface{}); ok {
+		response["data"] = transformMap(data)
 	}
 
-	if data, ok := response["data"].(map[string]interface{}); ok {
-		response["data"] = gin.H(data)
+	// Convertir "data" en slice de gin.H si c'est un tableau
+	if dataArray, ok := response["data"].([]interface{}); ok {
+		response["data"] = transformArray(dataArray)
 	}
+
+	return response
+}
+
+// Transforme une map[string]interface{} en gin.H avec traitement des champs imbriqués
+func transformMap(input map[string]interface{}) gin.H {
+	result := gin.H{}
+	for key, value := range input {
+		switch v := value.(type) {
+		case float64:
+			// Conversion des floats en int si applicable
+			if float64(int(v)) == v {
+				result[key] = int(v)
+			} else {
+				result[key] = v
+			}
+		case map[string]interface{}:
+			// Conversion récursive des maps imbriquées
+			result[key] = transformMap(v)
+		case []interface{}:
+			// Conversion des slices
+			result[key] = transformArray(v)
+		default:
+			result[key] = v
+		}
+	}
+	return result
+}
+
+// Transforme un slice []interface{} en []gin.H avec traitement des éléments
+func transformArray(input []interface{}) []gin.H {
+	var result []gin.H
+	for _, item := range input {
+		if itemMap, ok := item.(map[string]interface{}); ok {
+			result = append(result, transformMap(itemMap))
+		} else if itemGinH, ok := item.(gin.H); ok {
+			result = append(result, itemGinH)
+		}
+	}
+	return result
 }
 
 func TestUserController_CREATE(t *testing.T) {
