@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -8,12 +9,25 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/docs"
 	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/controller"
 	"gitlab.com/gym-partner1/api/gym-partner-api/middleware"
+	"time"
 )
 
 func Router(db *core.Database) *gin.Engine {
 	route := gin.Default()
 	route.Use(middleware.InitMiddleware(db.Logger))
 	docs.SwaggerInfo.BasePath = "/api/v1"
+
+	route.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://foo.com"},
+		AllowMethods:     []string{"PUT", "PATCH"},
+		AllowHeaders:     []string{"Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "https://github.com"
+		},
+		MaxAge: 12 * time.Hour,
+	}))
 
 	userController := controller.NewUserController(db)
 	workoutController := controller.NewWorkoutController(db)

@@ -34,7 +34,7 @@ func main() {
 	gymPartnerFigure := figure.NewFigure("Gym Partner API", "slant", true)
 	gymPartnerFigure.Print()
 	fmt.Println()
-	fmt.Printf(fmt.Sprintf("Run to: http://%s\n", address))
+	fmt.Printf(fmt.Sprintf("Run to: http://%s/api/v1\n", address))
 
 	if err := route.Run(address); err != nil {
 		log.Error(fmt.Sprintf("[RUN] %s", err.Error()))
