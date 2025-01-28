@@ -176,3 +176,13 @@ func (uc *UserController) Login(ctx *gin.Context) {
 		"token": token,
 	})
 }
+
+func (uc *UserController) LoginScratch(ctx *gin.Context) {
+	tokenData, err := uc.IUserInteractor.LoginScratch(ctx)
+	if err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, tokenData.Response())
+}

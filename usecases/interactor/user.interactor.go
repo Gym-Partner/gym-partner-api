@@ -20,6 +20,7 @@ type IUserInteractor interface {
 	Update(ctx *gin.Context) *core.Error
 	Delete(ctx *gin.Context) *core.Error
 	Login(user model.User) (string, *core.Error)
+	LoginScratch(ctx *gin.Context) (model.Token, *core.Error)
 }
 
 type UserInteractor struct {
@@ -144,4 +145,9 @@ func (ui *UserInteractor) Login(user model.User) (string, *core.Error) {
 	}
 
 	return token, nil
+}
+
+func (ui *UserInteractor) LoginScratch(ctx *gin.Context) (model.Token, *core.Error) {
+	// TODO implement me
+	panic("implement me")
 }
