@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Token struct {
+type Auth struct {
 	Id           string    `json:"id"`
 	UserId       string    `json:"user_id"`
 	Token        string    `json:"token"`
@@ -13,7 +13,7 @@ type Token struct {
 	ExpiresAt    time.Time `json:"expires_at"`
 }
 
-func (t *Token) Response() gin.H {
+func (t *Auth) Response() gin.H {
 	return gin.H{
 		"data": gin.H{
 			"user_id":       t.UserId,

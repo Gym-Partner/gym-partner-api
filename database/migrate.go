@@ -110,7 +110,7 @@ func (mes *MigrateExercices) GenerateForTest(exercice MigrateExercice) {
 	*mes = append(*mes, exercice)
 }
 
-type MigrateToken struct {
+type MigrateAuth struct {
 	Id           string    `json:"id" gorm:"primaryKey;not null"`
 	UserId       string    `json:"user_id" gorm:"not null"`
 	RefreshToken string    `json:"refresh_token" gorm:"not null"`
@@ -137,4 +137,4 @@ func (MigrateExercice) TableName() string {
 	return "exercice"
 }
 
-func (MigrateToken) TableName() string { return "token" }
+func (MigrateAuth) TableName() string { return "auth" }

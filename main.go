@@ -24,7 +24,7 @@ func main() {
 		database.MigrateUnityOfWorkout{},
 		database.MigrateExercice{},
 		database.MigrateSerie{},
-		database.MigrateToken{},
+		database.MigrateAuth{},
 	); err != nil {
 		log.Error(fmt.Sprintf(core.ErrMigrateModel, err.Error()))
 		return
