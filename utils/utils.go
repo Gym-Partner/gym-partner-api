@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type IUtils[T model.User | model.Workout | model.Auth] interface {
+type IUtils[T model.User | model.Workout | model.UserToLogin] interface {
 	HashPassword(password string) (string, *core.Error)
 	InjectBodyInModel(ctx *gin.Context) (T, *core.Error)
 	Bind(target, patch interface{}) *core.Error
@@ -25,7 +25,7 @@ type IUtils[T model.User | model.Workout | model.Auth] interface {
 	SchemaToModel(workout database.MigrateWorkout, unitie database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout
 }
 
-type Utils[T model.User | model.Workout | model.Auth] struct{}
+type Utils[T model.User | model.Workout | model.UserToLogin] struct{}
 
 func (u Utils[T]) GenerateUUID() string {
 	return uuid.New().String()

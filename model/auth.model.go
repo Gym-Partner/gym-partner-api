@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
 
@@ -22,4 +23,14 @@ func (t *Auth) Response() gin.H {
 			"expires_at":    t.ExpiresAt,
 		},
 	}
+}
+
+type CustomClaims struct {
+	UserId string `json:"user_id"`
+	jwt.RegisteredClaims
+}
+
+type UserToLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
