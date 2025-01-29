@@ -42,8 +42,8 @@ func Router(db *core.Database) *gin.Engine {
 			v1Auth.PATCH("/user/update", userController.Update)
 			v1Auth.DELETE("/user/delete", userController.Delete)
 			v1Auth.GET("/user/workout/getOne", workoutController.GetOneByUserId)
-
 			v1Auth.POST("/workout/create", workoutController.Create)
+			v1Auth.POST("/auth/refresh", authController.RefreshToken)
 		}
 
 		v1NoAuth := api.Group("/v1")

@@ -39,3 +39,5 @@ func (ac *AuthController) Login(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, auth.Response())
 }
+
+func (ac *AuthController) RefreshToken(ctx *gin.Context) {}
