@@ -1,9 +1,10 @@
 package database
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/lib/pq"
-	"time"
 )
 
 type MigrateUser struct {
@@ -13,6 +14,7 @@ type MigrateUser struct {
 	Username  string    `json:"username" gorm:"column:username;not null"`
 	Email     string    `json:"email" gorm:"not null"`
 	Password  string    `json:"password" gorm:"not null"`
+	Age       int       `json:"age"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 type MigrateUsers []MigrateUser
