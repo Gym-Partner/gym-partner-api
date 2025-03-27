@@ -112,6 +112,14 @@ func (mes *MigrateExercices) GenerateForTest(exercice MigrateExercice) {
 	*mes = append(*mes, exercice)
 }
 
+type MigrateAuth struct {
+	Id           string    `json:"id" gorm:"primaryKey;not null"`
+	UserId       string    `json:"user_id" gorm:"not null"`
+	Token        string    `json:"token" gorm:"not null"`
+	RefreshToken string    `json:"refresh_token" gorm:"not null"`
+	ExpiresAt    time.Time `json:"expires_at" gorm:"not null"`
+}
+
 func (MigrateUser) TableName() string {
 	return "user"
 }
@@ -131,3 +139,5 @@ func (MigrateSerie) TableName() string {
 func (MigrateExercice) TableName() string {
 	return "exercice"
 }
+
+func (MigrateAuth) TableName() string { return "auth" }
