@@ -1,6 +1,8 @@
 package router
 
 import (
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -9,7 +11,6 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/docs"
 	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/controller"
 	"gitlab.com/gym-partner1/api/gym-partner-api/middleware"
-	"time"
 )
 
 func Router(db *core.Database) *gin.Engine {
@@ -50,7 +51,8 @@ func Router(db *core.Database) *gin.Engine {
 		{
 			v1NoAuth.POST("/user/create", userController.Create)
 			v1NoAuth.POST("/user/login", userController.Login)
-			v1NoAuth.POST("/auth/login", authController.Login)
+			v1NoAuth.POST("/auth/sign_in", authController.Login)
+			v1NoAuth.POST("/auth/refresh_token", authController.RefreshToken)
 			v1NoAuth.GET("/ping", func(context *gin.Context) {
 				context.JSON(200, gin.H{
 					"message": "PONG",

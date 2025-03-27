@@ -1,9 +1,10 @@
 package database
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/lib/pq"
-	"time"
 )
 
 type MigrateUser struct {
@@ -113,6 +114,7 @@ func (mes *MigrateExercices) GenerateForTest(exercice MigrateExercice) {
 type MigrateAuth struct {
 	Id           string    `json:"id" gorm:"primaryKey;not null"`
 	UserId       string    `json:"user_id" gorm:"not null"`
+	Token        string    `json:"token" gorm:"not null"`
 	RefreshToken string    `json:"refresh_token" gorm:"not null"`
 	ExpiresAt    time.Time `json:"expires_at" gorm:"not null"`
 }

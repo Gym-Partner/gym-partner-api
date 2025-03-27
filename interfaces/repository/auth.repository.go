@@ -2,10 +2,11 @@ package repository
 
 import (
 	"fmt"
+	"net/http"
+
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 type AuthRepository struct {
@@ -16,11 +17,16 @@ type AuthRepository struct {
 func (a AuthRepository) GetUserIDByEmail(email string) (string, *core.Error) {
 	var userId string
 
-	if retour := a.DB.Table("user").Where("email = ?", email).Find(&userId); retour.Error != nil {
+	if retour := a.DB.Table("user").Select("id").Where("email = ?", email).Find(&userId); retour.Error != nil {
 		a.Log.Error(retour.Error.Error())
 		return userId, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, email), retour.Error)
 	}
 	return userId, nil
+}
+
+func (a AuthRepository) GetAuthByRefreshToken(refreshToken string) (model.Auth, *core.Error) {
+	//TODO Implement me
+	panic("implement me")
 }
 
 func (a AuthRepository) Create(data model.Auth) *core.Error {
