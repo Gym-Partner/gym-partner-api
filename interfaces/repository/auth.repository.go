@@ -25,8 +25,13 @@ func (a AuthRepository) GetUserIDByEmail(email string) (string, *core.Error) {
 }
 
 func (a AuthRepository) GetAuthByRefreshToken(refreshToken string) (model.Auth, *core.Error) {
-	//TODO Implement me
-	panic("implement me")
+	var auth model.Auth
+
+	if retour := a.DB.Table("auth").Where("refresh_token = ?", refreshToken).Find(&auth); retour.Error != nil {
+		a.Log.Error(retour.Error.Error())
+		return model.Auth{}, core.NewError(http.StatusNotFound, "", retour.Error)
+	}
+	return auth, nil
 }
 
 func (a AuthRepository) Create(data model.Auth) *core.Error {
@@ -38,6 +43,11 @@ func (a AuthRepository) Create(data model.Auth) *core.Error {
 }
 
 func (a AuthRepository) Delete(uid string) *core.Error {
-	//TODO implement me
-	panic("implement me")
+	var auth model.Auth
+
+	if retour := a.DB.Table("auth").Where("user_id = ?", uid).Delete(&auth); retour.Error != nil {
+		a.Log.Error(retour.Error.Error())
+		return core.NewError(http.StatusInternalServerError, "", retour.Error)
+	}
+	return nil
 }

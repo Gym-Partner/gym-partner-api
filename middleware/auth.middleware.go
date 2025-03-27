@@ -37,13 +37,16 @@ func (a AuthMiddleware) GenerateJWT(uid, secretKey string, expiredTime time.Dura
 }
 
 func (a AuthMiddleware) VerifyRefreshToken(auth model.Auth, refreshToken string) *core.Error {
-	claims := &model.CustomClaims{}
+	claims := &model.CustomClaims{
+		UserId: auth.UserId,
+	}
+
 	token, parseErr := jwt.ParseWithClaims(refreshToken, claims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(viper.GetString("REFRESH_TOKEN_SECRET")), nil
 	})
 
 	if parseErr != nil || !token.Valid {
-		return core.NewError(http.StatusUnauthorized, "Invalid or expired refresh token")
+		return core.NewError(http.StatusUnauthorized, "Invalid or expired refresh token", parseErr)
 	}
 
 	if claims.UserId != auth.UserId {

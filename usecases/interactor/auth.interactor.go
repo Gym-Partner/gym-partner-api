@@ -34,15 +34,17 @@ func (ai AuthInteractor) Authenticate(ctx *gin.Context) (model.Auth, *core.Error
 		return model.Auth{}, err
 	}
 
-	token, refresh, err := ai.generateJWTAndRefresh(userId)
+	token, refresh, expiration, err := ai.generateJWTAndRefresh(userId)
+	if err != nil {
+		return model.Auth{}, err
+	}
 
-	var expirationTime time.Time
 	auth := model.Auth{
 		Id:           ai.IUtils.GenerateUUID(),
 		UserId:       userId,
 		Token:        token,
 		RefreshToken: refresh,
-		ExpiresAt:    expirationTime,
+		ExpiresAt:    expiration,
 	}
 
 	err = ai.IAuthRepository.Create(auth)
@@ -65,31 +67,41 @@ func (ai AuthInteractor) RefreshAuthenticate(ctx *gin.Context) (model.Auth, *cor
 		return model.Auth{}, err
 	}
 
-	newToken, newRefresh, err := ai.generateJWTAndRefresh(existingAuth.UserId)
+	newToken, newRefresh, expiration, err := ai.generateJWTAndRefresh(existingAuth.UserId)
+	if err != nil {
+		return model.Auth{}, err
+	}
 
-	var expirationTime time.Time
 	updatedAuth := model.Auth{
 		Id:           existingAuth.Id,
 		UserId:       existingAuth.UserId,
 		Token:        newToken,
 		RefreshToken: newRefresh,
-		ExpiresAt:    expirationTime,
+		ExpiresAt:    expiration,
 	}
 
-	return model.Auth{}, nil
+	if err := ai.IAuthRepository.Delete(existingAuth.UserId); err != nil {
+		return model.Auth{}, err
+	}
+
+	if err := ai.IAuthRepository.Create(updatedAuth); err != nil {
+		return model.Auth{}, err
+	}
+
+	return updatedAuth, nil
 }
 
-func (ai AuthInteractor) generateJWTAndRefresh(userId string) (token, refresh string, err *core.Error) {
+func (ai AuthInteractor) generateJWTAndRefresh(userId string) (token, refresh string, expiration time.Time, err *core.Error) {
 	var expirationTime time.Time
 	token, newErr := ai.IAuthMiddleware.GenerateJWT(userId, "TOKEN_SECRET", 7*24*time.Hour, &expirationTime)
 	if newErr != nil {
-		return "", "", core.NewError(http.StatusUnauthorized, newErr.Error())
+		return "", "", time.Now(), core.NewError(http.StatusUnauthorized, newErr.Error())
 	}
 
 	refresh, otherErr := ai.IAuthMiddleware.GenerateJWT(userId, "REFRESH_TOKEN_SECRET", 17*24*time.Hour)
 	if otherErr != nil {
-		return "", "", core.NewError(http.StatusUnauthorized, otherErr.Error())
+		return "", "", time.Now(), core.NewError(http.StatusUnauthorized, otherErr.Error())
 	}
 
-	return token, refresh, nil
+	return token, refresh, expirationTime, nil
 }
