@@ -50,7 +50,6 @@ func Router(db *core.Database) *gin.Engine {
 		v1NoAuth := api.Group("/v1")
 		{
 			v1NoAuth.POST("/user/create", userController.Create)
-			v1NoAuth.POST("/user/login", userController.Login)
 			v1NoAuth.POST("/auth/sign_in", authController.Login)
 			v1NoAuth.POST("/auth/refresh_token", authController.RefreshToken)
 			v1NoAuth.GET("/ping", func(context *gin.Context) {

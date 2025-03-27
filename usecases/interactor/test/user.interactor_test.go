@@ -23,26 +23,25 @@ func TestUserInteractor_INSERT(t *testing.T) {
 
 	setupTest := []struct {
 		name        string
-		setupMock   func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context)
+		setupMock   func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], ctx *gin.Context)
 		expectedRes model.User
 		expectedErr *core.Error
 	}{
 		{
 			name: core.TestINTUserCreateSuccess,
-			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context) {
+			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], ctx *gin.Context) {
 				utilsMock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				userMock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
 				utilsMock.On("GenerateUUID").Return(user.Id).Once()
 				utilsMock.On("HashPassword", user.Password).Return(user.Password, (*core.Error)(nil)).Once()
 				userMock.On("Create", user).Return(user, (*core.Error)(nil)).Once()
-				cognitoMock.On("SignUp", user).Return((*core.Error)(nil)).Once()
 			},
 			expectedRes: user,
 			expectedErr: nil,
 		},
 		{
 			name: core.TestUserExistFailed,
-			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context) {
+			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], ctx *gin.Context) {
 				utilsMock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				userMock.On("IsExist", user.Email, "EMAIL").Return(true).Once()
 			},
@@ -51,7 +50,7 @@ func TestUserInteractor_INSERT(t *testing.T) {
 		},
 		{
 			name: core.TestInternalErrorFailed,
-			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock, ctx *gin.Context) {
+			setupMock: func(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], ctx *gin.Context) {
 				utilsMock.On("InjectBodyInModel", ctx).Return(user, (*core.Error)(nil)).Once()
 				userMock.On("IsExist", user.Email, "EMAIL").Return(false).Once()
 				utilsMock.On("GenerateUUID").Return(user.Id).Once()
@@ -67,9 +66,8 @@ func TestUserInteractor_INSERT(t *testing.T) {
 		t.Run(value.name, func(t *testing.T) {
 			UserMock := new(mock.UserInteractorMock)
 			UtilsMock := new(mock.UtilsMock[model.User])
-			CognitoMock := new(mock.CognitoMock)
 
-			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock)
 
 			buf, _ := utils.StructToReadCloser(user)
 			context := &gin.Context{
@@ -78,7 +76,7 @@ func TestUserInteractor_INSERT(t *testing.T) {
 				},
 			}
 
-			value.setupMock(UserMock, UtilsMock, CognitoMock, context)
+			value.setupMock(UserMock, UtilsMock, context)
 
 			result, err := ui.Create(context)
 
@@ -101,7 +99,6 @@ func TestUserInteractor_INSERT(t *testing.T) {
 			}
 			UserMock.AssertExpectations(t)
 			UtilsMock.AssertExpectations(t)
-			CognitoMock.AssertExpectations(t)
 		})
 	}
 }
@@ -138,9 +135,8 @@ func TestUserInteractor_GETALL(t *testing.T) {
 		t.Run(value.name, func(t *testing.T) {
 			UserMock := new(mock.UserInteractorMock)
 			UtilsMock := new(mock.UtilsMock[model.User])
-			CognitoMock := new(mock.CognitoMock)
 
-			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock)
 
 			value.setupMock(UserMock)
 
@@ -195,11 +191,10 @@ func TestUserInteractor_GETONEBYID(t *testing.T) {
 		t.Run(value.name, func(t *testing.T) {
 			UserMock := new(mock.UserInteractorMock)
 			UtilsMock := new(mock.UtilsMock[model.User])
-			CognitoMock := new(mock.CognitoMock)
 			context := &gin.Context{}
 			context.Set("uid", &user.Id)
 
-			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock)
 			value.setupMock(UserMock)
 
 			result, err := ui.GetOne(context)
@@ -255,7 +250,6 @@ func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
 		t.Run(value.name, func(t *testing.T) {
 			UserMock := new(mock.UserInteractorMock)
 			UtilsMock := new(mock.UtilsMock[model.User])
-			CognitoMock := new(mock.CognitoMock)
 			buf, _ := utils.StructToReadCloser(user)
 
 			context := &gin.Context{
@@ -264,7 +258,7 @@ func TestUserInteractor_GETONEBYEMAIL(t *testing.T) {
 				},
 			}
 
-			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock)
 			value.setupMock(UserMock, UtilsMock, context)
 
 			result, err := ui.GetOneByEmail(context)
@@ -341,7 +335,6 @@ func TestUserInteractor_UPDATE(t *testing.T) {
 		t.Run(value.name, func(t *testing.T) {
 			UserMock := new(mock.UserInteractorMock)
 			UtilsMock := new(mock.UtilsMock[model.User])
-			CognitoMock := new(mock.CognitoMock)
 			buf, _ := utils.StructToReadCloser(patch)
 
 			context := &gin.Context{
@@ -351,7 +344,7 @@ func TestUserInteractor_UPDATE(t *testing.T) {
 			}
 			context.Set("uid", &patch.Id)
 
-			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock)
 
 			value.setupMock(UserMock, UtilsMock, context)
 
@@ -384,41 +377,31 @@ func TestUserInteractor_DELETE(t *testing.T) {
 
 	setupTest := []struct {
 		name        string
-		setupMock   func(userMock *mock.UserInteractorMock, cognitoMock *mock.CognitoMock)
+		setupMock   func(userMock *mock.UserInteractorMock)
 		expectedRes *core.Error
 	}{
 		{
 			name: core.TestINTUserDeleteSuccess,
-			setupMock: func(userMock *mock.UserInteractorMock, cognitoMock *mock.CognitoMock) {
+			setupMock: func(userMock *mock.UserInteractorMock) {
 				userMock.On("IsExist", user.Id, "ID").Return(true).Once()
 				userMock.On("Delete", user.Id).Return((*core.Error)(nil)).Once()
-				cognitoMock.On("DeleteUser", token).Return((*core.Error)(nil)).Once()
 			},
 			expectedRes: (*core.Error)(nil),
 		},
 		{
 			name: core.TestUserNotExistFailed,
-			setupMock: func(userMock *mock.UserInteractorMock, cognitoMock *mock.CognitoMock) {
+			setupMock: func(userMock *mock.UserInteractorMock) {
 				userMock.On("IsExist", user.Id, "ID").Return(false).Once()
 			},
 			expectedRes: core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, user.Id)),
 		},
 		{
 			name: core.TestInternalErrorFailed,
-			setupMock: func(userMock *mock.UserInteractorMock, cognitoMock *mock.CognitoMock) {
+			setupMock: func(userMock *mock.UserInteractorMock) {
 				userMock.On("IsExist", user.Id, "ID").Return(true).Once()
 				userMock.On("Delete", user.Id).Return(core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBDeleteUser, user.Id)))
 			},
 			expectedRes: core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBDeleteUser, user.Id)),
-		},
-		{
-			name: core.TestUserNotDeletedCognito,
-			setupMock: func(userMock *mock.UserInteractorMock, cognitoMock *mock.CognitoMock) {
-				userMock.On("IsExist", user.Id, "ID").Return(true).Once()
-				userMock.On("Delete", user.Id).Return((*core.Error)(nil)).Once()
-				cognitoMock.On("DeleteUser", token).Return(core.NewError(http.StatusBadRequest, core.ErrAWSCognitoDeleteUser)).Once()
-			},
-			expectedRes: core.NewError(http.StatusBadRequest, core.ErrAWSCognitoDeleteUser),
 		},
 	}
 
@@ -426,14 +409,13 @@ func TestUserInteractor_DELETE(t *testing.T) {
 		t.Run(value.name, func(t *testing.T) {
 			UserMock := new(mock.UserInteractorMock)
 			UtilsMock := new(mock.UtilsMock[model.User])
-			CognitoMock := new(mock.CognitoMock)
 			context := &gin.Context{}
 
 			context.Set("uid", &user.Id)
 			context.Set("token", token)
 
-			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
-			value.setupMock(UserMock, CognitoMock)
+			ui := interactor.MockUserInteractor(UserMock, UtilsMock)
+			value.setupMock(UserMock)
 
 			result := ui.Delete(context)
 
@@ -447,67 +429,8 @@ func TestUserInteractor_DELETE(t *testing.T) {
 			case core.TestInternalErrorFailed:
 				assert.NotNil(t, result)
 				assert.Equal(t, result, value.expectedRes)
-			case core.TestUserNotDeletedCognito:
-				assert.NotNil(t, result)
-				assert.Equal(t, result, value.expectedRes)
 			}
 			UserMock.AssertExpectations(t)
-			CognitoMock.AssertExpectations(t)
-		})
-	}
-}
-
-func TestUserInteractor_LOGIN(t *testing.T) {
-	var token string
-	var user model.User
-	user.GenerateTestStruct()
-
-	setupTest := []struct {
-		name        string
-		setupMock   func(cognitoMock *mock.CognitoMock)
-		expectedRes string
-		expectedErr *core.Error
-	}{
-		{
-			name: core.TestINTUserLoginSuccess,
-			setupMock: func(cognitoMock *mock.CognitoMock) {
-				cognitoMock.On("SignIn", user).Return(token, (*core.Error)(nil)).Once()
-			},
-			expectedRes: token,
-			expectedErr: (*core.Error)(nil),
-		},
-		{
-			name: core.ErrAWSCognitoAuthUser,
-			setupMock: func(cognitoMock *mock.CognitoMock) {
-				cognitoMock.On("SignIn", user).Return("", core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser))
-			},
-			expectedRes: "",
-			expectedErr: core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser),
-		},
-	}
-
-	for _, value := range setupTest {
-		t.Run(value.name, func(t *testing.T) {
-			UserMock := new(mock.UserInteractorMock)
-			UtilsMock := new(mock.UtilsMock[model.User])
-			CognitoMock := new(mock.CognitoMock)
-
-			ui := interactor.MockUserInteractor(UserMock, UtilsMock, CognitoMock)
-			value.setupMock(CognitoMock)
-
-			result, err := ui.Login(user)
-
-			switch value.name {
-			case core.TestINTUserLoginSuccess:
-				assert.Nil(t, err)
-				assert.Equal(t, result, value.expectedRes)
-				assert.Equal(t, err, value.expectedErr)
-			case core.ErrAWSCognitoAuthUser:
-				assert.NotNil(t, err)
-				assert.Equal(t, result, value.expectedRes)
-				assert.Equal(t, err, value.expectedErr)
-			}
-			CognitoMock.AssertExpectations(t)
 		})
 	}
 }

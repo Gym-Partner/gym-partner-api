@@ -2,7 +2,10 @@ package test
 
 import (
 	"encoding/json"
-	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -10,9 +13,6 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 const TOKEN = "test@gmail.com"
@@ -381,77 +381,6 @@ func TestUserController_DELETE(t *testing.T) {
 			value.setupMock(UserControllerMock, ctx)
 
 			uc.Delete(ctx)
-			assert.Equal(t, value.expectedCode, res.Code)
-
-			var response gin.H
-			err := json.Unmarshal(res.Body.Bytes(), &response)
-			transformResponse(response)
-
-			assert.NoError(t, err)
-			assert.Equal(t, value.expectedBody, response)
-
-			UserControllerMock.AssertExpectations(t)
-		})
-	}
-}
-
-func TestUserController_LOGIN(t *testing.T) {
-	var user model.User
-	user.GenerateTestStruct()
-
-	setupTest := []struct {
-		name         string
-		setupMock    func(uc *mock.UserControllerMock, ctx *gin.Context)
-		expectedCode int
-		expectedBody gin.H
-	}{
-		{
-			name: core.TestCONUserLoginSuccess,
-			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
-				uc.On("GetOneByEmail", ctx).Return(user, (*core.Error)(nil)).Once()
-				uc.On("Login", user).Return(TOKEN, (*core.Error)(nil)).Once()
-			},
-			expectedCode: http.StatusOK,
-			expectedBody: gin.H{
-				"token": TOKEN,
-			},
-		},
-		{
-			name: core.TestUserNotFound,
-			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
-				uc.On("GetOneByEmail", ctx).Return(model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, user.Email))).Once()
-			},
-			expectedCode: http.StatusNotFound,
-			expectedBody: core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, user.Email)).Respons(),
-		},
-		{
-			name: core.TestUserLoginFailed,
-			setupMock: func(uc *mock.UserControllerMock, ctx *gin.Context) {
-				uc.On("GetOneByEmail", ctx).Return(user, (*core.Error)(nil)).Once()
-				uc.On("Login", user).Return("", core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser))
-			},
-			expectedCode: http.StatusUnauthorized,
-			expectedBody: core.NewError(http.StatusUnauthorized, core.ErrAWSCognitoAuthUser).Respons(),
-		},
-	}
-
-	for _, value := range setupTest {
-		t.Run(value.name, func(t *testing.T) {
-			UserControllerMock := new(mock.UserControllerMock)
-			uc := controller.MockUserController(UserControllerMock)
-
-			gin.SetMode(gin.TestMode)
-			res := httptest.NewRecorder()
-			ctx, _ := gin.CreateTestContext(res)
-			ctx.Request = &http.Request{
-				Header: http.Header{
-					"Authorization": []string{TOKEN},
-				},
-			}
-
-			value.setupMock(UserControllerMock, ctx)
-
-			uc.Login(ctx)
 			assert.Equal(t, value.expectedCode, res.Code)
 
 			var response gin.H

@@ -19,28 +19,23 @@ type IUserInteractor interface {
 	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
 	Update(ctx *gin.Context) *core.Error
 	Delete(ctx *gin.Context) *core.Error
-	Login(user model.User) (string, *core.Error)
 }
 
 type UserInteractor struct {
 	IUserRepository repository.IUserRepository
 	IUtils          utils.IUtils[model.User]
-	ICognito        core.ICognito
 }
 
-func MockUserInteractor(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User], cognitoMock *mock.CognitoMock) *UserInteractor {
+func MockUserInteractor(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User]) *UserInteractor {
 	return &UserInteractor{
 		IUserRepository: userMock,
 		IUtils:          utilsMock,
-		ICognito:        cognitoMock,
 	}
 }
 
 // -------------------------- CRUD ------------------------------
 
 func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
-	var userCognito model.User
-
 	data, err := ui.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return model.User{}, err
@@ -53,16 +48,10 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
 	data.Id = ui.IUtils.GenerateUUID()
 
-	userCognito.UserToAnother(data)
-
 	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
 	if err != nil {
 		return user, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser, err)
-	}
-
-	if err = ui.ICognito.SignUp(userCognito); err != nil {
-		return user, core.NewError(http.StatusBadRequest, core.ErrIntCreateUserAWS, err)
 	}
 
 	return user, err
@@ -118,7 +107,6 @@ func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
 }
 
 func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
-	token, _ := ctx.Get("token")
 	uid, _ := ctx.Get("uid")
 
 	exist := ui.IUserRepository.IsExist(*uid.(*string), "ID")
@@ -130,18 +118,5 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
 		return err
 	}
 
-	if err := ui.ICognito.DeleteUser(token.(string)); err != nil {
-		return err
-	}
-
 	return nil
-}
-
-func (ui *UserInteractor) Login(user model.User) (string, *core.Error) {
-	token, err := ui.ICognito.SignIn(user)
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
 }

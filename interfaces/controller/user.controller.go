@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"net/http"
+
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -20,16 +21,13 @@ type UserController struct {
 // ------------------------------ Constructor ------------------------------
 
 func NewUserController(db *core.Database) *UserController {
-	cognito := core.NewCognito(db.Logger)
-
 	return &UserController{
 		IUserInteractor: &interactor.UserInteractor{
 			IUserRepository: repository.UserRepository{
 				DB:  db.Handler,
 				Log: db.Logger,
 			},
-			IUtils:   utils.Utils[model.User]{},
-			ICognito: cognito,
+			IUtils: utils.Utils[model.User]{},
 		},
 		Log: db.Logger,
 	}
@@ -145,34 +143,4 @@ func (uc *UserController) Delete(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, nil)
-}
-
-// ------------------------------ AUTH ------------------------------
-
-// Login godoc
-// @Summary Sign in one user
-// @Schemes
-// @Description Sign in one user with this credentials and return user's token
-// @Tags User
-// @Produce application/json
-// @Param credentials body model.Login{} true "User's credentials"
-// @Success 200 {object} string "User's token"
-// @Failure 500 {object} core.Error{} "Internal server error"
-// @Router /user/login [post]
-func (uc *UserController) Login(ctx *gin.Context) {
-	user, err := uc.IUserInteractor.GetOneByEmail(ctx)
-	if err != nil {
-		ctx.JSON(err.Code, err.Respons())
-		return
-	}
-
-	token, err := uc.IUserInteractor.Login(user)
-	if err != nil {
-		ctx.JSON(err.Code, err.Respons())
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"token": token,
-	})
 }

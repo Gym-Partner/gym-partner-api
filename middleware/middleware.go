@@ -8,15 +8,11 @@ import (
 )
 
 func InitMiddleware(log *core.Log) gin.HandlerFunc {
-	return func(context *gin.Context) {
-		congito := core.NewCognito(log)
-		context.Set("cognito", congito)
-	}
+	return func(context *gin.Context) {}
 }
 
 func Auth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		cognito, _ := ctx.Get("cognito")
 
 		token := ctx.Request.Header["Authorization"]
 		newToken := strings.Join(token, "")
@@ -28,12 +24,8 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		uid, err := cognito.(*core.Cognito).GetUserByToken(newToken)
-		if err != nil {
-			ctx.JSON(err.Code, err.Respons())
-			ctx.Abort()
-			return
-		}
+		// Make change for recover user_id in token without AWS Cognito
+		uid := ""
 
 		ctx.Set("uid", uid)
 		ctx.Set("token", newToken)

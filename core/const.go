@@ -21,15 +21,8 @@ const (
 
 	ErrDBCreateAuth = "[AUTH][REPOSITORY] Failed to create auth"
 
-	ErrIntUserExist     = "[USER][INTERACTOR] User already exist in database"
-	ErrIntCreateUserAWS = "[USER][INTERACTOR] Failed to create user in AWS Cognito service"
-	ErrIntUserNotExist  = "[USER][INTERACTOR] User %s not found, or not exist in database"
-
-	ErrAWSCognitoCreateSession  = "[AWS][COGNITO] Failed to create new session"
-	ErrAWSCognitoCreateUser     = "[AWS][COGNITO] Failed to create user"
-	ErrAWSCognitoAuthUser       = "[AWS][COGNITO] Failed to authentificate user"
-	ErrAWSCognitoGetUserByToken = "[AWS][COGNITO] Failed to recover the user by his token"
-	ErrAWSCognitoDeleteUser     = "[AWS][COGNITO] Failed to delete user"
+	ErrIntUserExist    = "[USER][INTERACTOR] User already exist in database"
+	ErrIntUserNotExist = "[USER][INTERACTOR] User %s not found, or not exist in database"
 
 	ErrConnectDatabase = "[DB_CONNECT][PostgreSQL] "
 	ErrPingDatabase    = "[DB_PING][PostgreSQL] "
@@ -70,16 +63,15 @@ const (
 	TestCONUserDeleteSuccess = "[TEST][CONTROLLER][USER][SUCCESS]DELETE"
 	TestCONUserLoginSuccess  = "[TEST][CONTROLLER][USER][SUCCESS]LOGIN"
 
-	TestUserExistFailed       = "[TEST][FAILED]USER_EXIST"
-	TestUserNotExistFailed    = "[TEST][FAILED]USER_NOT_EXIST"
-	TestInternalErrorFailed   = "[TEST][FAILED]INTERNAL_ERROR"
-	TestUsersNotFound         = "[TEST][FAILED]USERS_NOT_FOUND"
-	TestUserNotFound          = "[TEST][FAILED]USER_NOT_FOUND"
-	TestUserNotDeletedCognito = "[TEST][FAILED]USER_NOT_DELETED_COGNITO"
-	TestUserCreateFailed      = "[TEST][FAILED]USER_CREATE"
-	TestUserUpdateFailed      = "[TEST][FAILED]USER_UPDATE"
-	TestUserDeleteFailed      = "[TEST][FAILED]USER_DELETE"
-	TestUserLoginFailed       = "[TEST][FAILED]USER_LOGIN"
+	TestUserExistFailed     = "[TEST][FAILED]USER_EXIST"
+	TestUserNotExistFailed  = "[TEST][FAILED]USER_NOT_EXIST"
+	TestInternalErrorFailed = "[TEST][FAILED]INTERNAL_ERROR"
+	TestUsersNotFound       = "[TEST][FAILED]USERS_NOT_FOUND"
+	TestUserNotFound        = "[TEST][FAILED]USER_NOT_FOUND"
+	TestUserCreateFailed    = "[TEST][FAILED]USER_CREATE"
+	TestUserUpdateFailed    = "[TEST][FAILED]USER_UPDATE"
+	TestUserDeleteFailed    = "[TEST][FAILED]USER_DELETE"
+	TestUserLoginFailed     = "[TEST][FAILED]USER_LOGIN"
 )
 
 const (
