@@ -1,10 +1,14 @@
 package middleware
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/spf13/viper"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
 func InitMiddleware(log *core.Log) gin.HandlerFunc {
@@ -24,10 +28,20 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		// Make change for recover user_id in token without AWS Cognito
-		uid := ""
+		claims := &model.CustomClaims{}
+		tokenAfterParse, err := jwt.ParseWithClaims(newToken, claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte(viper.GetString("TOKEN_SECRET")), nil
+		})
 
-		ctx.Set("uid", uid)
+		if err != nil || !tokenAfterParse.Valid {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Error to parse token",
+			})
+			ctx.Abort()
+			return
+		}
+
+		ctx.Set("uid", claims.UserId)
 		ctx.Set("token", newToken)
 	}
 }

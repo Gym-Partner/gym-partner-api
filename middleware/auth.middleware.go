@@ -14,6 +14,7 @@ type IAuthMiddleware interface {
 	// GenerateJWT create two type of token. First the real token and second the refreshToken
 	// The distinction is in the secretKey and expiredTime
 	GenerateJWT(uid, secretKey string, expiredTime time.Duration, endTime ...*time.Time) (string, error)
+	// VerifyRefreshToken verify the refreshTok with him, the secret key and the extisting auth
 	VerifyRefreshToken(auth model.Auth, refreshToken string) *core.Error
 }
 
@@ -37,9 +38,7 @@ func (a AuthMiddleware) GenerateJWT(uid, secretKey string, expiredTime time.Dura
 }
 
 func (a AuthMiddleware) VerifyRefreshToken(auth model.Auth, refreshToken string) *core.Error {
-	claims := &model.CustomClaims{
-		UserId: auth.UserId,
-	}
+	claims := &model.CustomClaims{}
 
 	token, parseErr := jwt.ParseWithClaims(refreshToken, claims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(viper.GetString("REFRESH_TOKEN_SECRET")), nil
