@@ -1,6 +1,7 @@
 package interactor
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -47,8 +48,11 @@ func (ai AuthInteractor) Authenticate(ctx *gin.Context) (model.Auth, *core.Error
 		ExpiresAt:    expiration,
 	}
 
-	err = ai.IAuthRepository.Create(auth)
-	if err != nil {
+	if err := ai.IAuthRepository.Delete(auth.UserId); err != nil {
+		log.Println("no user")
+	}
+
+	if err := ai.IAuthRepository.Create(auth); err != nil {
 		return model.Auth{}, err
 	}
 
