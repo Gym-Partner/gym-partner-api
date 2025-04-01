@@ -15,19 +15,19 @@ type AuthRepository struct {
 }
 
 func (a AuthRepository) GetUserIDByEmail(email string) (string, *core.Error) {
-	var userId string
+	var user model.User
 
-	if retour := a.DB.Table("user").Select("id").Where("email = ?", email).Find(&userId); retour.Error != nil {
+	if retour := a.DB.Table("user").Select("id").Where("email = ?", email).First(&user); retour.Error != nil {
 		a.Log.Error(retour.Error.Error())
-		return userId, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, email), retour.Error)
+		return "", core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, email), retour.Error)
 	}
-	return userId, nil
+	return user.Id, nil
 }
 
 func (a AuthRepository) GetAuthByRefreshToken(refreshToken string) (model.Auth, *core.Error) {
 	var auth model.Auth
 
-	if retour := a.DB.Table("auth").Where("refresh_token = ?", refreshToken).Find(&auth); retour.Error != nil {
+	if retour := a.DB.Table("auth").Where("refresh_token = ?", refreshToken).First(&auth); retour.Error != nil {
 		a.Log.Error(retour.Error.Error())
 		return model.Auth{}, core.NewError(http.StatusNotFound, "", retour.Error)
 	}
