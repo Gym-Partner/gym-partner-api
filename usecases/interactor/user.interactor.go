@@ -43,17 +43,15 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
 	exist := ui.IUserRepository.IsExist(data.Email, "EMAIL")
 	if exist {
-		return model.User{}, core.NewError(http.StatusBadRequest, core.ErrIntUserExist)
+		return model.User{}, core.NewError(
+			http.StatusBadRequest,
+			fmt.Sprintf(core.ErrAppINTUserExist, data.Email))
 	}
 
 	data.Id = ui.IUtils.GenerateUUID()
 
 	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
-	if err != nil {
-		return user, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser, err)
-	}
-
 	return user, err
 }
 
@@ -90,7 +88,9 @@ func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
 
 	exist := ui.IUserRepository.IsExist(patch.Id, "ID")
 	if !exist {
-		return core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, patch.Id))
+		return core.NewError(
+			http.StatusBadRequest,
+			fmt.Sprintf(core.ErrAppINTUserNotExist, patch.Id))
 	}
 
 	target, err := ui.IUserRepository.GetOneById(patch.Id)
@@ -111,12 +111,11 @@ func (ui *UserInteractor) Delete(ctx *gin.Context) *core.Error {
 
 	exist := ui.IUserRepository.IsExist(*uid.(*string), "ID")
 	if !exist {
-		return core.NewError(http.StatusBadRequest, fmt.Sprintf(core.ErrIntUserNotExist, *uid.(*string)))
+		return core.NewError(
+			http.StatusBadRequest,
+			fmt.Sprintf(core.ErrAppINTUserNotExist, *uid.(*string)))
 	}
 
-	if err := ui.IUserRepository.Delete(*uid.(*string)); err != nil {
-		return err
-	}
-
-	return nil
+	err := ui.IUserRepository.Delete(*uid.(*string))
+	return err
 }

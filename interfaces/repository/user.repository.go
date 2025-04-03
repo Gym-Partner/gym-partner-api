@@ -52,8 +52,12 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 
 func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
 	if retour := u.DB.Table(TABLE_NAME).Create(&data); retour.Error != nil {
-		u.Log.Error(retour.Error.Error())
-		return model.User{}, core.NewError(http.StatusInternalServerError, core.ErrDBCreateUser, retour.Error)
+		u.Log.Error(core.ErrDBCreateUser, retour.Error.Error())
+
+		return model.User{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBCreateUser, data.Email),
+			retour.Error)
 	}
 
 	return data, nil
@@ -63,8 +67,12 @@ func (u UserRepository) GetAll() (model.Users, *core.Error) {
 	var users model.Users
 
 	if retour := u.DB.Table(TABLE_NAME).Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
-		u.Log.Error(retour.Error.Error())
-		return model.Users{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetAllUser, retour.Error)
+		u.Log.Error(core.ErrDBGetAllUser, retour.Error.Error())
+
+		return model.Users{}, core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBGetAllUser,
+			retour.Error)
 	}
 
 	return users, nil
@@ -74,8 +82,12 @@ func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 	var user model.User
 
 	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).Find(&user); retour.Error != nil {
-		u.Log.Error(retour.Error.Error())
-		return model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, uid), retour.Error)
+		u.Log.Error(core.ErrDBGetOneUser, uid, retour.Error.Error())
+
+		return model.User{}, core.NewError(
+			http.StatusNotFound,
+			fmt.Sprintf(core.ErrAppDBGetOneUser, uid),
+			retour.Error)
 	}
 
 	return user, nil
@@ -85,8 +97,12 @@ func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 	var user model.User
 
 	if retour := u.DB.Table(TABLE_NAME).Where("email = ?", email).Select("id").Find(&user); retour.Error != nil {
-		u.Log.Error(retour.Error.Error())
-		return model.User{}, core.NewError(http.StatusNotFound, fmt.Sprintf(core.ErrDBGetOneUser, email), retour.Error)
+		u.Log.Error(core.ErrDBGetOneUser, email, retour.Error.Error())
+
+		return model.User{}, core.NewError(
+			http.StatusNotFound,
+			fmt.Sprintf(core.ErrAppDBGetOneUser, email),
+			retour.Error)
 	}
 
 	return user, nil
@@ -94,8 +110,12 @@ func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 
 func (u UserRepository) Update(data model.User) *core.Error {
 	if retour := u.DB.Table(TABLE_NAME).Save(&data); retour.Error != nil {
-		u.Log.Error(retour.Error.Error())
-		return core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBUpdateUser, data.Id), retour.Error)
+		u.Log.Error(core.ErrDBUpdateUser, data.Email, retour.Error.Error())
+
+		return core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBUpdateUser, data.Email),
+			retour.Error)
 	}
 
 	return nil
@@ -105,8 +125,12 @@ func (u UserRepository) Delete(uid string) *core.Error {
 	var user model.User
 
 	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).Delete(&user); retour.Error != nil {
-		u.Log.Error(retour.Error.Error())
-		return core.NewError(http.StatusInternalServerError, fmt.Sprintf(core.ErrDBDeleteUser, uid), retour.Error)
+		u.Log.Error(core.ErrDBDeleteUser, uid, retour.Error.Error())
+
+		return core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBDeleteUser, uid),
+			retour.Error)
 	}
 
 	return nil

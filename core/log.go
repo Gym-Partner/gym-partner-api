@@ -2,12 +2,13 @@ package core
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"io"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Log struct {
@@ -92,6 +93,7 @@ func (l *Log) Warn(msg string) {
 	l.Logger.Warn(msg)
 }
 
-func (l *Log) Error(msg string) {
+func (l *Log) Error(label string, err ...string) {
+	msg := fmt.Sprintf(label, err)
 	l.Logger.Error(msg)
 }

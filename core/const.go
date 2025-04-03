@@ -3,13 +3,25 @@ package core
 const (
 	InfoPingDatabase = "[DB PING][PostgreSQL] Connected to the database"
 
+	ErrAppDBCreateUser = "Failed to create user [%s] in database."
+	ErrAppDBGetAllUser = "Failed to retreive all users in database."
+	ErrAppDBGetOneUser = "Failed to retreive user [%s] in database."
+	ErrAppDBUpdateUser = "Failed to update user [%s] in database."
+	ErrAppDBDeleteUser = "Failed to delete user [%s] in database."
+
+	ErrAppINTUserExist    = "User [%s] already exist in database."
+	ErrAppINTUserNotExist = "User [%s] not found, or not exist in database."
+
+	// ######################################################################################
+	// 											LOG
+	// ######################################################################################
+
 	ErrDBUserNotFound = "[USER][REPOSITORY] User not found in database"
-	ErrDBCreateUser   = "[USER][REPOSITORY] Failed to create user in database"
-	ErrDBGetAllUser   = "[USER][REPOSITORY] Failed to recover all users"
-	ErrDBGetOneUser   = "[USER][REPOSITORY] Failed to recover user [%s]"
-	ErrDBUpdateUser   = "[USER][REPOSITORY] Failed to update user [%s]"
-	ErrDBDeleteUser   = "[USER][REPOSITORY] Failed to delete user [%s]"
-	ErrDBUserExist    = "[USER][REPOSITORY] User already exist"
+	ErrDBCreateUser   = "[USER][REPOSITORY] Failed to create user in database | [ORIGINAL-ERROR] : %s"
+	ErrDBGetAllUser   = "[USER][REPOSITORY] Failed to recover all users | [ORIGINAL-ERROR] : %s"
+	ErrDBGetOneUser   = "[USER][REPOSITORY] Failed to recover user [%s] | [ORIGINAL-ERROR] : %s"
+	ErrDBUpdateUser   = "[USER][REPOSITORY] Failed to update user [%s] | [ORIGINAL-ERROR] : %s"
+	ErrDBDeleteUser   = "[USER][REPOSITORY] Failed to delete user [%s] | [ORIGINAL-ERROR] : %s"
 
 	ErrDBCreateWorkout        = "[WORKOUT][REPOSITORY] Failed to create user's workout"
 	ErrDBCreateUnityOfWorkout = "[UNITY_OF_WORKOUT][REPOSITORY] Failed to create workout's unity"
