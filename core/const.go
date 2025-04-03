@@ -1,6 +1,8 @@
 package core
 
 const (
+	InfoPingDatabase = "[DB PING][PostgreSQL] Connected to the database"
+
 	ErrDBUserNotFound = "[USER][REPOSITORY] User not found in database"
 	ErrDBCreateUser   = "[USER][REPOSITORY] Failed to create user in database"
 	ErrDBGetAllUser   = "[USER][REPOSITORY] Failed to recover all users"
@@ -32,13 +34,11 @@ const (
 	ErrEnvLoad         = "[ENV] Error while loading config file: "
 	ErrEnvNoStart      = "[ENV] Error no START parameter provided"
 	ErrEnvNoConfigFile = "[ENV] Error no config file found at: %s/config.yaml"
-)
 
-const (
-	InfoPingDatabase = "[DB PING][PostgreSQL] Connected to the database"
-)
+	// ######################################################################################
+	// 										TEST LOG
+	// ######################################################################################
 
-const (
 	TestINTUserCreateSuccess        = "[TEST][INTERACTOR][USER][SUCCESS]CREATE"
 	TestINTUserGetAllSuccess        = "[TEST][INTERACTOR][USER][SUCCESS]GET_ALL"
 	TestINTUserGetOneByIdSuccess    = "[TEST][INTERACTOR][USER][SUCCESS]GET_ONE_BY_ID"
@@ -72,9 +72,7 @@ const (
 	TestUserUpdateFailed    = "[TEST][FAILED]USER_UPDATE"
 	TestUserDeleteFailed    = "[TEST][FAILED]USER_DELETE"
 	TestUserLoginFailed     = "[TEST][FAILED]USER_LOGIN"
-)
 
-const (
 	TestINTWorkoutCreateSuccess = "[TEST][INTERACTOR][WORKOUT][SUCCESS]CREATE"
 	TestINTWorkoutGetSuccess    = "[TEST][INTERACTOR][WORKOUT][SUCCESS]GET]"
 
