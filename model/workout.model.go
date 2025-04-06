@@ -2,9 +2,10 @@ package model
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
@@ -39,12 +40,12 @@ func (w *Workout) GenerateUID() {
 	w.Id = uuid.New().String()
 }
 
-func (w *Workout) ChargeData(uid string) {
+func (w *Workout) ChargeData(uid string, day time.Time) {
 	var WG sync.WaitGroup
 
 	w.GenerateUID()
 	w.UserId = uid
-	w.Day = time.Now()
+	w.Day = day
 
 	for i := range w.UnitiesOfWorkout {
 		WG.Add(1)

@@ -1,6 +1,8 @@
 package interactor
 
 import (
+	"reflect"
+
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
@@ -8,7 +10,6 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
-	"reflect"
 )
 
 type IWorkoutInteractor interface {
@@ -35,7 +36,7 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 
 	if reflect.TypeOf(wi.IWorkoutRepository) != reflect.TypeOf(&mock.WorkoutInteractorMock{}) {
 		uid, _ := ctx.Get("uid")
-		data.ChargeData(*uid.(*string))
+		data.ChargeData(*uid.(*string), data.Day)
 	}
 
 	if err := wi.IWorkoutRepository.CreateWorkout(data); err != nil {
