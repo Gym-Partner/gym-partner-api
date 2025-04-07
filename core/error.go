@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +26,7 @@ func NewError(code int, msg string, origin ...error) *Error {
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("Error %d: %s (Occurred at: %s) with origin from: %v", e.Code, e.Message, e.OriginalErr)
+	return fmt.Sprintf("Error %d: %s with origin from: %v", e.Code, e.Message, e.OriginalErr)
 }
 
 func (e *Error) Respons() gin.H {
