@@ -15,6 +15,7 @@ import (
 type IWorkoutInteractor interface {
 	Create(ctx *gin.Context) *core.Error
 	GetOneByUserId(ctx *gin.Context) (model.Workout, *core.Error)
+	GetAllByUserId(ctx *gin.Context) (model.Workouts, *core.Error)
 }
 
 type WorkoutInteractor struct {
@@ -103,4 +104,9 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 
 	newData := wi.IUtils.SchemaToModel(workout, unities, exercices, series)
 	return newData, nil
+}
+
+func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *core.Error) {
+	//TODO implement me
+	panic("implement me")
 }

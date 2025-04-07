@@ -27,12 +27,31 @@ func (w *Workout) Respons() gin.H {
 	return gin.H{
 		"data": gin.H{
 			"id":                 w.Id,
-			"userId":             w.UserId,
+			"user_id":            w.UserId,
 			"unities_of_workout": w.UnitiesOfWorkout.Response(),
 			"day":                w.Day.Format("2006-01-02"),
 			"name":               w.Name,
 			"comment":            w.Comment,
 		},
+	}
+}
+
+func (w *Workouts) Respons() gin.H {
+	var result []gin.H
+
+	for _, workout := range *w {
+		result = append(result, gin.H{
+			"id":                 workout.Id,
+			"user_id":            workout.UserId,
+			"unities_of_workout": workout.UnitiesOfWorkout.Response(),
+			"day":                workout.Day.Format("2006-01-02"),
+			"name":               workout.Name,
+			"comment":            workout.Comment,
+		})
+	}
+
+	return gin.H{
+		"data": result,
 	}
 }
 
