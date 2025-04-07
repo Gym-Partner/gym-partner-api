@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"net/http"
+
+	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -78,4 +79,14 @@ func (wc *WorkoutController) GetOneByUserId(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, workout.Respons())
+}
+
+func (wc *WorkoutController) GetAllByUserId(ctx *gin.Context) {
+	workouts, err := wc.IWorkoutInteractor.GetAllByUserId(ctx)
+	if err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, workouts.Respons())
 }

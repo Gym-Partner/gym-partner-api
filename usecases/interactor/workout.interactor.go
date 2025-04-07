@@ -1,6 +1,8 @@
 package interactor
 
 import (
+	"reflect"
+
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
@@ -8,12 +10,12 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
-	"reflect"
 )
 
 type IWorkoutInteractor interface {
 	Create(ctx *gin.Context) *core.Error
 	GetOneByUserId(ctx *gin.Context) (model.Workout, *core.Error)
+	GetAllByUserId(ctx *gin.Context) (model.Workouts, *core.Error)
 }
 
 type WorkoutInteractor struct {
@@ -35,7 +37,7 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 
 	if reflect.TypeOf(wi.IWorkoutRepository) != reflect.TypeOf(&mock.WorkoutInteractorMock{}) {
 		uid, _ := ctx.Get("uid")
-		data.ChargeData(*uid.(*string))
+		data.ChargeData(uid.(string), data.Day)
 	}
 
 	if err := wi.IWorkoutRepository.CreateWorkout(data); err != nil {
@@ -102,4 +104,51 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 
 	newData := wi.IUtils.SchemaToModel(workout, unities, exercices, series)
 	return newData, nil
+}
+
+func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *core.Error) {
+	var emptyWorkouts model.Workouts
+	uid, _ := ctx.Get("uid")
+
+	workouts, err := wi.IWorkoutRepository.GetAllWorkoutByUserId(uid.(string))
+	if err != nil {
+		return emptyWorkouts, err
+	}
+
+	var result model.Workouts
+
+	for _, workout := range workouts {
+		var unities database.MigrateUnitiesOfWorkout
+		var exercices database.MigrateExercices
+		var series database.MigrateSeries
+
+		for _, unityId := range workout.UnitiesId {
+			unity, err := wi.IWorkoutRepository.GetUntyById(unityId)
+			if err != nil {
+				return emptyWorkouts, err
+			}
+			unities = append(unities, unity)
+
+			for _, exerciceId := range unity.ExerciceId {
+				exercice, err := wi.IWorkoutRepository.GetExerciceById(exerciceId)
+				if err != nil {
+					return emptyWorkouts, err
+				}
+				exercices = append(exercices, exercice)
+			}
+
+			for _, serieId := range unity.SerieId {
+				serie, err := wi.IWorkoutRepository.GetSerieById(serieId)
+				if err != nil {
+					return emptyWorkouts, err
+				}
+				series = append(series, serie)
+			}
+		}
+
+		newData := wi.IUtils.SchemaToModel(workout, unities, exercices, series)
+		result = append(result, newData)
+	}
+
+	return result, nil
 }
