@@ -37,7 +37,7 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 
 	if reflect.TypeOf(wi.IWorkoutRepository) != reflect.TypeOf(&mock.WorkoutInteractorMock{}) {
 		uid, _ := ctx.Get("uid")
-		data.ChargeData(*uid.(*string), data.Day)
+		data.ChargeData(uid.(string), data.Day)
 	}
 
 	if err := wi.IWorkoutRepository.CreateWorkout(data); err != nil {
@@ -110,7 +110,7 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 	var emptyWorkouts model.Workouts
 	uid, _ := ctx.Get("uid")
 
-	workouts, err := wi.IWorkoutRepository.GetAllWorkoutByUserId(*uid.(*string))
+	workouts, err := wi.IWorkoutRepository.GetAllWorkoutByUserId(uid.(string))
 	if err != nil {
 		return emptyWorkouts, err
 	}
