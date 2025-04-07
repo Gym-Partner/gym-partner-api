@@ -4,10 +4,12 @@ const (
 	InfoPingDatabase = "[DB PING][PostgreSQL] Connected to the database"
 
 	ErrAppDBCreateUser = "Failed to create user [%s] in database."
-	ErrAppDBGetAllUser = "Failed to retreive all users in database."
-	ErrAppDBGetOneUser = "Failed to retreive user [%s] in database."
+	ErrAppDBGetAllUser = "Failed to retrieve all users in database."
+	ErrAppDBGetOneUser = "Failed to retrieve user [%s] in database."
 	ErrAppDBUpdateUser = "Failed to update user [%s] in database."
 	ErrAppDBDeleteUser = "Failed to delete user [%s] in database."
+
+	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database"
 
 	ErrAppINTUserExist    = "User [%s] already exist in database."
 	ErrAppINTUserNotExist = "User [%s] not found, or not exist in database."
@@ -29,6 +31,7 @@ const (
 	ErrDBCreateSerie          = "[SERIE][REPOSITORY] Failed to create unity's serie"
 
 	ErrDBGetWorkout        = "[WORKOUT][REPOSITORY] Failed to recover user's workout with his id"
+	ErrDBGetWorkouts       = "[WORKOUT][REPOSITORY] Failed to recover user's workouts with his id [%s] | [ORIGINAL-ERROR] : %s"
 	ErrDBGetUnityOfWorkout = "[UNITY_OF_WORKOUT][REPOSITORY] Failed to recover workout's unity with his id"
 	ErrDBGetExercice       = "[EXERCICE][REPOSITORY] Failed to recover unity's exercice with his id"
 	ErrDBGetSerie          = "[SERIE][REPOSITORY] Failed to recover unity's serie with his id"
