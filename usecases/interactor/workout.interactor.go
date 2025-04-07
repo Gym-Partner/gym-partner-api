@@ -107,6 +107,48 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 }
 
 func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *core.Error) {
-	//TODO implement me
-	panic("implement me")
+	var emptyWorkouts model.Workouts
+	uid, _ := ctx.Get("uid")
+
+	workouts, err := wi.IWorkoutRepository.GetAllWorkoutByUserId(*uid.(*string))
+	if err != nil {
+		return emptyWorkouts, err
+	}
+
+	var result model.Workouts
+
+	for _, workout := range workouts {
+		var unities database.MigrateUnitiesOfWorkout
+		var exercices database.MigrateExercices
+		var series database.MigrateSeries
+
+		for _, unityId := range workout.UnitiesId {
+			unity, err := wi.IWorkoutRepository.GetUntyById(unityId)
+			if err != nil {
+				return emptyWorkouts, err
+			}
+			unities = append(unities, unity)
+
+			for _, exerciceId := range unity.ExerciceId {
+				exercice, err := wi.IWorkoutRepository.GetExerciceById(exerciceId)
+				if err != nil {
+					return emptyWorkouts, err
+				}
+				exercices = append(exercices, exercice)
+			}
+
+			for _, serieId := range unity.SerieId {
+				serie, err := wi.IWorkoutRepository.GetSerieById(serieId)
+				if err != nil {
+					return emptyWorkouts, err
+				}
+				series = append(series, serie)
+			}
+		}
+
+		newData := wi.IUtils.SchemaToModel(workout, unities, exercices, series)
+		result = append(result, newData)
+	}
+
+	return result, nil
 }
