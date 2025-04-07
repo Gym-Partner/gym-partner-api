@@ -122,6 +122,16 @@ func (wr WorkoutRepository) GetSerieById(id string) (database.MigrateSerie, *cor
 // ------------------------------ READ ALL ------------------------------
 
 func (wr WorkoutRepository) GetAllWorkoutByUserId(uid string) (database.MigrateWorkouts, *core.Error) {
-	//TODO implement me
-	panic("implement me")
+	var workouts database.MigrateWorkouts
+
+	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Where("user_id = ?", uid).Find(&workouts); retour.Error != nil {
+		wr.Log.Error(core.ErrDBGetWorkouts, uid, retour.Error.Error())
+
+		return workouts, core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBGetWorkouts,
+			retour.Error)
+	}
+
+	return workouts, nil
 }

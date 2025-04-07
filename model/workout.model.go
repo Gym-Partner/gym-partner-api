@@ -2,9 +2,10 @@ package model
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
@@ -26,7 +27,7 @@ func (w *Workout) Respons() gin.H {
 	return gin.H{
 		"data": gin.H{
 			"id":                 w.Id,
-			"userId":             w.UserId,
+			"user_id":            w.UserId,
 			"unities_of_workout": w.UnitiesOfWorkout.Response(),
 			"day":                w.Day.Format("2006-01-02"),
 			"name":               w.Name,
@@ -35,16 +36,35 @@ func (w *Workout) Respons() gin.H {
 	}
 }
 
+func (w *Workouts) Respons() gin.H {
+	var result []gin.H
+
+	for _, workout := range *w {
+		result = append(result, gin.H{
+			"id":                 workout.Id,
+			"user_id":            workout.UserId,
+			"unities_of_workout": workout.UnitiesOfWorkout.Response(),
+			"day":                workout.Day.Format("2006-01-02"),
+			"name":               workout.Name,
+			"comment":            workout.Comment,
+		})
+	}
+
+	return gin.H{
+		"data": result,
+	}
+}
+
 func (w *Workout) GenerateUID() {
 	w.Id = uuid.New().String()
 }
 
-func (w *Workout) ChargeData(uid string) {
+func (w *Workout) ChargeData(uid string, day time.Time) {
 	var WG sync.WaitGroup
 
 	w.GenerateUID()
 	w.UserId = uid
-	w.Day = time.Now()
+	w.Day = day
 
 	for i := range w.UnitiesOfWorkout {
 		WG.Add(1)

@@ -20,3 +20,8 @@ func (w *WorkoutControllerMock) GetOneByUserId(ctx *gin.Context) (model.Workout,
 	args := w.Called(ctx)
 	return args.Get(0).(model.Workout), args.Error(1).(*core.Error)
 }
+
+func (w *WorkoutControllerMock) GetAllByUserId(ctx *gin.Context) (model.Workouts, *core.Error) {
+	//TODO implement me
+	panic("implement me")
+}
