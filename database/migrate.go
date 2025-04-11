@@ -47,7 +47,7 @@ type MigrateUnityOfWorkout struct {
 	SerieId     pq.StringArray `json:"serie_id" gorm:"type:text[]; not null"`
 	NbSerie     int            `json:"nb_serie" gorm:"not null"`
 	Comment     string         `json:"comment"`
-	RestTimeSec time.Time      `json:"rest_time_sec"`
+	RestTimeSec int            `json:"rest_time_sec"`
 }
 type MigrateUnitiesOfWorkout []MigrateUnityOfWorkout
 

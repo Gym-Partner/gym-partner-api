@@ -144,7 +144,7 @@ type UnityOfWorkout struct {
 	Series      Series    `json:"series"`
 	NbSerie     int       `json:"nb_serie"`
 	Comment     string    `json:"comment"`
-	RestTimeSec time.Time `json:"rest_time_sec"`
+	RestTimeSec int       `json:"rest_time_sec"`
 }
 type UnitiesOfWorkout []UnityOfWorkout
 
@@ -158,7 +158,7 @@ func (uow *UnitiesOfWorkout) Response() []gin.H {
 			"series":        unity.Series.Response(),
 			"nb_serie":      unity.NbSerie,
 			"comment":       unity.Comment,
-			"rest_time_sec": unity.RestTimeSec.Format("2006-01-02"),
+			"rest_time_sec": unity.RestTimeSec,
 		}
 	}
 
@@ -196,7 +196,7 @@ func (uow *UnityOfWorkout) GenerateTestUnity() {
 	uow.Series = generateTestSeries(2)
 	uow.NbSerie = 2
 	uow.Comment = "Comment test unity of workout"
-	uow.RestTimeSec = time.Now()
+	uow.RestTimeSec = 20
 }
 
 func generateTestUnities(iteration int) UnitiesOfWorkout {
