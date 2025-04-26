@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +9,6 @@ import (
 type Error struct {
 	Code        int
 	Message     string
-	OccurredAt  time.Time
 	OriginalErr error
 }
 
@@ -23,20 +21,18 @@ func NewError(code int, msg string, origin ...error) *Error {
 	return &Error{
 		Code:        code,
 		Message:     msg,
-		OccurredAt:  time.Now(),
 		OriginalErr: originErr,
 	}
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("Error %d: %s (Occurred at: %s) with origin from: %v", e.Code, e.Message, e.OccurredAt.Format(time.RFC3339), e.OriginalErr)
+	return fmt.Sprintf("Error %d: %s with origin from: %v", e.Code, e.Message, e.OriginalErr)
 }
 
 func (e *Error) Respons() gin.H {
 	return gin.H{
 		"code":        e.Code,
 		"message":     e.Message,
-		"occurredAt":  e.OccurredAt,
 		"originalErr": e.OriginalErr,
 	}
 }

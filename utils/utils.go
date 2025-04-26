@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"io"
 	"reflect"
 	"strings"
@@ -16,14 +17,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type IUtils[T model.User] interface {
+type IUtils[T model.User | model.Workout | model.UserToLogin] interface {
 	HashPassword(password string) (string, *core.Error)
 	InjectBodyInModel(ctx *gin.Context) (T, *core.Error)
 	Bind(target, patch interface{}) *core.Error
 	GenerateUUID() string
+	SchemaToModel(workout database.MigrateWorkout, unitie database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout
 }
 
-type Utils[T model.User] struct{}
+type Utils[T model.User | model.Workout | model.UserToLogin] struct{}
 
 func (u Utils[T]) GenerateUUID() string {
 	return uuid.New().String()
@@ -42,10 +44,78 @@ func (u Utils[T]) InjectBodyInModel(ctx *gin.Context) (T, *core.Error) {
 	var data T
 
 	if err := ctx.ShouldBind(&data); err != nil {
-		return data, core.NewError(500, "Error to inject Resquest Body to model")
+		return data, core.NewError(500, err.Error())
 	}
 
 	return data, nil
+}
+
+func (u Utils[T]) SchemaToModel(workout database.MigrateWorkout, unities database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout {
+	var newWorkout model.Workout
+	var newUnities model.UnitiesOfWorkout
+
+	for _, unity := range unities {
+		var newUnity model.UnityOfWorkout
+		newExercices := make(model.Exercices, 0)
+		newSeries := make(model.Series, 0)
+
+		for _, exercice := range exercices {
+			if contains(unity.ExerciceId, exercice.Id) {
+				newExercice := model.Exercice{
+					Id:         exercice.Id,
+					Name:       exercice.Name,
+					Equipement: exercice.Equipement,
+				}
+				newExercices = append(newExercices, newExercice)
+			}
+		}
+
+		for _, serie := range series {
+			if contains(unity.SerieId, serie.Id) {
+				newSerie := model.Serie{
+					Id:          serie.Id,
+					Weight:      serie.Weight,
+					Repetitions: serie.Repetitions,
+					IsWarmUp:    serie.IsWarmUp,
+				}
+				newSeries = append(newSeries, newSerie)
+			}
+		}
+
+		newUnity = model.UnityOfWorkout{
+			Id:          unity.Id,
+			Exercices:   newExercices,
+			Series:      newSeries,
+			NbSerie:     unity.NbSerie,
+			Comment:     unity.Comment,
+			RestTimeSec: unity.RestTimeSec,
+		}
+
+		newUnities = append(newUnities, newUnity)
+
+		newExercices = nil
+		newSeries = nil
+	}
+
+	newWorkout = model.Workout{
+		Id:               workout.Id,
+		UserId:           workout.UserId,
+		UnitiesOfWorkout: newUnities,
+		Day:              workout.Day,
+		Name:             workout.Name,
+		Comment:          workout.Comment,
+	}
+
+	return newWorkout
+}
+
+func contains(slice []string, item string) bool {
+	for _, id := range slice {
+		if id == item {
+			return true
+		}
+	}
+	return false
 }
 
 func (u Utils[T]) Bind(target, patch interface{}) *core.Error {
@@ -61,7 +131,7 @@ func (u Utils[T]) Bind(target, patch interface{}) *core.Error {
 
 	for i := 0; i < patchValue.NumField(); i++ {
 		patchField := patchValue.Type().Field(i)
-		patchFieldName := ToTitle(patchField.Name)
+		patchFieldName := toTitle(patchField.Name)
 		targetField := targetValue.Elem().FieldByName(patchFieldName)
 
 		if !targetField.IsValid() || !targetField.CanSet() {
@@ -71,7 +141,7 @@ func (u Utils[T]) Bind(target, patch interface{}) *core.Error {
 
 		patchFieldValue := patchValue.Field(i)
 
-		if !IsEmptyValue(patchFieldValue) {
+		if !isEmptyValue(patchFieldValue) {
 			if targetField.Type() == reflect.TypeOf(time.Time{}) && patchFieldValue.Type() == reflect.TypeOf(int64(0)) {
 				targetField.Set(reflect.ValueOf(time.Unix(patchFieldValue.Interface().(int64), 0)))
 			} else {
@@ -83,11 +153,11 @@ func (u Utils[T]) Bind(target, patch interface{}) *core.Error {
 	return nil
 }
 
-func ToTitle(s string) string {
+func toTitle(s string) string {
 	return strings.Join(strings.FieldsFunc(s, unicode.IsSpace), " ")
 }
 
-func IsEmptyValue(v reflect.Value) bool {
+func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
 		return v.Len() == 0
