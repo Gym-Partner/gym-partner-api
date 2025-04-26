@@ -1,39 +1,47 @@
 package middleware
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/spf13/viper"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
 func InitMiddleware(log *core.Log) gin.HandlerFunc {
-	return func(context *gin.Context) {
-		congito := core.NewCognito(log)
-		context.Set("cognito", congito)
-	}
+	return func(context *gin.Context) {}
 }
 
 func Auth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		cognito, _ := ctx.Get("")
 
 		token := ctx.Request.Header["Authorization"]
 		newToken := strings.Join(token, "")
-		if len(token) <= 0 {
+		if len(newToken) <= 0 {
 			ctx.JSON(500, gin.H{
 				"message": "Token undefined in request's headers",
 			})
 			ctx.Abort()
+			return
 		}
 
-		uid, err := cognito.(*core.Cognito).GetUserByToken(newToken)
-		if err != nil {
-			ctx.JSON(err.Code, err.Respons())
+		claims := &model.CustomClaims{}
+		tokenAfterParse, err := jwt.ParseWithClaims(newToken, claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte(viper.GetString("TOKEN_SECRET")), nil
+		})
+
+		if err != nil || !tokenAfterParse.Valid {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Error to parse token",
+			})
 			ctx.Abort()
+			return
 		}
 
-		ctx.Set("uid", uid)
+		ctx.Set("uid", claims.UserId)
 		ctx.Set("token", newToken)
 	}
 }

@@ -2,12 +2,13 @@ package core
 
 import (
 	"fmt"
+	"io"
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
-    "go.uber.org/zap"
-    "go.uber.org/zap/zapcore"
-    "io"
-    "os"
-    "time"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Log struct {
@@ -15,9 +16,15 @@ type Log struct {
 	*zap.Logger
 }
 
-func NewLog(file string) *Log {
-	return &Log{
-		FilePath: fmt.Sprintf("%s/logs", file),
+func NewLog(file string, isTest bool) *Log {
+	if !isTest {
+		return &Log{
+			FilePath: fmt.Sprintf("%s/logs", file),
+		}
+	} else {
+		return &Log{
+			FilePath: fmt.Sprintf("%s/logs-test", file),
+		}
 	}
 }
 
@@ -48,13 +55,13 @@ func createLogger(filePath string) *zap.Logger {
 	encoderCfg.StacktraceKey = ""
 
 	config := zap.Config{
-		Level: zap.NewAtomicLevelAt(zap.DebugLevel),
-		Development: false,
-		DisableCaller: false,
+		Level:             zap.NewAtomicLevelAt(zap.DebugLevel),
+		Development:       false,
+		DisableCaller:     false,
 		DisableStacktrace: false,
-		Sampling: nil,
-		Encoding: "json",
-		EncoderConfig: encoderCfg,
+		Sampling:          nil,
+		Encoding:          "json",
+		EncoderConfig:     encoderCfg,
 		OutputPaths: []string{
 			filePath,
 		},
@@ -64,7 +71,7 @@ func createLogger(filePath string) *zap.Logger {
 		InitialFields: map[string]interface{}{
 			"pid": os.Getegid(),
 		},
-    }
+	}
 
 	return zap.Must(config.Build())
 }
@@ -86,6 +93,7 @@ func (l *Log) Warn(msg string) {
 	l.Logger.Warn(msg)
 }
 
-func (l *Log) Error(msg string) {
+func (l *Log) Error(label string, err ...string) {
+	msg := fmt.Sprintf(label, err)
 	l.Logger.Error(msg)
 }

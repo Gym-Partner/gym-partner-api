@@ -11,7 +11,3 @@ API_SERVER_PORT: "4200"
 
 # AWS
 AWS_REGION: "us-east-1"
-
-# AWS Cognito
-APP_CLIENT_ID: "4qq70oblk6fem0h2b7ch5iki5s"
-USER_PASSWORD_AUTH: "gym-partner-password-auth"
