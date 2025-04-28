@@ -55,7 +55,7 @@ deploy_staging:
           EOF
         - scp -i id_rsa ./build/$APP_NAME azureuser@$AZURE_VM_IP:/home/azureuser/src/api
         - |
-          ssh -i id_rsa azureuser@AZURE_VM_IP << 'EOF'
+          ssh -i id_rsa azureuser@$AZURE_VM_IP << 'EOF'
             sudo systemctl start gym-partner-api.service
             sudo systemctl status gym-partner-api.service --no-pager
           EOF
