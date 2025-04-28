@@ -7,11 +7,62 @@ variables:
     TAG: "v1.1.0.0"
     DOCKER_DRIVER: overlay2
     ARGOCD_APPLICATION_NAME: "gym-partner-api"
+    APP_NAME: "gym-partner-api"
 
 stages:
     - build
     - deploy
 
+# Staging Part
+go_build:
+    stage: build
+    before_script:
+        - go get -v -d ./...
+    script:
+        - GOOS=linux GOARCH=amd64 go build -o ./build/$APP_NAME main.go
+    artifacts:
+      paths:
+        - build
+    rules:
+        - if: '$CI_COMMIT_BRANCH == "staging"'
+
+deploy_staging:
+    stage: deploy
+    dependencies:
+        - go_build
+    before_script:
+        - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
+        - eval $(ssh-agent -s)
+        - echo "$AZURE_SSH_KEY" | tr -d '\r' | ssh-add -
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+        - ssh-keyscan $AZURE_VM_IP >> ~/.ssh/known_hosts
+        - chmod 644 ~/.ssh/known_hosts
+        - echo "$AZURE_SSH_KEY" > id_rsa
+        - chmod 600 id_rsa
+    script:
+        - TIMESTAMP=$(date +%Y-%m-%d)
+        - |
+          ssh -i id_rsa azureuser@$AZURE_VM_IP << EOF
+            if systemctl is-active --quiet gym-partner-websocket.service
+            then
+                sudo systemctl stop gym-partner-api.service
+            fi
+
+            if [ -f /home/azureuser/src/api/$APP_NAME ]; then
+                mv /home/azureuser/src/api/$APP_NAME /home/azureuser/src/api/back/$APP_NAME-$TIMESTAMP
+            fi
+          EOF
+        - scp -i id_rsa ./build/$APP_NAME azureuser@AZURE_VM_IP:/home/azureuser/src/api
+        - |
+          ssh -i id_rsa azureuser@AZURE_VM_IP << 'EOF'
+            sudo systemctl start gym-partner-api.service
+            sudo systemctl status gym-partner-api.service --no-pager
+          EOF
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "staging"'
+
+# Production Part
 docker:
     stage: build
     image: docker:latest
