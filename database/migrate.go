@@ -120,24 +120,23 @@ type MigrateAuth struct {
 	ExpiresAt    time.Time `json:"expires_at" gorm:"not null"`
 }
 
-func (MigrateUser) TableName() string {
-	return "user"
+type MigrateFollow struct {
+	Id        string         `json:"id" gorm:"primaryKey;not null"`
+	UserId    string         `json:"user_id" gorm:"not null"`
+	Followers pq.StringArray `json:"followers" gorm:"type:text[]"`
+	Following pq.StringArray `json:"following" gorm:"type:text[]"`
 }
 
-func (MigrateWorkout) TableName() string {
-	return "workout"
-}
+func (MigrateUser) TableName() string { return "user" }
 
-func (MigrateUnityOfWorkout) TableName() string {
-	return "unity_of_workout"
-}
+func (MigrateWorkout) TableName() string { return "workout" }
 
-func (MigrateSerie) TableName() string {
-	return "serie"
-}
+func (MigrateUnityOfWorkout) TableName() string { return "unity_of_workout" }
 
-func (MigrateExercice) TableName() string {
-	return "exercice"
-}
+func (MigrateSerie) TableName() string { return "serie" }
+
+func (MigrateExercice) TableName() string { return "exercice" }
 
 func (MigrateAuth) TableName() string { return "auth" }
+
+func (MigrateFollow) TableName() string { return "follow" }
