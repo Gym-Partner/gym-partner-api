@@ -52,6 +52,10 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
 	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
+	if err != nil {
+		return model.User{}, err
+	}
+
 	return user, err
 }
 

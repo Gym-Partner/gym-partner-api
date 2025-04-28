@@ -15,6 +15,8 @@ type User struct {
 	Email     string    `json:"email" gorm:"not null" example:"test@test.com"`
 	Password  string    `json:"password" gorm:"not null" example:"aaaAAA111"`
 	Age       int       `json:"age" example:"24"`
+	Followers []string  `json:"followers"`
+	Following []string  `json:"following"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 type Users []User
