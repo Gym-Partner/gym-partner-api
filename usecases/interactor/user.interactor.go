@@ -22,8 +22,9 @@ type IUserInteractor interface {
 }
 
 type UserInteractor struct {
-	IUserRepository repository.IUserRepository
-	IUtils          utils.IUtils[model.User]
+	IUserRepository   repository.IUserRepository
+	IFollowRepository repository.IFollowRepository
+	IUtils            utils.IUtils[model.User]
 }
 
 func MockUserInteractor(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User]) *UserInteractor {
@@ -55,6 +56,9 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 	if err != nil {
 		return model.User{}, err
 	}
+
+	// Create first follow row in database for this user
+	panic("implement me")
 
 	return user, err
 }

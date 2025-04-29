@@ -39,6 +39,8 @@ func (u *User) Respons() gin.H {
 			"username":   u.UserName,
 			"email":      u.Email,
 			"age":        u.Age,
+			"followers":  u.Followers,
+			"following":  u.Following,
 		},
 	}
 }
@@ -48,7 +50,6 @@ func (u *User) GenerateUID() {
 }
 
 func (u *User) GenerateTestStruct(uid ...string) {
-
 	newUid := ""
 	for _, v := range uid {
 		newUid = v
@@ -92,7 +93,6 @@ func (u *Users) Respons() gin.H {
 	return gin.H{
 		"data": result,
 	}
-
 }
 
 func (u *Users) GenerateTestStruct() *NewUsers {
@@ -103,7 +103,7 @@ func (u *Users) GenerateTestStruct() *NewUsers {
 			LastName:  "Test1",
 			UserName:  "test_test1",
 			Email:     "test1@test.com",
-			//Password:  "aaaAAA111",
+			// Password:  "aaaAAA111",
 		},
 		{
 			Id:        uuid.New().String(),
@@ -111,7 +111,7 @@ func (u *Users) GenerateTestStruct() *NewUsers {
 			LastName:  "Test2",
 			UserName:  "test_test2",
 			Email:     "test2@test.com",
-			//Password:  "aaaAAA222",
+			// Password:  "aaaAAA222",
 		},
 		{
 			Id:        uuid.New().String(),
@@ -119,7 +119,7 @@ func (u *Users) GenerateTestStruct() *NewUsers {
 			LastName:  "Test3",
 			UserName:  "test_test3",
 			Email:     "test3@test.com",
-			//Password:  "aaaAAA333",
+			// Password:  "aaaAAA333",
 		},
 	}
 

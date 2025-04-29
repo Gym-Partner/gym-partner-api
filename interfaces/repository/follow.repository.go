@@ -11,6 +11,22 @@ type FollowRepository struct {
 	Log *core.Log
 }
 
+func (fr FollowRepository) IsExist(userId string) bool {
+	var follow model.Follow
+
+	if retour := fr.DB.Table("follow").Where("user_id = ?", userId).First(&follow); retour.Error != nil {
+		fr.Log.Error(retour.Error.Error())
+		return false
+	}
+
+	if follow.Id == "" {
+		fr.Log.Error("error")
+		return false
+	} else {
+		return true
+	}
+}
+
 func (fr FollowRepository) Create(data model.Follow) (model.Follow, *core.Error) {
 	// TODO implement me
 	panic("implement me")

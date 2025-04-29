@@ -6,6 +6,7 @@ import (
 )
 
 type IFollowRepository interface {
+	IsExist(userId string) bool
 	GetAll() (model.Follows, *core.Error)
 	Create(data model.Follow) (model.Follow, *core.Error)
 }
