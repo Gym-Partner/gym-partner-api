@@ -6,6 +6,8 @@ import (
 )
 
 type IFollowRepository interface {
-	GetAllByUserId(userId string) (model.Follows, *core.Error)
-	Create(data model.Follow) *core.Error
+	FollowerIsExistByFollowedId(followedId string) bool
+	GetAllByUserId(followedId string) (model.Follows, *core.Error)
+	AddFollower(data model.Follow) *core.Error
+	RemoveFollower(data model.Follow) *core.Error
 }
