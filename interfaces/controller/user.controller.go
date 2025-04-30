@@ -27,10 +27,6 @@ func NewUserController(db *core.Database) *UserController {
 				DB:  db.Handler,
 				Log: db.Logger,
 			},
-			IFollowRepository: repository.FollowRepository{
-				DB:  db.Handler,
-				Log: db.Logger,
-			},
 			IUtils: utils.Utils[model.User]{},
 		},
 		Log: db.Logger,

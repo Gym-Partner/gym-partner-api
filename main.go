@@ -25,7 +25,7 @@ func main() {
 		database.MigrateExercice{},
 		database.MigrateSerie{},
 		database.MigrateAuth{},
-		database.MigrateFollow{},
+		database.MigrateFollows{},
 	); err != nil {
 		log.Error(fmt.Sprintf(core.ErrMigrateModel, err.Error()))
 		return

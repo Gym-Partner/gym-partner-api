@@ -22,9 +22,8 @@ type IUserInteractor interface {
 }
 
 type UserInteractor struct {
-	IUserRepository   repository.IUserRepository
-	IFollowRepository repository.IFollowRepository
-	IUtils            utils.IUtils[model.User]
+	IUserRepository repository.IUserRepository
+	IUtils          utils.IUtils[model.User]
 }
 
 func MockUserInteractor(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User]) *UserInteractor {
@@ -53,27 +52,7 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
 	data.Password, _ = ui.IUtils.HashPassword(data.Password)
 	user, err := ui.IUserRepository.Create(data)
-	if err != nil {
-		return model.User{}, err
-	}
-
-	userFollow := model.Follow{
-		Id:        ui.IUtils.GenerateUUID(),
-		UserId:    user.Id,
-		Followers: []string{"None"},
-		Following: []string{"None"},
-	}
-
-	// Create first follow row in database for this user
-	follow, err := ui.IFollowRepository.Create(userFollow)
-	if err != nil {
-		return model.User{}, err
-	}
-
-	user.Followers = follow.Followers
-	user.Following = follow.Following
-
-	return user, nil
+	return user, err
 }
 
 func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
@@ -85,19 +64,7 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 	uid, _ := c.Get("uid")
 
 	user, err := ui.IUserRepository.GetOneById(uid.(string))
-	if err != nil {
-		return model.User{}, err
-	}
-
-	follow, err := ui.IFollowRepository.GetByUserId(user.Id)
-	if err != nil {
-		return model.User{}, err
-	}
-
-	user.Followers = follow.Followers
-	user.Following = follow.Following
-
-	return user, nil
+	return user, err
 }
 
 func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Error) {

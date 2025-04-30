@@ -36,7 +36,7 @@ func (mw *MigrateWorkout) GenerateForTest(userId string) {
 		uuid.New().String(),
 		uuid.New().String(),
 	}
-	//mw.Day = time.Now()
+	// mw.Day = time.Now()
 	mw.Name = "Workout name test"
 	mw.Comment = "Workout comment test"
 }
@@ -64,7 +64,7 @@ func (mu *MigrateUnityOfWorkout) GenerateForTest(ids pq.StringArray) {
 		}
 		mu.NbSerie = 0
 		mu.Comment = "Unity of workout comment test"
-		//mu.RestTimeSec = time.Now()
+		// mu.RestTimeSec = time.Now()
 	}
 }
 
@@ -120,11 +120,10 @@ type MigrateAuth struct {
 	ExpiresAt    time.Time `json:"expires_at" gorm:"not null"`
 }
 
-type MigrateFollow struct {
-	Id        string         `json:"id" gorm:"primaryKey;not null"`
-	UserId    string         `json:"user_id" gorm:"not null"`
-	Followers pq.StringArray `json:"followers" gorm:"type:text[]"`
-	Following pq.StringArray `json:"following" gorm:"type:text[]"`
+type MigrateFollows struct {
+	FollowerId string    `json:"follower_id" gorm:"primaryKey; not null"`
+	FollowedId string    `json:"followed_id" gorm:"primaryKey; not null"`
+	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 
 func (MigrateUser) TableName() string { return "user" }
@@ -139,4 +138,4 @@ func (MigrateExercice) TableName() string { return "exercice" }
 
 func (MigrateAuth) TableName() string { return "auth" }
 
-func (MigrateFollow) TableName() string { return "follow" }
+func (MigrateFollows) TableName() string { return "follows" }

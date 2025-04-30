@@ -1,11 +1,7 @@
 package repository
 
 import (
-	"fmt"
-	"net/http"
-
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
-	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gorm.io/gorm"
 )
@@ -15,48 +11,12 @@ type FollowRepository struct {
 	Log *core.Log
 }
 
-func (fr FollowRepository) IsExist(userId string) bool {
-	var follow model.Follow
-
-	if retour := fr.DB.Table("follow").Where("user_id = ?", userId).First(&follow); retour.Error != nil {
-		fr.Log.Error(retour.Error.Error())
-		return false
-	}
-
-	if follow.Id == "" {
-		fr.Log.Error("error")
-		return false
-	} else {
-		return true
-	}
+func (fr FollowRepository) Create(data model.Follow) *core.Error {
+	// TODO implement me
+	panic("implement me")
 }
 
-func (fr FollowRepository) Create(data model.Follow) (model.Follow, *core.Error) {
-	newData := data.ModelToSchema()
-
-	if retour := fr.DB.Table("follow").Create(&newData); retour.Error != nil {
-		fr.Log.Error("test %v", retour.Error.Error())
-
-		return model.Follow{}, core.NewError(
-			http.StatusInternalServerError,
-			fmt.Sprintf("Test %s", data.UserId),
-			retour.Error)
-	}
-
-	return data, nil
-}
-
-func (fr FollowRepository) GetByUserId(userId string) (database.MigrateFollow, *core.Error) {
-	var follow database.MigrateFollow
-
-	if retour := fr.DB.Table("follow").Where("user_id = ?", userId).First(&follow); retour.Error != nil {
-		fr.Log.Error("Failed to recover user's follows [%s] | original error : %v", userId, retour.Error.Error())
-
-		return database.MigrateFollow{}, core.NewError(
-			http.StatusInternalServerError,
-			fmt.Sprintf("Error : %s", userId),
-			retour.Error)
-	}
-
-	return follow, nil
+func (fr FollowRepository) GetAllByUserId(userId string) (model.Follows, *core.Error) {
+	// TODO implement me
+	panic("implement me")
 }
