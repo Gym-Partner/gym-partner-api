@@ -43,7 +43,16 @@ func (fr FollowRepository) RemoveFollower(data model.Follow) *core.Error {
 	return nil
 }
 
-func (fr FollowRepository) GetAllByUserId(FollowedId string) (model.Follows, *core.Error) {
-	// TODO implement me
-	panic("implement me")
+func (fr FollowRepository) GetAllByUserId(followedId string) (model.Follows, *core.Error) {
+	var follows model.Follows
+
+	if retour := fr.DB.Table("follows").Where("followed_id = ?", followedId).Find(&follows); retour.Error != nil {
+		fr.Log.Error("Failed to get follows | originalErr: %s", retour.Error.Error())
+
+		return model.Follows{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf("Failed to get follows for %s user", followedId),
+			retour.Error)
+	}
+	return follows, nil
 }

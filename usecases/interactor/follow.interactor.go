@@ -9,7 +9,9 @@ import (
 )
 
 type IFollowInteractor interface {
-	Create(ctx *gin.Context) (model.Follow, *core.Error)
+	AddFollower(ctx *gin.Context) *core.Error
+	RemoveFollower(ctx *gin.Context) *core.Error
+	GetFollowers(ctx *gin.Context) (model.Follows, *core.Error)
 }
 
 type FollowInteractor struct {
@@ -17,7 +19,13 @@ type FollowInteractor struct {
 	IUtils            utils.IUtils[model.Follow]
 }
 
-func (fi *FollowInteractor) Create(ctx *gin.Context) (model.Follow, *core.Error) {
+func (fi *FollowInteractor) AddFollower(ctx *gin.Context) *core.Error {
 	// TODO implement me
+	panic("implement me")
+}
+
+func (fi *FollowInteractor) RemoveFollower(ctx *gin.Context) *core.Error { panic("implement me") }
+
+func (fi *FollowInteractor) GetFollowers(ctx *gin.Context) (model.Follows, *core.Error) {
 	panic("implement me")
 }
