@@ -11,6 +11,8 @@ const (
 
 	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database"
 
+	ErrAppDBAddFollower = "Failed to add follower for user [%s] in database"
+
 	ErrAppINTUserExist    = "User [%s] already exist in database."
 	ErrAppINTUserNotExist = "User [%s] not found, or not exist in database."
 
@@ -37,6 +39,8 @@ const (
 	ErrDBGetSerie          = "[SERIE][REPOSITORY] Failed to recover unity's serie with his id"
 
 	ErrDBCreateAuth = "[AUTH][REPOSITORY] Failed to create auth"
+
+	ErrDBAddFollower = "[FOLLOWER][REPOSITORY] Failed to add follower | [ORIGINAL-ERROR] : %s"
 
 	ErrIntUserExist    = "[USER][INTERACTOR] User already exist in database"
 	ErrIntUserNotExist = "[USER][INTERACTOR] User %s not found, or not exist in database"

@@ -32,11 +32,11 @@ func (fr FollowRepository) FollowerIsExistByFollowedId(data model.Follow) bool {
 
 func (fr FollowRepository) AddFollower(data model.Follow) *core.Error {
 	if retour := fr.DB.Table("follows").Create(&data); retour.Error != nil {
-		fr.Log.Error("Failed to add follower | originalErr: %s", retour.Error.Error())
+		fr.Log.Error(core.ErrDBAddFollower, retour.Error.Error())
 
 		return core.NewError(
 			http.StatusInternalServerError,
-			fmt.Sprintf("Failed to add follower for %s user", data.FollowedId),
+			fmt.Sprintf(core.ErrAppDBAddFollower, data.FollowedId),
 			retour.Error)
 	}
 	return nil
