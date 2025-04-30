@@ -57,10 +57,23 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 		return model.User{}, err
 	}
 
-	// Create first follow row in database for this user
-	panic("implement me")
+	userFollow := model.Follow{
+		Id:        ui.IUtils.GenerateUUID(),
+		UserId:    user.Id,
+		Followers: []string{"None"},
+		Following: []string{"None"},
+	}
 
-	return user, err
+	// Create first follow row in database for this user
+	follow, err := ui.IFollowRepository.Create(userFollow)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user.Followers = follow.Followers
+	user.Following = follow.Following
+
+	return user, nil
 }
 
 func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {

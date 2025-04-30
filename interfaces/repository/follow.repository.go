@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"fmt"
+	"net/http"
+
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gorm.io/gorm"
@@ -28,8 +31,18 @@ func (fr FollowRepository) IsExist(userId string) bool {
 }
 
 func (fr FollowRepository) Create(data model.Follow) (model.Follow, *core.Error) {
-	// TODO implement me
-	panic("implement me")
+	newData := data.ModelToSchema()
+
+	if retour := fr.DB.Table("follow").Create(&newData); retour.Error != nil {
+		fr.Log.Error("test %v", retour.Error.Error())
+
+		return model.Follow{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf("Test %s", data.UserId),
+			retour.Error)
+	}
+
+	return data, nil
 }
 
 func (fr FollowRepository) GetAll() (model.Follows, *core.Error) {
