@@ -34,7 +34,7 @@ func (fi *FollowInteractor) AddFollower(ctx *gin.Context) *core.Error {
 	if exist {
 		return core.NewError(
 			http.StatusUnauthorized,
-			fmt.Sprintf("Follower %s already exist for %s user", data.FollowerId, data.FollowedId))
+			fmt.Sprintf(core.ErrAppINTFollowerExist, data.FollowerId, data.FollowedId))
 	}
 
 	if err := fi.IFollowRepository.AddFollower(data); err != nil {
@@ -43,7 +43,27 @@ func (fi *FollowInteractor) AddFollower(ctx *gin.Context) *core.Error {
 	return nil
 }
 
-func (fi *FollowInteractor) RemoveFollower(ctx *gin.Context) *core.Error { panic("implement me") }
+func (fi *FollowInteractor) RemoveFollower(ctx *gin.Context) *core.Error {
+	uid, _ := ctx.Get("uid")
+	data, err := fi.IUtils.InjectBodyInModel(ctx)
+	if err != nil {
+		return err
+	}
+
+	data.FollowedId = uid.(string)
+
+	exist := fi.IFollowRepository.FollowerIsExistByFollowedId(data)
+	if !exist {
+		return core.NewError(
+			http.StatusUnauthorized,
+			fmt.Sprintf(core.ErrAppINTFollowerNotExist, data.FollowerId, data.FollowedId))
+	}
+
+	if err := fi.IFollowRepository.RemoveFollower(data); err != nil {
+		return err
+	}
+	return nil
+}
 
 func (fi *FollowInteractor) GetFollowers(ctx *gin.Context) (model.Follows, *core.Error) {
 	panic("implement me")

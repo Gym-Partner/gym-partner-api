@@ -33,9 +33,15 @@ func (fc *FollowController) AddFollower(ctx *gin.Context) {
 		ctx.JSON(err.Code, err.Respons())
 		return
 	}
-	ctx.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusAccepted, nil)
 }
 
-func (fc *FollowController) RemoveFollower(ctx *gin.Context) {}
+func (fc *FollowController) RemoveFollower(ctx *gin.Context) {
+	if err := fc.IFollowInteractor.RemoveFollower(ctx); err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+	ctx.JSON(http.StatusOK, nil)
+}
 
 func (fc *FollowController) GetFollowers(ctx *gin.Context) {}

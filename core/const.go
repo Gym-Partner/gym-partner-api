@@ -9,12 +9,15 @@ const (
 	ErrAppDBUpdateUser = "Failed to update user [%s] in database."
 	ErrAppDBDeleteUser = "Failed to delete user [%s] in database."
 
-	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database"
+	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database."
 
-	ErrAppDBAddFollower = "Failed to add follower for user [%s] in database"
+	ErrAppDBAddFollower = "Failed to add follower for user [%s] in database."
 
 	ErrAppINTUserExist    = "User [%s] already exist in database."
 	ErrAppINTUserNotExist = "User [%s] not found, or not exist in database."
+
+	ErrAppINTFollowerExist    = "Follower [%s] already exist for user [%s] in database."
+	ErrAppINTFollowerNotExist = "Follower [%s] not exist for user [%s] in database."
 
 	// ######################################################################################
 	// 											LOG
