@@ -87,7 +87,18 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 	}
 
 	user, err := ui.IUserRepository.GetOneByEmail(data.Email)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	followers, err := ui.IFollowRepository.GetAllByUserId(data.Id)
+	if err != nil {
+		return model.User{}, err
+	}
+
 	user.Password = data.Password
+	user.Followers = followers.Followers
+	user.Following = followers.Followings
 	return user, err
 }
 
