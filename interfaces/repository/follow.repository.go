@@ -44,26 +44,40 @@ func (fr FollowRepository) AddFollower(data model.Follow) *core.Error {
 
 func (fr FollowRepository) RemoveFollower(data model.Follow) *core.Error {
 	if retour := fr.DB.Table("follows").Where("follower_id = ? AND followed_id = ?", data.FollowerId, data.FollowedId).Delete(&data); retour.Error != nil {
-		fr.Log.Error("Failed to remove follower | originalErr: %s", retour.Error.Error())
+		fr.Log.Error(core.ErrDBRemoveFollower, retour.Error.Error())
 
 		return core.NewError(
 			http.StatusInternalServerError,
-			fmt.Sprintf("Failed to remove follower for %s user", data.FollowedId),
+			fmt.Sprintf(core.ErrAppDBRemoveFollower, data.FollowedId),
 			retour.Error)
 	}
 	return nil
 }
 
-func (fr FollowRepository) GetAllByUserId(followedId string) (model.Follows, *core.Error) {
-	var follows model.Follows
+func (fr FollowRepository) GetAllByUserId(userId string) (model.UserFollows, *core.Error) {
+	var followed []string
+	var followers []string
+	var userFollows model.UserFollows
 
-	if retour := fr.DB.Table("follows").Where("followed_id = ?", followedId).Find(&follows); retour.Error != nil {
-		fr.Log.Error("Failed to get follows | originalErr: %s", retour.Error.Error())
+	if followedReturn := fr.DB.Table("follows").Where("followed_id = ?", userId).Select("follower_id").Find(&followed); followedReturn.Error != nil {
+		fr.Log.Error(core.ErrDBGetFollowers, followedReturn.Error.Error())
 
-		return model.Follows{}, core.NewError(
+		return model.UserFollows{}, core.NewError(
 			http.StatusInternalServerError,
-			fmt.Sprintf("Failed to get follows for %s user", followedId),
-			retour.Error)
+			fmt.Sprintf(core.ErrAppDBGetFollowers, userId),
+			followedReturn.Error)
 	}
-	return follows, nil
+	userFollows.Followings = followed
+
+	if followerReturn := fr.DB.Table("follows").Where("follower_id = ?", userId).Select("followed_id").Find(&followers); followerReturn.Error != nil {
+		fr.Log.Error(core.ErrDBGetFollowed, followerReturn.Error.Error())
+
+		return model.UserFollows{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBGetFollowed, userId),
+			followerReturn.Error)
+	}
+	userFollows.Followers = followers
+
+	return userFollows, nil
 }

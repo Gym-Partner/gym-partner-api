@@ -22,8 +22,9 @@ type IUserInteractor interface {
 }
 
 type UserInteractor struct {
-	IUserRepository repository.IUserRepository
-	IUtils          utils.IUtils[model.User]
+	IUserRepository   repository.IUserRepository
+	IFollowRepository repository.IFollowRepository
+	IUtils            utils.IUtils[model.User]
 }
 
 func MockUserInteractor(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User]) *UserInteractor {
@@ -64,7 +65,19 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 	uid, _ := c.Get("uid")
 
 	user, err := ui.IUserRepository.GetOneById(uid.(string))
-	return user, err
+	if err != nil {
+		return model.User{}, err
+	}
+
+	// Followers part
+	followers, err := ui.IFollowRepository.GetAllByUserId(uid.(string))
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user.Followers = followers.Followers
+	user.Following = followers.Followings
+	return user, nil
 }
 
 func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Error) {

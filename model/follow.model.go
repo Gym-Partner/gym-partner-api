@@ -21,3 +21,24 @@ func (f *Follow) Response() gin.H {
 		},
 	}
 }
+
+func (f *Follows) Response() gin.H {
+	var result []gin.H
+
+	for _, follow := range *f {
+		result = append(result, gin.H{
+			"follower_id": follow.FollowerId,
+			"followed_id": follow.FollowedId,
+			"created_at":  follow.CreatedAt,
+		})
+	}
+
+	return gin.H{
+		"data": result,
+	}
+}
+
+type UserFollows struct {
+	Followers  []string `json:"followers"`
+	Followings []string `json:"followings"`
+}

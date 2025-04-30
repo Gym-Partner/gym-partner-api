@@ -15,6 +15,8 @@ type User struct {
 	Email     string    `json:"email" gorm:"not null" example:"test@test.com"`
 	Password  string    `json:"password" gorm:"not null" example:"aaaAAA111"`
 	Age       int       `json:"age" example:"24"`
+	Followers []string  `json:"followers" gorm:"-"`
+	Following []string  `json:"following" gorm:"-"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 type Users []User
@@ -37,6 +39,8 @@ func (u *User) Respons() gin.H {
 			"username":   u.UserName,
 			"email":      u.Email,
 			"age":        u.Age,
+			"followers":  u.Followers,
+			"following":  u.Following,
 		},
 	}
 }

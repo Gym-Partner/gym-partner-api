@@ -64,7 +64,6 @@ func Router(db *core.Database) *gin.Engine {
 			// ###########################################################
 			v1Auth.POST("/user/follower/add_follower", followController.AddFollower)
 			v1Auth.POST("/user/follower/remove_follower", followController.RemoveFollower)
-			v1Auth.GET("/user/follower/get_followers", followController.GetFollowers)
 		}
 
 		v1NoAuth := api.Group("/v1")

@@ -13,7 +13,6 @@ import (
 type IFollowInteractor interface {
 	AddFollower(ctx *gin.Context) *core.Error
 	RemoveFollower(ctx *gin.Context) *core.Error
-	GetFollowers(ctx *gin.Context) (model.Follows, *core.Error)
 }
 
 type FollowInteractor struct {
@@ -63,8 +62,4 @@ func (fi *FollowInteractor) RemoveFollower(ctx *gin.Context) *core.Error {
 		return err
 	}
 	return nil
-}
-
-func (fi *FollowInteractor) GetFollowers(ctx *gin.Context) (model.Follows, *core.Error) {
-	panic("implement me")
 }

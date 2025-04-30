@@ -43,5 +43,3 @@ func (fc *FollowController) RemoveFollower(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, nil)
 }
-
-func (fc *FollowController) GetFollowers(ctx *gin.Context) {}
