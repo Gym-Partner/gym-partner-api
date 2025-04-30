@@ -14,9 +14,20 @@ type FollowRepository struct {
 	Log *core.Log
 }
 
-func (fr FollowRepository) FollowerIsExistByFollowedId(followedId string) bool {
-	// TODO implement me
-	panic("implement me")
+func (fr FollowRepository) FollowerIsExistByFollowedId(data model.Follow) bool {
+	var newData model.Follow
+
+	if retour := fr.DB.Table("follows").Where("follower_id = ? AND followed_id = ?", data.FollowerId, data.FollowedId).First(&newData); retour.Error != nil {
+		fr.Log.Error(retour.Error.Error())
+		return false
+	}
+
+	if newData.FollowedId == "" {
+		fr.Log.Error("Follower not found in database")
+		return false
+	} else {
+		return true
+	}
 }
 
 func (fr FollowRepository) AddFollower(data model.Follow) *core.Error {
