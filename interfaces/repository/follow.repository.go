@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
+	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 	"gorm.io/gorm"
 )
@@ -45,7 +46,17 @@ func (fr FollowRepository) Create(data model.Follow) (model.Follow, *core.Error)
 	return data, nil
 }
 
-func (fr FollowRepository) GetAll() (model.Follows, *core.Error) {
-	// TODO implement me
-	panic("implement me")
+func (fr FollowRepository) GetByUserId(userId string) (database.MigrateFollow, *core.Error) {
+	var follow database.MigrateFollow
+
+	if retour := fr.DB.Table("follow").Where("user_id = ?", userId).First(&follow); retour.Error != nil {
+		fr.Log.Error("Failed to recover user's follows [%s] | original error : %v", userId, retour.Error.Error())
+
+		return database.MigrateFollow{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf("Error : %s", userId),
+			retour.Error)
+	}
+
+	return follow, nil
 }

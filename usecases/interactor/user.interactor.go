@@ -84,8 +84,20 @@ func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
 func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 	uid, _ := c.Get("uid")
 
-	user, err := ui.IUserRepository.GetOneById(*uid.(*string))
-	return user, err
+	user, err := ui.IUserRepository.GetOneById(uid.(string))
+	if err != nil {
+		return model.User{}, err
+	}
+
+	follow, err := ui.IFollowRepository.GetByUserId(user.Id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user.Followers = follow.Followers
+	user.Following = follow.Following
+
+	return user, nil
 }
 
 func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Error) {
