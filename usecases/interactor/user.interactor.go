@@ -22,8 +22,9 @@ type IUserInteractor interface {
 }
 
 type UserInteractor struct {
-	IUserRepository repository.IUserRepository
-	IUtils          utils.IUtils[model.User]
+	IUserRepository   repository.IUserRepository
+	IFollowRepository repository.IFollowRepository
+	IUtils            utils.IUtils[model.User]
 }
 
 func MockUserInteractor(userMock *mock.UserInteractorMock, utilsMock *mock.UtilsMock[model.User]) *UserInteractor {
@@ -63,8 +64,20 @@ func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
 func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 	uid, _ := c.Get("uid")
 
-	user, err := ui.IUserRepository.GetOneById(*uid.(*string))
-	return user, err
+	user, err := ui.IUserRepository.GetOneById(uid.(string))
+	if err != nil {
+		return model.User{}, err
+	}
+
+	// Followers part
+	followers, err := ui.IFollowRepository.GetAllByUserId(uid.(string))
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user.Followers = followers.Followers
+	user.Following = followers.Followings
+	return user, nil
 }
 
 func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Error) {
@@ -74,7 +87,18 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 	}
 
 	user, err := ui.IUserRepository.GetOneByEmail(data.Email)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	followers, err := ui.IFollowRepository.GetAllByUserId(data.Id)
+	if err != nil {
+		return model.User{}, err
+	}
+
 	user.Password = data.Password
+	user.Followers = followers.Followers
+	user.Following = followers.Followings
 	return user, err
 }
 

@@ -9,14 +9,24 @@ const (
 	ErrAppDBUpdateUser = "Failed to update user [%s] in database."
 	ErrAppDBDeleteUser = "Failed to delete user [%s] in database."
 
-	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database"
+	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database."
+
+	ErrAppDBAddFollower    = "Failed to add follower for user [%s] in database."
+	ErrAppDBRemoveFollower = "Failed to remove follower for user [%s] in database."
+	ErrAppDBGetFollowers   = "Failed to retrieve all followers from user [%s] in database."
+	ErrAppDBGetFollowed    = "Failed to retrieve all followed from user [%s] in database."
 
 	ErrAppINTUserExist    = "User [%s] already exist in database."
 	ErrAppINTUserNotExist = "User [%s] not found, or not exist in database."
 
+	ErrAppINTFollowerExist    = "Follower [%s] already exist for user [%s] in database."
+	ErrAppINTFollowerNotExist = "Follower [%s] not exist for user [%s] in database."
+
 	// ######################################################################################
 	// 											LOG
 	// ######################################################################################
+
+	// USERS
 
 	ErrDBUserNotFound = "[USER][REPOSITORY] User not found in database"
 	ErrDBCreateUser   = "[USER][REPOSITORY] Failed to create user in database | [ORIGINAL-ERROR] : %s"
@@ -24,6 +34,8 @@ const (
 	ErrDBGetOneUser   = "[USER][REPOSITORY] Failed to recover user [%s] | [ORIGINAL-ERROR] : %s"
 	ErrDBUpdateUser   = "[USER][REPOSITORY] Failed to update user [%s] | [ORIGINAL-ERROR] : %s"
 	ErrDBDeleteUser   = "[USER][REPOSITORY] Failed to delete user [%s] | [ORIGINAL-ERROR] : %s"
+
+	// WORKOUTS
 
 	ErrDBCreateWorkout        = "[WORKOUT][REPOSITORY] Failed to create user's workout"
 	ErrDBCreateUnityOfWorkout = "[UNITY_OF_WORKOUT][REPOSITORY] Failed to create workout's unity"
@@ -36,14 +48,29 @@ const (
 	ErrDBGetExercice       = "[EXERCICE][REPOSITORY] Failed to recover unity's exercice with his id"
 	ErrDBGetSerie          = "[SERIE][REPOSITORY] Failed to recover unity's serie with his id"
 
+	// AUTH
+
 	ErrDBCreateAuth = "[AUTH][REPOSITORY] Failed to create auth"
+
+	// FOLLOWERS
+
+	ErrDBAddFollower    = "[FOLLOWER][REPOSITORY] Failed to add follower | [ORIGINAL-ERROR] : %s"
+	ErrDBRemoveFollower = "[FOLLOWER][REPOSITORY] Failed to remove follower | [ORIGINAL-ERROR] : %s"
+	ErrDBGetFollowers   = "[FOLLOWER][REPOSITORY] Failed to retrieve followers from followed | [ORIGINAL-ERROR] : %s"
+	ErrDBGetFollowed    = "[FOLLOWER][REPOSITORY] Failed to retrieve followed from follower | [ORIGINAL-ERROR] : %s"
+
+	// OTHER
 
 	ErrIntUserExist    = "[USER][INTERACTOR] User already exist in database"
 	ErrIntUserNotExist = "[USER][INTERACTOR] User %s not found, or not exist in database"
 
+	// DATABASE
+
 	ErrConnectDatabase = "[DB_CONNECT][PostgreSQL] "
 	ErrPingDatabase    = "[DB_PING][PostgreSQL] "
 	ErrMigrateModel    = "[DB][Postgres] %s"
+
+	// ENV
 
 	ErrEnvParseStart   = "[ENV] Error while parsing START argument: "
 	ErrEnvLoad         = "[ENV] Error while loading config file: "
