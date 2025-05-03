@@ -3,12 +3,13 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"io"
 	"reflect"
 	"strings"
 	"time"
 	"unicode"
+
+	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -17,7 +18,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type IUtils[T model.User | model.Workout | model.UserToLogin] interface {
+type IUtils[T model.User | model.Workout | model.UserToLogin | model.Follow] interface {
 	HashPassword(password string) (string, *core.Error)
 	InjectBodyInModel(ctx *gin.Context) (T, *core.Error)
 	Bind(target, patch interface{}) *core.Error
@@ -25,7 +26,7 @@ type IUtils[T model.User | model.Workout | model.UserToLogin] interface {
 	SchemaToModel(workout database.MigrateWorkout, unitie database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout
 }
 
-type Utils[T model.User | model.Workout | model.UserToLogin] struct{}
+type Utils[T model.User | model.Workout | model.UserToLogin | model.Follow] struct{}
 
 func (u Utils[T]) GenerateUUID() string {
 	return uuid.New().String()
