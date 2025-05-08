@@ -11,6 +11,11 @@ type UserControllerMock struct {
 	mock.Mock
 }
 
+func (u *UserControllerMock) Search(query string, limit, offset int) (model.Users, *core.Error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (u *UserControllerMock) Create(ctx *gin.Context) (model.User, *core.Error) {
 	args := u.Called(ctx)
 	return args.Get(0).(model.User), args.Error(1).(*core.Error)

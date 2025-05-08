@@ -3,11 +3,12 @@ package core
 const (
 	InfoPingDatabase = "[DB PING][PostgreSQL] Connected to the database"
 
-	ErrAppDBCreateUser = "Failed to create user [%s] in database."
-	ErrAppDBGetAllUser = "Failed to retrieve all users in database."
-	ErrAppDBGetOneUser = "Failed to retrieve user [%s] in database."
-	ErrAppDBUpdateUser = "Failed to update user [%s] in database."
-	ErrAppDBDeleteUser = "Failed to delete user [%s] in database."
+	ErrAppDBCreateUser  = "Failed to create user [%s] in database."
+	ErrAppDBGetAllUser  = "Failed to retrieve all users in database."
+	ErrAppDBGetOneUser  = "Failed to retrieve user [%s] in database."
+	ErrAppDBSearchUsers = "Failed to search users in database."
+	ErrAppDBUpdateUser  = "Failed to update user [%s] in database."
+	ErrAppDBDeleteUser  = "Failed to delete user [%s] in database."
 
 	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database."
 
@@ -32,6 +33,7 @@ const (
 	ErrDBCreateUser   = "[USER][REPOSITORY] Failed to create user in database | [ORIGINAL-ERROR] : %s"
 	ErrDBGetAllUser   = "[USER][REPOSITORY] Failed to recover all users | [ORIGINAL-ERROR] : %s"
 	ErrDBGetOneUser   = "[USER][REPOSITORY] Failed to recover user [%s] | [ORIGINAL-ERROR] : %s"
+	ErrDBSearchUsers  = "[USER][REPOSITORY] Failed to search users | [ORIGINAL-ERROR] : %s"
 	ErrDBUpdateUser   = "[USER][REPOSITORY] Failed to update user [%s] | [ORIGINAL-ERROR] : %s"
 	ErrDBDeleteUser   = "[USER][REPOSITORY] Failed to delete user [%s] | [ORIGINAL-ERROR] : %s"
 

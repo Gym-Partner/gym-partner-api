@@ -17,6 +17,7 @@ type IUserInteractor interface {
 	GetAll() (model.Users, *core.Error)
 	GetOne(c *gin.Context) (model.User, *core.Error)
 	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
+	Search(query string, limit, offset int) (model.Users, *core.Error)
 	Update(ctx *gin.Context) *core.Error
 	Delete(ctx *gin.Context) *core.Error
 }
@@ -115,6 +116,11 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 	user.Followers = followers.Followers
 	user.Following = followers.Followings
 	return user, err
+}
+
+func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, *core.Error) {
+	users, err := ui.IUserRepository.Search(query, limit, offset)
+	return users, err
 }
 
 func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {

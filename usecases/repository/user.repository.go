@@ -9,6 +9,7 @@ type IUserRepository interface {
 	IsExist(data, OPT string) bool
 
 	GetAll() (model.Users, *core.Error)
+	Search(query string, limit, offset int) (model.Users, *core.Error)
 	GetOneById(uid string) (model.User, *core.Error)
 	GetOneByEmail(email string) (model.User, *core.Error)
 
