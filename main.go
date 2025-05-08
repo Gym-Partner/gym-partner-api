@@ -30,6 +30,7 @@ func main() {
 		log.Error(fmt.Sprintf(core.ErrMigrateModel, err.Error()))
 		return
 	}
+	database.PsqlIndex(db.Handler)
 
 	route := router.Router(db)
 	address := viper.GetString("API_SERVER_HOST") + ":" + viper.GetString("API_SERVER_PORT")
