@@ -44,6 +44,7 @@ func Router(db *core.Database) *gin.Engine {
 			// ###########################################################
 			v1Auth.GET("/user/get_all", userController.GetAll)
 			v1Auth.GET("/user/get_one", userController.GetOne)
+			v1Auth.GET("/users/search", userController.Search)
 			v1Auth.PATCH("/user/update", userController.Update)
 			v1Auth.DELETE("/user/delete", userController.Delete)
 

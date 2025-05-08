@@ -1,6 +1,7 @@
 package database
 
 import (
+	"gorm.io/gorm"
 	"time"
 
 	"github.com/google/uuid"
@@ -139,3 +140,9 @@ func (MigrateExercice) TableName() string { return "exercice" }
 func (MigrateAuth) TableName() string { return "auth" }
 
 func (MigrateFollows) TableName() string { return "follows" }
+
+func PsqlIndex(db *gorm.DB) {
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_first_name ON "user" (LOWER(first_name))`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_last_name ON "user" (LOWER(last_name))`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_username ON "user" (LOWER(username))`)
+}
