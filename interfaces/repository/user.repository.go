@@ -98,6 +98,7 @@ func (u UserRepository) Search(query string, limit, offset int) (model.Users, *c
 
 	if retour := u.DB.Table("user").
 		Where("LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(username) LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%").
+		Select("id", "first_name", "last_name", "username", "age").
 		Limit(limit).
 		Offset(offset).Find(&users); retour.Error != nil {
 		u.Log.Error(core.ErrDBSearchUsers, retour.Error.Error())

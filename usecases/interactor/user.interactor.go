@@ -120,7 +120,22 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 
 func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, *core.Error) {
 	users, err := ui.IUserRepository.Search(query, limit, offset)
-	return users, err
+	if err != nil {
+		return model.Users{}, err
+	}
+
+	// Followers part
+	for key, user := range users {
+		followers, err := ui.IFollowRepository.GetAllByUserId(user.Id)
+		if err != nil {
+			return model.Users{}, err
+		}
+
+		users[key].Followers = followers.Followers
+		users[key].Following = followers.Followings
+	}
+
+	return users, nil
 }
 
 func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
