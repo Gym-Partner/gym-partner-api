@@ -58,7 +58,22 @@ func (ui *UserInteractor) Create(ctx *gin.Context) (model.User, *core.Error) {
 
 func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
 	users, err := ui.IUserRepository.GetAll()
-	return users, err
+	if err != nil {
+		return model.Users{}, err
+	}
+
+	// Followers part
+	for key, user := range users {
+		followers, err := ui.IFollowRepository.GetAllByUserId(user.Id)
+		if err != nil {
+			return model.Users{}, err
+		}
+
+		users[key].Followers = followers.Followers
+		users[key].Following = followers.Followings
+	}
+
+	return users, nil
 }
 
 func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {

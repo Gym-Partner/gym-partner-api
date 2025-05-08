@@ -87,6 +87,9 @@ func (u *Users) Respons() gin.H {
 			"last_name":  user.LastName,
 			"username":   user.UserName,
 			"email":      user.Email,
+			"age":        user.Age,
+			"followers":  user.Followers,
+			"following":  user.Following,
 		})
 	}
 
