@@ -2,6 +2,8 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 
@@ -110,6 +112,38 @@ func (uc *UserController) GetOne(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user.Respons())
+}
+
+func (uc *UserController) Search(ctx *gin.Context) {
+	query := strings.ToLower(ctx.Query("query"))
+	limitStr := ctx.DefaultQuery("limit", "10")
+	offsetStr := ctx.DefaultQuery("offset", "0")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit > 50 {
+		limit = 10
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil {
+		offset = 0
+	}
+
+	if len(query) < 3 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "query too short"})
+		return
+	}
+
+	users, searchErr := uc.IUserInteractor.Search(query, limit, offset)
+	if searchErr != nil {
+		ctx.JSON(searchErr.Code, searchErr.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":  users,
+		"count": len(users),
+	})
 }
 
 // Update godoc

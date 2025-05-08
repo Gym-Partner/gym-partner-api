@@ -10,6 +10,11 @@ type UserInteractorMock struct {
 	mock.Mock
 }
 
+func (u *UserInteractorMock) Search(query string, limit, offset int) (model.Users, *core.Error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (u *UserInteractorMock) IsExist(data, OPT string) bool {
 	args := u.Called(data, OPT)
 	return args.Bool(0)
