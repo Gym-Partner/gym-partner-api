@@ -93,25 +93,6 @@ func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 	return user, nil
 }
 
-func (u UserRepository) Search(query string, limit, offset int) (model.Users, *core.Error) {
-	var users model.Users
-
-	if retour := u.DB.Table("user").
-		Where("LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(username) LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%").
-		Select("id", "first_name", "last_name", "username", "age").
-		Limit(limit).
-		Offset(offset).Find(&users); retour.Error != nil {
-		u.Log.Error(core.ErrDBSearchUsers, retour.Error.Error())
-
-		return model.Users{}, core.NewError(
-			http.StatusNotFound,
-			core.ErrAppDBSearchUsers,
-			retour.Error)
-	}
-
-	return users, nil
-}
-
 func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 	var user model.User
 
@@ -153,4 +134,81 @@ func (u UserRepository) Delete(uid string) *core.Error {
 	}
 
 	return nil
+}
+
+func (u UserRepository) Search(query string, limit, offset int) (model.Users, *core.Error) {
+	var users model.Users
+
+	if retour := u.DB.Table("user").
+		Where("LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(username) LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%").
+		Select("id", "first_name", "last_name", "username", "age").
+		Limit(limit).
+		Offset(offset).Find(&users); retour.Error != nil {
+		u.Log.Error(core.ErrDBSearchUsers, retour.Error.Error())
+
+		return model.Users{}, core.NewError(
+			http.StatusNotFound,
+			core.ErrAppDBSearchUsers,
+			retour.Error)
+	}
+
+	return users, nil
+}
+
+func (u UserRepository) UploadImage(data model.UserImage) *core.Error {
+	if retour := u.DB.Table("user_image").Create(&data); retour.Error != nil {
+		u.Log.Error(core.ErrDBCreateUserImage, retour.Error.Error())
+
+		return core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBCreateUserImage),
+			retour.Error)
+	}
+
+	return nil
+}
+
+func (u UserRepository) UserImageIsExist(uid string) bool {
+	var userImage model.UserImage
+
+	if retour := u.DB.Table("user_image").Where("user_id = ?", uid).First(&userImage); retour.Error != nil {
+		u.Log.Error(retour.Error.Error())
+		return false
+	}
+
+	if userImage.Id == "" {
+		u.Log.Error(core.ErrDBUserImageNotFound)
+		return false
+	} else {
+		return true
+	}
+}
+
+func (u UserRepository) DeleteUserImage(uid string) *core.Error {
+	var userImage model.UserImage
+
+	if retour := u.DB.Table("user_image").Where("user_id = ?", uid).Delete(&userImage); retour.Error != nil {
+		u.Log.Error(core.ErrDBDeleteUserImage, retour.Error.Error())
+
+		return core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBDeleteUserImage),
+			retour.Error)
+	}
+	return nil
+}
+
+func (u UserRepository) GetImageByUserId(uid string) (model.UserImage, *core.Error) {
+	var userImage model.UserImage
+
+	if retour := u.DB.Table("user_image").Where("user_id = ?", uid).First(&userImage); retour.Error != nil {
+		u.Log.Error(core.ErrDBGetUserImage, uid, retour.Error.Error())
+
+		return model.UserImage{}, core.NewError(
+			http.StatusNotFound,
+			fmt.Sprintf(core.ErrAppDBGetUserImage, uid),
+			retour.Error)
+	}
+
+	return userImage, nil
 }

@@ -11,6 +11,11 @@ type UserControllerMock struct {
 	mock.Mock
 }
 
+func (u *UserControllerMock) UploadImage(ctx *gin.Context) (model.UserImage, *core.Error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (u *UserControllerMock) Search(query string, limit, offset int) (model.Users, *core.Error) {
 	//TODO implement me
 	panic("implement me")
