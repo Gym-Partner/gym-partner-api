@@ -197,3 +197,18 @@ func (u UserRepository) DeleteUserImage(uid string) *core.Error {
 	}
 	return nil
 }
+
+func (u UserRepository) GetImageByUserId(uid string) (model.UserImage, *core.Error) {
+	var userImage model.UserImage
+
+	if retour := u.DB.Table("user_image").Where("user_id = ?", uid).First(&userImage); retour.Error != nil {
+		u.Log.Error(core.ErrDBGetUserImage, uid, retour.Error.Error())
+
+		return model.UserImage{}, core.NewError(
+			http.StatusNotFound,
+			fmt.Sprintf(core.ErrAppDBGetUserImage, uid),
+			retour.Error)
+	}
+
+	return userImage, nil
+}

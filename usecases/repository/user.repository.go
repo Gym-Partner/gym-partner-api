@@ -17,7 +17,9 @@ type IUserRepository interface {
 	Delete(uid string) *core.Error
 
 	Search(query string, limit, offset int) (model.Users, *core.Error)
-	UploadImage(data model.UserImage) *core.Error
+
 	UserImageIsExist(uid string) bool
+	GetImageByUserId(uid string) (model.UserImage, *core.Error)
+	UploadImage(data model.UserImage) *core.Error
 	DeleteUserImage(uid string) *core.Error
 }

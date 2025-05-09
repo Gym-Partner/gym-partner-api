@@ -72,15 +72,21 @@ func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
 		return model.Users{}, err
 	}
 
-	// Followers part
+	// Followers part and user's part
 	for key, user := range users {
 		followers, err := ui.IFollowRepository.GetAllByUserId(user.Id)
 		if err != nil {
 			return model.Users{}, err
 		}
 
+		userImage, err := ui.IUserRepository.GetImageByUserId(user.Id)
+		if err != nil {
+			return model.Users{}, err
+		}
+
 		users[key].Followers = followers.Followers
 		users[key].Following = followers.Followings
+		users[key].UserImage = userImage.ImageURL
 	}
 
 	return users, nil
@@ -100,8 +106,15 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 		return model.User{}, err
 	}
 
+	// User's image part
+	userImage, err := ui.IUserRepository.GetImageByUserId(uid.(string))
+	if err != nil {
+		return model.User{}, err
+	}
+
 	user.Followers = followers.Followers
 	user.Following = followers.Followings
+	user.UserImage = userImage.ImageURL
 	return user, nil
 }
 
@@ -116,7 +129,14 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 		return model.User{}, err
 	}
 
+	// Followers part
 	followers, err := ui.IFollowRepository.GetAllByUserId(data.Id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	// User's image part
+	userImage, err := ui.IUserRepository.GetImageByUserId(data.Id)
 	if err != nil {
 		return model.User{}, err
 	}
@@ -124,6 +144,7 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 	user.Password = data.Password
 	user.Followers = followers.Followers
 	user.Following = followers.Followings
+	user.UserImage = userImage.ImageURL
 	return user, err
 }
 

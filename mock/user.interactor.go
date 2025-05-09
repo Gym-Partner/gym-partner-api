@@ -10,6 +10,11 @@ type UserInteractorMock struct {
 	mock.Mock
 }
 
+func (u *UserInteractorMock) GetImageByUserId(uid string) (model.UserImage, *core.Error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (u *UserInteractorMock) DeleteUserImage(uid string) *core.Error {
 	//TODO implement me
 	panic("implement me")
