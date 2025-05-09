@@ -17,6 +17,7 @@ type User struct {
 	Age       int       `json:"age" example:"24"`
 	Followers []string  `json:"followers" gorm:"-"`
 	Following []string  `json:"following" gorm:"-"`
+	UserImage string    `json:"user_image" gorm:"-"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 type Users []User
@@ -48,6 +49,7 @@ func (u *User) Respons() gin.H {
 			"age":        u.Age,
 			"followers":  u.Followers,
 			"following":  u.Following,
+			"user_image": u.UserImage,
 		},
 	}
 }
@@ -97,6 +99,7 @@ func (u *Users) Respons() gin.H {
 			"age":        user.Age,
 			"followers":  user.Followers,
 			"following":  user.Following,
+			"user_image": user.UserImage,
 		})
 	}
 
