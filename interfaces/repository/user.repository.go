@@ -156,6 +156,14 @@ func (u UserRepository) Search(query string, limit, offset int) (model.Users, *c
 }
 
 func (u UserRepository) UploadImage(data model.UserImage) *core.Error {
-	//TODO implement me
-	panic("implement me")
+	if retour := u.DB.Table("user_image").Create(&data); retour.Error != nil {
+		u.Log.Error(core.ErrDBCreateUserImage, retour.Error.Error())
+
+		return core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBCreateUserImage),
+			retour.Error)
+	}
+
+	return nil
 }

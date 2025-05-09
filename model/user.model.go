@@ -31,9 +31,10 @@ type Login struct {
 }
 
 type UserImage struct {
-	Id       string `json:"id"`
-	UserId   string `json:"user_id"`
-	ImageURL string `json:"image_url"`
+	Id        string    `json:"id"`
+	UserId    string    `json:"user_id"`
+	ImageURL  string    `json:"image_url"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func (u *User) Respons() gin.H {
@@ -146,9 +147,10 @@ func (u *NewUsers) AddCreatedAt() {
 func (u *UserImage) Response() gin.H {
 	return gin.H{
 		"data": gin.H{
-			"id":        u.Id,
-			"user_id":   u.UserId,
-			"image_url": u.ImageURL,
+			"id":         u.Id,
+			"user_id":    u.UserId,
+			"image_url":  u.ImageURL,
+			"created_at": u.CreatedAt,
 		},
 	}
 }

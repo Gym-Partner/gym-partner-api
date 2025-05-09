@@ -128,9 +128,10 @@ type MigrateFollows struct {
 }
 
 type MigrateUserImage struct {
-	Id       string `json:"id" gorm:"primaryKey;not null"`
-	UserId   string `json:"user_id" gorm:"not null"`
-	ImageURL string `json:"image_url" gorm:"not null"`
+	Id        string    `json:"id" gorm:"primaryKey;not null"`
+	UserId    string    `json:"user_id" gorm:"not null"`
+	ImageURL  string    `json:"image_url" gorm:"not null"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func (MigrateUser) TableName() string { return "user" }
