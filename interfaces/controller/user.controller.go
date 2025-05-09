@@ -146,6 +146,16 @@ func (uc *UserController) Search(ctx *gin.Context) {
 	})
 }
 
+func (uc *UserController) UploadImage(ctx *gin.Context) {
+	userImage, err := uc.IUserInteractor.UploadImage(ctx)
+	if err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, userImage)
+}
+
 // Update godoc
 // @Summary Update one user
 // @Schemes

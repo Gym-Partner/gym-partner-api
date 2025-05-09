@@ -2,7 +2,15 @@ package interactor
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/google/uuid"
+	"github.com/spf13/viper"
+	"gitlab.com/gym-partner1/api/gym-partner-api/core/awsService"
+	"log"
 	"net/http"
+	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -18,6 +26,7 @@ type IUserInteractor interface {
 	GetOne(c *gin.Context) (model.User, *core.Error)
 	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
 	Search(query string, limit, offset int) (model.Users, *core.Error)
+	UploadImage(ctx *gin.Context) (model.UserImage, *core.Error)
 	Update(ctx *gin.Context) *core.Error
 	Delete(ctx *gin.Context) *core.Error
 }
@@ -63,15 +72,21 @@ func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
 		return model.Users{}, err
 	}
 
-	// Followers part
+	// Followers part and user's part
 	for key, user := range users {
 		followers, err := ui.IFollowRepository.GetAllByUserId(user.Id)
 		if err != nil {
 			return model.Users{}, err
 		}
 
+		userImage, err := ui.IUserRepository.GetImageByUserId(user.Id)
+		if err != nil {
+			return model.Users{}, err
+		}
+
 		users[key].Followers = followers.Followers
 		users[key].Following = followers.Followings
+		users[key].UserImage = userImage.ImageURL
 	}
 
 	return users, nil
@@ -91,8 +106,15 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 		return model.User{}, err
 	}
 
+	// User's image part
+	userImage, err := ui.IUserRepository.GetImageByUserId(uid.(string))
+	if err != nil {
+		return model.User{}, err
+	}
+
 	user.Followers = followers.Followers
 	user.Following = followers.Followings
+	user.UserImage = userImage.ImageURL
 	return user, nil
 }
 
@@ -107,7 +129,14 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 		return model.User{}, err
 	}
 
+	// Followers part
 	followers, err := ui.IFollowRepository.GetAllByUserId(data.Id)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	// User's image part
+	userImage, err := ui.IUserRepository.GetImageByUserId(data.Id)
 	if err != nil {
 		return model.User{}, err
 	}
@@ -115,6 +144,7 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 	user.Password = data.Password
 	user.Followers = followers.Followers
 	user.Following = followers.Followings
+	user.UserImage = userImage.ImageURL
 	return user, err
 }
 
@@ -136,6 +166,87 @@ func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, 
 	}
 
 	return users, nil
+}
+
+func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.Error) {
+	uid, _ := ctx.Get("uid")
+	file, err := ctx.FormFile("image")
+	if err != nil {
+		return model.UserImage{}, core.NewError(
+			http.StatusNotAcceptable,
+			fmt.Sprintf(core.ErrAppINTUserImageNotFound, uid),
+			err)
+	}
+
+	filename := uid.(string) + filepath.Ext(file.Filename)
+
+	src, err := file.Open()
+	if err != nil {
+		return model.UserImage{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppINTUserImageNotOpen, uid),
+			err)
+	}
+	defer src.Close()
+
+	// Initialization AWS services
+	awsSess := awsService.NewAWSService()
+	s3Client := awsService.NewAWSS3(awsSess)
+	bucketName := viper.GetString("AWS_S3_BUCKET_NAME")
+
+	exist := ui.IUserRepository.UserImageIsExist(uid.(string))
+	if exist {
+		// Remove image in database and S3 service
+		_, err = s3Client.DeleteObject(&s3.DeleteObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(filename),
+		})
+		if err != nil {
+			return model.UserImage{}, core.NewError(
+				http.StatusInternalServerError,
+				fmt.Sprintf(core.ErrAppINTUserImageDeleteS3, uid),
+				err)
+		}
+
+		if err = ui.IUserRepository.DeleteUserImage(uid.(string)); err != nil {
+			return model.UserImage{}, core.NewError(
+				http.StatusInternalServerError,
+				fmt.Sprintf(core.ErrAppINTUserImageDeletePsql, uid),
+				err)
+		}
+	}
+
+	_, err = s3Client.PutObject(&s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(filename),
+		Body:   src,
+		//ContentType: aws.String(file.Header.Get("Content-Type")),
+	})
+	if err != nil {
+		log.Println(err.Error())
+		return model.UserImage{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppINTUserImageUpload, uid),
+			err)
+	}
+
+	imageURL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s",
+		bucketName,
+		viper.GetString("AWS_REGION"),
+		filename)
+
+	userImage := model.UserImage{
+		Id:        uuid.New().String(),
+		UserId:    uid.(string),
+		ImageURL:  imageURL,
+		CreatedAt: time.Now(),
+	}
+
+	if err := ui.IUserRepository.UploadImage(userImage); err != nil {
+		return model.UserImage{}, err
+	}
+
+	return userImage, nil
 }
 
 func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {
