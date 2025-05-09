@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core/awsService"
+	"log"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -199,9 +200,9 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 		Key:    aws.String(filename),
 		Body:   src,
 		//ContentType: aws.String(file.Header.Get("Content-Type")),
-		//ACL: aws.String("public-read"),
 	})
 	if err != nil {
+		log.Println(err.Error())
 		return model.UserImage{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppINTUserImageUpload, uid),

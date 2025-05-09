@@ -33,6 +33,6 @@ func (e *Error) Respons() gin.H {
 	return gin.H{
 		"code":        e.Code,
 		"message":     e.Message,
-		"originalErr": e.OriginalErr.Error(),
+		"originalErr": e.OriginalErr,
 	}
 }
