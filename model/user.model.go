@@ -17,6 +17,7 @@ type User struct {
 	Age       int       `json:"age" example:"24"`
 	Followers []string  `json:"followers" gorm:"-"`
 	Following []string  `json:"following" gorm:"-"`
+	UserImage string    `json:"user_image" gorm:"-"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 type Users []User
@@ -30,6 +31,13 @@ type Login struct {
 	Password string `json:"password"`
 }
 
+type UserImage struct {
+	Id        string    `json:"id"`
+	UserId    string    `json:"user_id"`
+	ImageURL  string    `json:"image_url"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 func (u *User) Respons() gin.H {
 	return gin.H{
 		"data": gin.H{
@@ -41,6 +49,7 @@ func (u *User) Respons() gin.H {
 			"age":        u.Age,
 			"followers":  u.Followers,
 			"following":  u.Following,
+			"user_image": u.UserImage,
 		},
 	}
 }
@@ -90,6 +99,7 @@ func (u *Users) Respons() gin.H {
 			"age":        user.Age,
 			"followers":  user.Followers,
 			"following":  user.Following,
+			"user_image": user.UserImage,
 		})
 	}
 
@@ -134,5 +144,16 @@ func (u *Users) GenerateTestStruct() *NewUsers {
 func (u *NewUsers) AddCreatedAt() {
 	for _, user := range u.Users {
 		user.CreatedAt = time.Now()
+	}
+}
+
+func (u *UserImage) Response() gin.H {
+	return gin.H{
+		"data": gin.H{
+			"id":         u.Id,
+			"user_id":    u.UserId,
+			"image_url":  u.ImageURL,
+			"created_at": u.CreatedAt,
+		},
 	}
 }
