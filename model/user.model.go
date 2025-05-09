@@ -30,6 +30,12 @@ type Login struct {
 	Password string `json:"password"`
 }
 
+type UserImage struct {
+	Id       string `json:"id"`
+	UserId   string `json:"user_id"`
+	ImageURL string `json:"image_url"`
+}
+
 func (u *User) Respons() gin.H {
 	return gin.H{
 		"data": gin.H{
@@ -134,5 +140,15 @@ func (u *Users) GenerateTestStruct() *NewUsers {
 func (u *NewUsers) AddCreatedAt() {
 	for _, user := range u.Users {
 		user.CreatedAt = time.Now()
+	}
+}
+
+func (u *UserImage) Response() gin.H {
+	return gin.H{
+		"data": gin.H{
+			"id":        u.Id,
+			"user_id":   u.UserId,
+			"image_url": u.ImageURL,
+		},
 	}
 }

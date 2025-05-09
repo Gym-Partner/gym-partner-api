@@ -18,6 +18,7 @@ type IUserInteractor interface {
 	GetOne(c *gin.Context) (model.User, *core.Error)
 	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
 	Search(query string, limit, offset int) (model.Users, *core.Error)
+	UploadImage(ctx *gin.Context) *core.Error
 	Update(ctx *gin.Context) *core.Error
 	Delete(ctx *gin.Context) *core.Error
 }
@@ -136,6 +137,10 @@ func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, 
 	}
 
 	return users, nil
+}
+
+func (ui *UserInteractor) UploadImage(ctx *gin.Context) *core.Error {
+	uid, _ := ctx.Get("uid")
 }
 
 func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {

@@ -127,6 +127,12 @@ type MigrateFollows struct {
 	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 
+type MigrateUserImage struct {
+	Id       string `json:"id" gorm:"primaryKey;not null"`
+	UserId   string `json:"user_id" gorm:"not null"`
+	ImageURL string `json:"image_url" gorm:"not null"`
+}
+
 func (MigrateUser) TableName() string { return "user" }
 
 func (MigrateWorkout) TableName() string { return "workout" }
@@ -140,6 +146,8 @@ func (MigrateExercice) TableName() string { return "exercice" }
 func (MigrateAuth) TableName() string { return "auth" }
 
 func (MigrateFollows) TableName() string { return "follows" }
+
+func (MigrateUserImage) TableName() string { return "user_image" }
 
 func PsqlIndex(db *gorm.DB) {
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_first_name ON "user" (LOWER(first_name))`)
