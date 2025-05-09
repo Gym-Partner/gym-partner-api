@@ -17,8 +17,11 @@ const (
 	ErrAppDBGetFollowers   = "Failed to retrieve all followers from user [%s] in database."
 	ErrAppDBGetFollowed    = "Failed to retrieve all followed from user [%s] in database."
 
-	ErrAppINTUserExist    = "User [%s] already exist in database."
-	ErrAppINTUserNotExist = "User [%s] not found, or not exist in database."
+	ErrAppINTUserExist         = "User [%s] already exist in database."
+	ErrAppINTUserNotExist      = "User [%s] not found, or not exist in database."
+	ErrAppINTUserImageNotFound = "User [%s] image not available in request body"
+	ErrAppINTUserImageNotOpen  = "User [%s] error to open file image"
+	ErrAppINTUserImageUpload   = "User [%s] failed to upload file image"
 
 	ErrAppINTFollowerExist    = "Follower [%s] already exist for user [%s] in database."
 	ErrAppINTFollowerNotExist = "Follower [%s] not exist for user [%s] in database."

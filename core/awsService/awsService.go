@@ -1,4 +1,4 @@
-package aws
+package awsService
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
@@ -7,11 +7,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-type AWSSession struct {
+type AWSService struct {
 	*session.Session
 }
 
-func NewAWSSession() *AWSSession {
+func NewAWSService() *AWSService {
 	sess := session.Must(session.NewSession(
 		&aws.Config{
 			Region: aws.String(viper.GetString("AWS_REGION")),
@@ -23,5 +23,5 @@ func NewAWSSession() *AWSSession {
 		},
 	))
 
-	return &AWSSession{sess}
+	return &AWSService{sess}
 }

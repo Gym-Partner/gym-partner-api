@@ -10,6 +10,11 @@ type UserInteractorMock struct {
 	mock.Mock
 }
 
+func (u *UserInteractorMock) UploadImage(data model.UserImage) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (u *UserInteractorMock) Search(query string, limit, offset int) (model.Users, *core.Error) {
 	//TODO implement me
 	panic("implement me")

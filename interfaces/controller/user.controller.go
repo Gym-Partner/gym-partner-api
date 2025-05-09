@@ -147,12 +147,13 @@ func (uc *UserController) Search(ctx *gin.Context) {
 }
 
 func (uc *UserController) UploadImage(ctx *gin.Context) {
-	if err := uc.IUserInteractor.UploadImage(ctx); err != nil {
+	userImage, err := uc.IUserInteractor.UploadImage(ctx)
+	if err != nil {
 		ctx.JSON(err.Code, err.Respons())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, nil)
+	ctx.JSON(http.StatusCreated, userImage)
 }
 
 // Update godoc

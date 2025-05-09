@@ -2,7 +2,13 @@ package interactor
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/google/uuid"
+	"github.com/spf13/viper"
+	"gitlab.com/gym-partner1/api/gym-partner-api/core/awsService"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -18,7 +24,7 @@ type IUserInteractor interface {
 	GetOne(c *gin.Context) (model.User, *core.Error)
 	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
 	Search(query string, limit, offset int) (model.Users, *core.Error)
-	UploadImage(ctx *gin.Context) *core.Error
+	UploadImage(ctx *gin.Context) (model.UserImage, *core.Error)
 	Update(ctx *gin.Context) *core.Error
 	Delete(ctx *gin.Context) *core.Error
 }
@@ -139,8 +145,63 @@ func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, 
 	return users, nil
 }
 
-func (ui *UserInteractor) UploadImage(ctx *gin.Context) *core.Error {
+func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.Error) {
 	uid, _ := ctx.Get("uid")
+	file, err := ctx.FormFile("image")
+	if err != nil {
+		return model.UserImage{}, core.NewError(
+			http.StatusNotAcceptable,
+			fmt.Sprintf(core.ErrAppINTUserImageNotFound, uid),
+			err)
+	}
+
+	filename := uid.(string) + filepath.Ext(file.Filename)
+
+	src, err := file.Open()
+	if err != nil {
+		return model.UserImage{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppINTUserImageNotOpen, uid),
+			err)
+	}
+	defer src.Close()
+
+	// Initialization AWS services
+	awsSess := awsService.NewAWSService()
+	s3Client := awsService.NewAWSS3(awsSess)
+
+	bucketName := viper.GetString("AWS_S3_BUCKET_NAME")
+
+	_, err = s3Client.PutObject(&s3.PutObjectInput{
+		Bucket:      aws.String(bucketName),
+		Key:         aws.String(filename),
+		Body:        src,
+		ContentType: aws.String(file.Header.Get("Content-Type")),
+		ACL:         aws.String("public-read"),
+	})
+	if err != nil {
+		return model.UserImage{}, core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppINTUserImageUpload, uid),
+			err)
+	}
+
+	imageURL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s",
+		bucketName,
+		viper.GetString("AWS_REGION"),
+		filename)
+
+	userImage := model.UserImage{
+		Id:       uuid.New().String(),
+		UserId:   uid.(string),
+		ImageURL: imageURL,
+	}
+
+	if err := ui.IUserRepository.UploadImage(userImage); err != nil {
+		return model.UserImage{}, err
+	}
+
+	return userImage, nil
 }
 
 func (ui *UserInteractor) Update(ctx *gin.Context) *core.Error {

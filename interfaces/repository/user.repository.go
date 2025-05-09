@@ -93,25 +93,6 @@ func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 	return user, nil
 }
 
-func (u UserRepository) Search(query string, limit, offset int) (model.Users, *core.Error) {
-	var users model.Users
-
-	if retour := u.DB.Table("user").
-		Where("LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(username) LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%").
-		Select("id", "first_name", "last_name", "username", "age").
-		Limit(limit).
-		Offset(offset).Find(&users); retour.Error != nil {
-		u.Log.Error(core.ErrDBSearchUsers, retour.Error.Error())
-
-		return model.Users{}, core.NewError(
-			http.StatusNotFound,
-			core.ErrAppDBSearchUsers,
-			retour.Error)
-	}
-
-	return users, nil
-}
-
 func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 	var user model.User
 
@@ -153,4 +134,28 @@ func (u UserRepository) Delete(uid string) *core.Error {
 	}
 
 	return nil
+}
+
+func (u UserRepository) Search(query string, limit, offset int) (model.Users, *core.Error) {
+	var users model.Users
+
+	if retour := u.DB.Table("user").
+		Where("LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(username) LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%").
+		Select("id", "first_name", "last_name", "username", "age").
+		Limit(limit).
+		Offset(offset).Find(&users); retour.Error != nil {
+		u.Log.Error(core.ErrDBSearchUsers, retour.Error.Error())
+
+		return model.Users{}, core.NewError(
+			http.StatusNotFound,
+			core.ErrAppDBSearchUsers,
+			retour.Error)
+	}
+
+	return users, nil
+}
+
+func (u UserRepository) UploadImage(data model.UserImage) *core.Error {
+	//TODO implement me
+	panic("implement me")
 }
