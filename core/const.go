@@ -8,6 +8,7 @@ const (
 	ErrAppDBGetOneUser      = "Failed to retrieve user [%s] in database."
 	ErrAppDBSearchUsers     = "Failed to search users in database."
 	ErrAppDBCreateUserImage = "Failed to create users's image in database."
+	ErrAppDBDeleteUserImage = "Failed to delete users's image in database."
 	ErrAppDBUpdateUser      = "Failed to update user [%s] in database."
 	ErrAppDBDeleteUser      = "Failed to delete user [%s] in database."
 
@@ -18,11 +19,13 @@ const (
 	ErrAppDBGetFollowers   = "Failed to retrieve all followers from user [%s] in database."
 	ErrAppDBGetFollowed    = "Failed to retrieve all followed from user [%s] in database."
 
-	ErrAppINTUserExist         = "User [%s] already exist in database."
-	ErrAppINTUserNotExist      = "User [%s] not found, or not exist in database."
-	ErrAppINTUserImageNotFound = "User [%s] image not available in request body"
-	ErrAppINTUserImageNotOpen  = "User [%s] error to open file image"
-	ErrAppINTUserImageUpload   = "User [%s] failed to upload file image"
+	ErrAppINTUserExist           = "User [%s] already exist in database."
+	ErrAppINTUserNotExist        = "User [%s] not found, or not exist in database."
+	ErrAppINTUserImageNotFound   = "User [%s] image not available in request body"
+	ErrAppINTUserImageNotOpen    = "User [%s] error to open file image"
+	ErrAppINTUserImageUpload     = "User [%s] failed to upload file image"
+	ErrAppINTUserImageDeleteS3   = "User [%s] failed to delete file image in S3 service"
+	ErrAppINTUserImageDeletePsql = "User [%s] failed to delete file image in PSQL service"
 
 	ErrAppINTFollowerExist    = "Follower [%s] already exist for user [%s] in database."
 	ErrAppINTFollowerNotExist = "Follower [%s] not exist for user [%s] in database."
@@ -33,14 +36,16 @@ const (
 
 	// USERS
 
-	ErrDBUserNotFound    = "[USER][REPOSITORY] User not found in database"
-	ErrDBCreateUser      = "[USER][REPOSITORY] Failed to create user in database | [ORIGINAL-ERROR] : %s"
-	ErrDBGetAllUser      = "[USER][REPOSITORY] Failed to recover all users | [ORIGINAL-ERROR] : %s"
-	ErrDBGetOneUser      = "[USER][REPOSITORY] Failed to recover user [%s] | [ORIGINAL-ERROR] : %s"
-	ErrDBSearchUsers     = "[USER][REPOSITORY] Failed to search users | [ORIGINAL-ERROR] : %s"
-	ErrDBCreateUserImage = "[USER][REPOSITORY] Failed to create user's image | [ORIGINAL-ERROR] : %s"
-	ErrDBUpdateUser      = "[USER][REPOSITORY] Failed to update user [%s] | [ORIGINAL-ERROR] : %s"
-	ErrDBDeleteUser      = "[USER][REPOSITORY] Failed to delete user [%s] | [ORIGINAL-ERROR] : %s"
+	ErrDBUserNotFound      = "[USER][REPOSITORY] User not found in database"
+	ErrDBCreateUser        = "[USER][REPOSITORY] Failed to create user in database | [ORIGINAL-ERROR] : %s"
+	ErrDBGetAllUser        = "[USER][REPOSITORY] Failed to recover all users | [ORIGINAL-ERROR] : %s"
+	ErrDBGetOneUser        = "[USER][REPOSITORY] Failed to recover user [%s] | [ORIGINAL-ERROR] : %s"
+	ErrDBSearchUsers       = "[USER][REPOSITORY] Failed to search users | [ORIGINAL-ERROR] : %s"
+	ErrDBCreateUserImage   = "[USER][REPOSITORY] Failed to create user's image | [ORIGINAL-ERROR] : %s"
+	ErrDBUserImageNotFound = "[USER][REPOSITORY] User's image not found in database"
+	ErrDBDeleteUserImage   = "[USER][REPOSITORY] Failed to delete user's image [%s] | [ORIGINAL-ERROR] : %s"
+	ErrDBUpdateUser        = "[USER][REPOSITORY] Failed to update user [%s] | [ORIGINAL-ERROR] : %s"
+	ErrDBDeleteUser        = "[USER][REPOSITORY] Failed to delete user [%s] | [ORIGINAL-ERROR] : %s"
 
 	// WORKOUTS
 

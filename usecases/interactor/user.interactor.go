@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core/awsService"
-	"log"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -171,8 +170,29 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 	// Initialization AWS services
 	awsSess := awsService.NewAWSService()
 	s3Client := awsService.NewAWSS3(awsSess)
-
 	bucketName := viper.GetString("AWS_S3_BUCKET_NAME")
+
+	exist := ui.IUserRepository.UserImageIsExist(uid.(string))
+	if exist {
+		// Remove image in database and S3 service
+		_, err = s3Client.DeleteObject(&s3.DeleteObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(filename),
+		})
+		if err != nil {
+			return model.UserImage{}, core.NewError(
+				http.StatusInternalServerError,
+				fmt.Sprintf(core.ErrAppINTUserImageDeleteS3, uid),
+				err)
+		}
+
+		if err = ui.IUserRepository.DeleteUserImage(uid.(string)); err != nil {
+			return model.UserImage{}, core.NewError(
+				http.StatusInternalServerError,
+				fmt.Sprintf(core.ErrAppINTUserImageDeletePsql, uid),
+				err)
+		}
+	}
 
 	_, err = s3Client.PutObject(&s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
@@ -182,7 +202,6 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 		//ACL: aws.String("public-read"),
 	})
 	if err != nil {
-		log.Println(err.Error())
 		return model.UserImage{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppINTUserImageUpload, uid),

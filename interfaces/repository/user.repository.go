@@ -167,3 +167,33 @@ func (u UserRepository) UploadImage(data model.UserImage) *core.Error {
 
 	return nil
 }
+
+func (u UserRepository) UserImageIsExist(uid string) bool {
+	var userImage model.UserImage
+
+	if retour := u.DB.Table("user_image").Where("user_id = ?", uid).First(&userImage); retour.Error != nil {
+		u.Log.Error(retour.Error.Error())
+		return false
+	}
+
+	if userImage.Id == "" {
+		u.Log.Error(core.ErrDBUserImageNotFound)
+		return false
+	} else {
+		return true
+	}
+}
+
+func (u UserRepository) DeleteUserImage(uid string) *core.Error {
+	var userImage model.UserImage
+
+	if retour := u.DB.Table("user_image").Where("user_id = ?", uid).Delete(&userImage); retour.Error != nil {
+		u.Log.Error(core.ErrDBDeleteUserImage, retour.Error.Error())
+
+		return core.NewError(
+			http.StatusInternalServerError,
+			fmt.Sprintf(core.ErrAppDBDeleteUserImage),
+			retour.Error)
+	}
+	return nil
+}
