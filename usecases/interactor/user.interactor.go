@@ -197,6 +197,7 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 	exist := ui.IUserRepository.UserImageIsExist(uid.(string))
 	if exist {
 		// Remove image in database and S3 service
+		// do something for push anything else
 		_, err = s3Client.DeleteObject(&s3.DeleteObjectInput{
 			Bucket: aws.String(bucketName),
 			Key:    aws.String(filename),
