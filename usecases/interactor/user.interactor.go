@@ -208,11 +208,8 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 				err)
 		}
 
-		if err = ui.IUserRepository.DeleteUserImage(uid.(string)); err != nil {
-			return model.UserImage{}, core.NewError(
-				http.StatusInternalServerError,
-				fmt.Sprintf(core.ErrAppINTUserImageDeletePsql, uid),
-				err)
+		if err := ui.IUserRepository.DeleteUserImage(uid.(string)); err != nil {
+			return model.UserImage{}, err
 		}
 	}
 
