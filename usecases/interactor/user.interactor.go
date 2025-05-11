@@ -154,15 +154,21 @@ func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, 
 		return model.Users{}, err
 	}
 
-	// Followers part
+	// Followers part / user's image
 	for key, user := range users {
 		followers, err := ui.IFollowRepository.GetAllByUserId(user.Id)
 		if err != nil {
 			return model.Users{}, err
 		}
 
+		userImage, err := ui.IUserRepository.GetImageByUserId(user.Id)
+		if err != nil {
+			return model.Users{}, err
+		}
+
 		users[key].Followers = followers.Followers
 		users[key].Following = followers.Followings
+		users[key].UserImage = userImage.ImageURL
 	}
 
 	return users, nil
