@@ -25,6 +25,7 @@ type IUserInteractor interface {
 	GetAll() (model.Users, *core.Error)
 	GetOne(c *gin.Context) (model.User, *core.Error)
 	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
+	GetUsers(ctx *gin.Context) (model.Users, *core.Error)
 	Search(query string, limit, offset int) (model.Users, *core.Error)
 	UploadImage(ctx *gin.Context) (model.UserImage, *core.Error)
 	Update(ctx *gin.Context) *core.Error
@@ -146,6 +147,44 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 	user.Following = followers.Followings
 	user.UserImage = userImage.ImageURL
 	return user, err
+}
+
+func (ui *UserInteractor) GetUsers(ctx *gin.Context) (model.Users, *core.Error) {
+	var users model.Users
+	var uids []string
+	if err := ctx.ShouldBind(&uids); err != nil {
+		return model.Users{}, core.NewError(
+			http.StatusUnauthorized,
+			core.ErrAppINTUserBindData,
+			err)
+	}
+
+	for _, uid := range uids {
+		user, err := ui.IUserRepository.GetOneById(uid)
+		if err != nil {
+			return model.Users{}, err
+		}
+
+		// Followers part
+		followers, err := ui.IFollowRepository.GetAllByUserId(uid)
+		if err != nil {
+			return model.Users{}, err
+		}
+
+		// User's image part
+		userImage, err := ui.IUserRepository.GetImageByUserId(uid)
+		if err != nil {
+			return model.Users{}, err
+		}
+
+		user.Followers = followers.Followers
+		user.Following = followers.Followings
+		user.UserImage = userImage.ImageURL
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, *core.Error) {

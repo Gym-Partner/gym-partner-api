@@ -22,6 +22,7 @@ const (
 
 	ErrAppINTUserExist           = "User [%s] already exist in database."
 	ErrAppINTUserNotExist        = "User [%s] not found, or not exist in database."
+	ErrAppINTUserBindData        = "Failed to bind users data to model"
 	ErrAppINTUserImageNotFound   = "User [%s] image not available in request body"
 	ErrAppINTUserImageNotOpen    = "User [%s] error to open file image"
 	ErrAppINTUserImageUpload     = "User [%s] failed to upload file image"

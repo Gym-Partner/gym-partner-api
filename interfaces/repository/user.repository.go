@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -202,10 +203,14 @@ func (u UserRepository) GetImageByUserId(uid string) (model.UserImage, *core.Err
 	var userImage model.UserImage
 
 	if retour := u.DB.Table("user_image").Where("user_id = ?", uid).First(&userImage); retour.Error != nil {
+		if errors.Is(retour.Error, gorm.ErrRecordNotFound) {
+			return model.UserImage{}, nil
+		}
+
 		u.Log.Error(core.ErrDBGetUserImage, uid, retour.Error.Error())
 
 		return model.UserImage{}, core.NewError(
-			http.StatusNotFound,
+			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppDBGetUserImage, uid),
 			retour.Error)
 	}
