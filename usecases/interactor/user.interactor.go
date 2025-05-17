@@ -193,15 +193,21 @@ func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, 
 		return model.Users{}, err
 	}
 
-	// Followers part
+	// Followers part / user's image
 	for key, user := range users {
 		followers, err := ui.IFollowRepository.GetAllByUserId(user.Id)
 		if err != nil {
 			return model.Users{}, err
 		}
 
+		userImage, err := ui.IUserRepository.GetImageByUserId(user.Id)
+		if err != nil {
+			return model.Users{}, err
+		}
+
 		users[key].Followers = followers.Followers
 		users[key].Following = followers.Followings
+		users[key].UserImage = userImage.ImageURL
 	}
 
 	return users, nil
@@ -235,23 +241,28 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 
 	exist := ui.IUserRepository.UserImageIsExist(uid.(string))
 	if exist {
-		// Remove image in database and S3 service
-		_, err = s3Client.DeleteObject(&s3.DeleteObjectInput{
-			Bucket: aws.String(bucketName),
-			Key:    aws.String(filename),
-		})
+		oldImage, err := ui.IUserRepository.GetImageByUserId(uid.(string))
 		if err != nil {
+			return model.UserImage{}, err
+		}
+
+		oldKey := filepath.Base(oldImage.ImageURL)
+
+		// Remove image in database and S3 service
+		// do something for push anything else
+		_, errS3 := s3Client.DeleteObject(&s3.DeleteObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(oldKey),
+		})
+		if errS3 != nil {
 			return model.UserImage{}, core.NewError(
 				http.StatusInternalServerError,
 				fmt.Sprintf(core.ErrAppINTUserImageDeleteS3, uid),
 				err)
 		}
 
-		if err = ui.IUserRepository.DeleteUserImage(uid.(string)); err != nil {
-			return model.UserImage{}, core.NewError(
-				http.StatusInternalServerError,
-				fmt.Sprintf(core.ErrAppINTUserImageDeletePsql, uid),
-				err)
+		if err := ui.IUserRepository.DeleteUserImage(uid.(string)); err != nil {
+			return model.UserImage{}, err
 		}
 	}
 
