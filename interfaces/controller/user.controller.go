@@ -114,6 +114,16 @@ func (uc *UserController) GetOne(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user.Respons())
 }
 
+func (uc *UserController) GetUsers(ctx *gin.Context) {
+	users, err := uc.IUserInteractor.GetUsers(ctx)
+	if err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users.Respons())
+}
+
 func (uc *UserController) Search(ctx *gin.Context) {
 	query := strings.ToLower(ctx.Query("query"))
 	limitStr := ctx.DefaultQuery("limit", "10")

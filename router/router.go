@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/zsais/go-gin-prometheus"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/docs"
 	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/controller"
@@ -18,9 +19,12 @@ func Router(db *core.Database) *gin.Engine {
 	route.Use(middleware.InitMiddleware(db.Logger))
 	docs.SwaggerInfo.BasePath = "/api/v1"
 
+	prometheus := ginprometheus.NewPrometheus("gin")
+	prometheus.Use(route)
+
 	route.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"https://foo.com"},
-		AllowMethods:     []string{"PUT", "PATCH"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH"},
 		AllowHeaders:     []string{"Origin"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -44,6 +48,7 @@ func Router(db *core.Database) *gin.Engine {
 			// ###########################################################
 			v1Auth.GET("/user/get_all", userController.GetAll)
 			v1Auth.GET("/user/get_one", userController.GetOne)
+			v1Auth.POST("/users/get_users", userController.GetUsers)
 			v1Auth.GET("/users/search", userController.Search)
 			v1Auth.POST("/user/upload_image", userController.UploadImage)
 			v1Auth.PATCH("/user/update", userController.Update)
@@ -78,6 +83,7 @@ func Router(db *core.Database) *gin.Engine {
 					"message": "PONG",
 				})
 			})
+
 		}
 	}
 	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
