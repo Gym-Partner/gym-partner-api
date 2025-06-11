@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -41,7 +42,36 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
+		if isTokenExpired(newToken) {
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"message": "Token is expired",
+			})
+			ctx.Abort()
+			return
+		}
+
 		ctx.Set("uid", claims.UserId)
 		ctx.Set("token", newToken)
 	}
+}
+
+func isTokenExpired(tokenStr string) bool {
+	claims := &model.CustomClaims{}
+
+	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(viper.GetString("TOKEN_SECRET")), nil
+	})
+	if err != nil {
+		return true
+	}
+
+	if !token.Valid {
+		return true
+	}
+
+	if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {
+		return true
+	}
+
+	return false
 }
