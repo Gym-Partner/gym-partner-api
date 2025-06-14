@@ -52,7 +52,7 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 			return err
 		}
 
-		for _, exercise := range unity.Exercices {
+		for _, exercise := range unity.Exercises {
 			if err := wi.IWorkoutRepository.CreateExercise(exercise); err != nil {
 				return err
 			}
