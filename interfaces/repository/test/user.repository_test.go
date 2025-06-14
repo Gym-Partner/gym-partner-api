@@ -44,7 +44,7 @@ func TestUserRepository_ISEXIST(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "password", "created_at"}).
 					AddRow("1234", "Test", "Test", "test@gmail.com", "aaaAAA111", time.Now())
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE id =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE id =(.+)`).
 					WithArgs("1234").
 					WillReturnRows(rows)
 			},
@@ -56,7 +56,7 @@ func TestUserRepository_ISEXIST(t *testing.T) {
 			OPT:  "ID",
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "password", "created_at"})
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE id =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE id =(.+)`).
 					WithArgs("5678").
 					WillReturnRows(rows)
 			},
@@ -70,7 +70,7 @@ func TestUserRepository_ISEXIST(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "password", "created_at"}).
 					AddRow("1234", "Test", "Test", "test@gmail.com", "aaaAAA111", time.Now())
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE email =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE email =(.+)`).
 					WithArgs("test@gmail.com").
 					WillReturnRows(rows)
 			},
@@ -82,7 +82,7 @@ func TestUserRepository_ISEXIST(t *testing.T) {
 			OPT:  "EMAIL",
 			setupMock: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "password", "created_at"})
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE email =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE email =(.+)`).
 					WithArgs("unknown@gmail.com").
 					WillReturnRows(rows)
 			},
@@ -122,7 +122,7 @@ func TestUserRepository_INSERT(t *testing.T) {
 			name: core.TestREPUserCreateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "user"`).
+				mock.ExpectExec(`INSERT INTO "users"`).
 					WithArgs(
 						user.Id,
 						user.FirstName,
@@ -142,7 +142,7 @@ func TestUserRepository_INSERT(t *testing.T) {
 			name: core.TestUserCreateFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "user"`).
+				mock.ExpectExec(`INSERT INTO "users"`).
 					WithArgs(
 						user.Id,
 						user.FirstName,
@@ -270,7 +270,7 @@ func TestUserRepository_GETONEBYID(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "username", "email", "password", "created_at"}).
 					AddRow(user.Id, user.FirstName, user.LastName, user.UserName, user.Email, user.Password, user.CreatedAt)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE id =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE id =(.+)`).
 					WithArgs(user.Id).
 					WillReturnRows(rows)
 			},
@@ -280,7 +280,7 @@ func TestUserRepository_GETONEBYID(t *testing.T) {
 		{
 			name: core.TestUserNotFound,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE id =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE id =(.+)`).
 					WillReturnError(fmt.Errorf("database error"))
 			},
 			expectedRes: model.User{},
@@ -333,7 +333,7 @@ func TestUserRepository_GETONEBYEMAIL(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"id"}).
 					AddRow(user.Id)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE email =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE email =(.+)`).
 					WithArgs(user.Email).
 					WillReturnRows(rows)
 			},
@@ -343,7 +343,7 @@ func TestUserRepository_GETONEBYEMAIL(t *testing.T) {
 		{
 			name: core.TestUserNotFound,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"user\" WHERE email =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"users\" WHERE email =(.+)`).
 					WithArgs(user.Email).
 					WillReturnError(fmt.Errorf("database error"))
 			},
@@ -394,7 +394,7 @@ func TestUserRepository_UPDATE(t *testing.T) {
 			name: core.TestREPUserUpdateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE \"user\" SET .+`).
+				mock.ExpectExec(`UPDATE \"users\" SET .+`).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
@@ -404,7 +404,7 @@ func TestUserRepository_UPDATE(t *testing.T) {
 			name: core.TestUserUpdateFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE \"user\" SET .+`).
+				mock.ExpectExec(`UPDATE \"users\" SET .+`).
 					WillReturnError(fmt.Errorf("database error"))
 				mock.ExpectRollback()
 			},
@@ -442,7 +442,7 @@ func TestUserRepository_DELETE(t *testing.T) {
 			name: core.TestREPUserDeleteSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`DELETE FROM \"user\" WHERE id=?`).
+				mock.ExpectExec(`DELETE FROM \"users\" WHERE id=?`).
 					WithArgs(user.Id).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -453,7 +453,7 @@ func TestUserRepository_DELETE(t *testing.T) {
 			name: core.TestUserDeleteFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`DELETE FROM \"user\" WHERE id=?`).
+				mock.ExpectExec(`DELETE FROM \"users\" WHERE id=?`).
 					WithArgs(user.Id).
 					WillReturnError(fmt.Errorf("database error"))
 				mock.ExpectRollback()
