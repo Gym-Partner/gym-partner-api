@@ -146,12 +146,12 @@ func (wr WorkoutRepository) GetAllWorkoutsByUserId(uid string) (database.Migrate
 
 // ------------------------------- UPDATE -------------------------------
 
-func (wr WorkoutRepository) UpdateWorkout(data model.Workout) *core.Error {
+func (wr WorkoutRepository) UpdateWorkouts(data model.Workout) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (wr WorkoutRepository) UpdateUnityOfWorkout(data model.UnityOfWorkout) *core.Error {
+func (wr WorkoutRepository) UpdateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -168,7 +168,7 @@ func (wr WorkoutRepository) UpdateSeries(data model.Serie) *core.Error {
 
 // ------------------------------- DELETE -------------------------------
 
-func (wr WorkoutRepository) DeleteWorkoutByUserId(uid string) *core.Error {
+func (wr WorkoutRepository) DeleteWorkoutsByUserId(uid string) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }

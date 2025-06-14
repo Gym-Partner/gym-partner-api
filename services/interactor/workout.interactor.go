@@ -157,11 +157,11 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 }
 
 func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
-	uid, _ := ctx.Get("uid")
-	patch, err := wi.IUtils.InjectBodyInModel(ctx)
-	if err != nil {
-		return err
-	}
+	//uid, _ := ctx.Get("uid")
+	//patch, err := wi.IUtils.InjectBodyInModel(ctx)
+	//if err != nil {
+	//	return err
+	//}
 
 	//TODO implement me
 	panic("implement me")
