@@ -34,8 +34,8 @@ func MockWorkoutRepository(db *gorm.DB) *WorkoutRepository {
 
 // ------------------------------ IS EXIST-------------------------------
 
-func (wr WorkoutRepository) IsExist(uid string) bool {
-	workout, err := findByID[database.MigrateWorkout](wr, WORKOUTS_TABLE_NAME, "user_id", uid)
+func (wr WorkoutRepository) IsExist(id string) bool {
+	workout, err := findByID[database.MigrateWorkout](wr, WORKOUTS_TABLE_NAME, "_id", id)
 	if err != nil {
 		return false
 	}
@@ -249,11 +249,75 @@ func (wr WorkoutRepository) UpdateSeries(data model.Serie) *core.Error {
 
 // ------------------------------- DELETE -------------------------------
 
-func (wr WorkoutRepository) DeleteWorkoutsByUserId(uid string) *core.Error {
-	//TODO implement me
-	panic("implement me")
+func (wr WorkoutRepository) DeleteWorkouts(id string) *core.Error {
+	var workouts database.MigrateWorkouts
+
+	if raw := wr.DB.
+		Table(WORKOUTS_TABLE_NAME).
+		Where("id = ?", id).
+		Delete(&workouts); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBDeleteWorkout, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBDeleteWorkouts,
+			raw.Error)
+	}
+
+	return nil
 }
 
+func (wr WorkoutRepository) DeleteUnities(id string) *core.Error {
+	var unity database.MigrateUnityOfWorkout
+
+	if raw := wr.DB.
+		Table(UNITIES_TABLE_NAME).
+		Where("id = ?", id).
+		Delete(&unity); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBDeleteUnityOfWorkout, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBDeleteUnityOfWorkouts,
+			raw.Error)
+	}
+
+	return nil
+}
+
+func (wr WorkoutRepository) DeleteExercises(id string) *core.Error {
+	var exercise database.MigrateExercise
+
+	if raw := wr.DB.
+		Table(EXERCISES_TABLE_NAME).
+		Where("id = ?", id).
+		Delete(&exercise); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBDeleteExercises, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBDeleteExercises,
+			raw.Error)
+	}
+
+	return nil
+}
+
+func (wr WorkoutRepository) DeleteSeries(id string) *core.Error {
+	var series database.MigrateSerie
+
+	if raw := wr.DB.
+		Table(SERIES_TABLE_NAME).
+		Where("id = ?", id).
+		Delete(&series); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBDeleteSeries, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBDeleteSeries,
+			raw.Error)
+	}
+
+	return nil
+}
+
+// ------------------------------- OTHER --------------------------------
 func findByID[T any](wr WorkoutRepository, tableName, columnName, value string) (T, error) {
 	var result T
 	err := wr.DB.Table(tableName).Where(fmt.Sprintf("%s = ?", columnName), value).First(&result).Error

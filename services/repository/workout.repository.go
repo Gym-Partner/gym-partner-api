@@ -7,7 +7,7 @@ import (
 )
 
 type IWorkoutRepository interface {
-	IsExist(uid string) bool
+	IsExist(id string) bool
 
 	CreateWorkouts(data model.Workout) *core.Error
 	CreateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error
@@ -18,7 +18,6 @@ type IWorkoutRepository interface {
 	GetUnitiesById(id string) (database.MigrateUnityOfWorkout, *core.Error)
 	GetExerciseById(id string) (database.MigrateExercise, *core.Error)
 	GetSeriesById(id string) (database.MigrateSerie, *core.Error)
-
 	GetAllWorkoutsByUserId(uid string) (database.MigrateWorkouts, *core.Error)
 
 	UpdateWorkouts(data model.Workout) *core.Error
@@ -26,5 +25,8 @@ type IWorkoutRepository interface {
 	UpdateExercise(data model.Exercise) *core.Error
 	UpdateSeries(data model.Serie) *core.Error
 
-	DeleteWorkoutsByUserId(uid string) *core.Error
+	DeleteWorkouts(id string) *core.Error
+	DeleteUnities(id string) *core.Error
+	DeleteExercises(id string) *core.Error
+	DeleteSeries(id string) *core.Error
 }

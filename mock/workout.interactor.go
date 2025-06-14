@@ -11,21 +11,6 @@ type WorkoutInteractorMock struct {
 	mock.Mock
 }
 
-func (w *WorkoutInteractorMock) UpdateWorkouts(data model.Workout) *core.Error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (w *WorkoutInteractorMock) UpdateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (w *WorkoutInteractorMock) DeleteWorkoutsByUserId(uid string) *core.Error {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (w *WorkoutInteractorMock) CreateWorkouts(data model.Workout) *core.Error {
 	args := w.Called(data)
 	return args.Error(0).(*core.Error)
@@ -71,12 +56,12 @@ func (w *WorkoutInteractorMock) GetAllWorkoutsByUserId(uid string) (database.Mig
 	return args.Get(0).(database.MigrateWorkouts), args.Error(1).(*core.Error)
 }
 
-func (w *WorkoutInteractorMock) UpdateWorkout(data model.Workout) *core.Error {
+func (w *WorkoutInteractorMock) UpdateWorkouts(data model.Workout) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (w *WorkoutInteractorMock) UpdateUnityOfWorkout(data model.UnityOfWorkout) *core.Error {
+func (w *WorkoutInteractorMock) UpdateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -91,12 +76,27 @@ func (w *WorkoutInteractorMock) UpdateSeries(data model.Serie) *core.Error {
 	panic("implement me")
 }
 
-func (w *WorkoutInteractorMock) DeleteWorkoutByUserId(uid string) *core.Error {
+func (w *WorkoutInteractorMock) DeleteWorkouts(id string) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (w *WorkoutInteractorMock) IsExist(uid string) bool {
+func (w *WorkoutInteractorMock) DeleteUnities(id string) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (w *WorkoutInteractorMock) DeleteExercises(id string) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (w *WorkoutInteractorMock) DeleteSeries(id string) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (w *WorkoutInteractorMock) IsExist(id string) bool {
 	//TODO implement me
 	panic("implement me")
 }

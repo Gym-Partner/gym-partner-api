@@ -159,17 +159,16 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 }
 
 func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
-	uid, _ := ctx.Get("uid")
 	update, err := wi.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return err
 	}
 
-	exist := wi.IWorkoutRepository.IsExist(uid.(string))
+	exist := wi.IWorkoutRepository.IsExist(update.Id)
 	if !exist {
 		return core.NewError(
-			http.StatusBadRequest,
-			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, uid.(string)))
+			http.StatusNotFound,
+			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, update.Name))
 	}
 
 	if err := wi.IWorkoutRepository.UpdateWorkouts(update); err != nil {
@@ -198,6 +197,39 @@ func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
 }
 
 func (wi *WorkoutInteractor) Delete(ctx *gin.Context) *core.Error {
-	//TODO implement me
-	panic("implement me")
+	workout, err := wi.IUtils.InjectBodyInModel(ctx)
+	if err != nil {
+		return err
+	}
+
+	exist := wi.IWorkoutRepository.IsExist(workout.Id)
+	if !exist {
+		return core.NewError(
+			http.StatusNotFound,
+			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, workout.Name))
+	}
+
+	if err := wi.IWorkoutRepository.DeleteWorkouts(workout.Id); err != nil {
+		return err
+	}
+
+	for _, unity := range workout.UnitiesOfWorkout {
+		if err := wi.IWorkoutRepository.DeleteUnities(unity.Id); err != nil {
+			return err
+		}
+
+		for _, exercise := range unity.Exercises {
+			if err := wi.IWorkoutRepository.DeleteExercises(exercise.Id); err != nil {
+				return err
+			}
+		}
+
+		for _, series := range unity.Series {
+			if err := wi.IWorkoutRepository.DeleteSeries(series.Id); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

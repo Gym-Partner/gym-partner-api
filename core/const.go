@@ -19,6 +19,11 @@ const (
 	ErrAppDBUpdateExercises         = "Failed to update user's exercises of workouts in database."
 	ErrAppDBUpdateSeries            = "Failed to update user's series of workouts in database."
 
+	ErrAppDBDeleteWorkouts        = "Failed to delete user's workouts in database."
+	ErrAppDBDeleteUnityOfWorkouts = "Failed to delete user's unity of workouts in database."
+	ErrAppDBDeleteExercises       = "Failed to delete user's exercises of workouts in database."
+	ErrAppDBDeleteSeries          = "Failed to delete user's series of workouts in database."
+
 	ErrAppDBAddFollower    = "Failed to add follower for user [%s] in database."
 	ErrAppDBRemoveFollower = "Failed to remove follower for user [%s] in database."
 	ErrAppDBGetFollowers   = "Failed to retrieve all followers from user [%s] in database."
@@ -33,7 +38,7 @@ const (
 	ErrAppINTUserImageDeleteS3   = "User [%s] failed to delete file image in S3 service"
 	ErrAppINTUserImageDeletePsql = "User [%s] failed to delete file image in PSQL service"
 
-	ErrAppINTWorkoutsNotExist = "User's workout [%s] not exist in database."
+	ErrAppINTWorkoutsNotExist = `User's workout "%s" not exist in database.`
 
 	ErrAppINTFollowerExist    = "Follower [%s] already exist for user [%s] in database."
 	ErrAppINTFollowerNotExist = "Follower [%s] not exist for user [%s] in database."
@@ -70,9 +75,14 @@ const (
 	ErrDBGetSeries         = "[SERIES][REPOSITORY] Failed to recover unity's series with his id"
 
 	ErrDBUpdateWorkout           = "[WORKOUT][REPOSITORY] Failed to update workout with is user_id: %s | [ORIGINAL-ERROR] : %s"
-	ErrDBUpdateUnitiesOfWorkouts = "[UNITIES_OF_WORKOUT][REPOSITORY] Failed to update workout's unity unities | [ORIGINAL-ERROR] : %s"
+	ErrDBUpdateUnitiesOfWorkouts = "[UNITIES_OF_WORKOUT][REPOSITORY] Failed to update workout's unities | [ORIGINAL-ERROR] : %s"
 	ErrDBUpdateExercises         = "[EXERCISES][REPOSITORY] Failed to update workout's exercises | [ORIGINAL-ERROR] : %s"
 	ErrDBUpdateSeries            = "[SERIES][REPOSITORY] Failed to update workout's series | [ORIGINAL-ERROR] : %s"
+
+	ErrDBDeleteWorkout        = "[WORKOUT][REPOSITORY] Failed to delete workout | [ORIGINAL-ERROR] : %s"
+	ErrDBDeleteUnityOfWorkout = "[WORKOUT][REPOSITORY] Failed to delete workout's unities | [ORIGINAL-ERROR] : %s"
+	ErrDBDeleteExercises      = "[WORKOUT][REPOSITORY] Failed to delete workout's exercises | [ORIGINAL-ERROR] : %s"
+	ErrDBDeleteSeries         = "[WORKOUT][REPOSITORY] Failed to delete workout's series | [ORIGINAL-ERROR] : %s"
 
 	// AUTH
 
