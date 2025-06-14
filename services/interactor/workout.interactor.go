@@ -159,6 +159,7 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 }
 
 func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
+	uid, _ := ctx.Get("uid")
 	update, err := wi.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return err
@@ -171,22 +172,35 @@ func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
 			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, update.Name))
 	}
 
+	update.UserId = uid.(string)
 	if err := wi.IWorkoutRepository.UpdateWorkouts(update); err != nil {
 		return err
 	}
 
 	for _, unity := range update.UnitiesOfWorkout {
+		if unity.Id == "" {
+			unity.GenerateUID()
+		}
+
 		if err := wi.IWorkoutRepository.UpdateUnitiesOfWorkout(unity); err != nil {
 			return err
 		}
 
 		for _, exercises := range unity.Exercises {
+			if exercises.Id == "" {
+				exercises.GenerateUID()
+			}
+
 			if err := wi.IWorkoutRepository.UpdateExercise(exercises); err != nil {
 				return err
 			}
 		}
 
 		for _, series := range unity.Series {
+			if series.Id == "" {
+				series.GenerateUID()
+			}
+
 			if err := wi.IWorkoutRepository.UpdateSeries(series); err != nil {
 				return err
 			}

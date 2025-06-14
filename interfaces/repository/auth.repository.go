@@ -20,7 +20,7 @@ func (a AuthRepository) GetUserIDByEmail(email string) (string, *core.Error) {
 	var user model.User
 
 	if raw := a.DB.
-		Table(AUTH_TABLE_NAME).
+		Table(USERS_TABLE_NAME).
 		Select("id").
 		Where("email = ?", email).
 		First(&user); raw.Error != nil {

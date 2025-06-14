@@ -35,24 +35,36 @@ func MockWorkoutRepository(db *gorm.DB) *WorkoutRepository {
 // ------------------------------ IS EXIST-------------------------------
 
 func (wr WorkoutRepository) IsExist(id string) bool {
-	workout, err := findByID[database.MigrateWorkout](wr, WORKOUTS_TABLE_NAME, "_id", id)
+	workout, err := findByID[database.MigrateWorkout](wr, WORKOUTS_TABLE_NAME, "id", id)
 	if err != nil {
 		return false
 	}
 
 	for _, unityID := range workout.UnitiesId {
+		if unityID == "" {
+			continue
+		}
+
 		unity, err := findByID[database.MigrateUnityOfWorkout](wr, UNITIES_TABLE_NAME, "id", unityID)
 		if err != nil {
 			return false
 		}
 
 		for _, exerciseID := range unity.ExercisesId {
+			if exerciseID == "" {
+				continue
+			}
+
 			if _, err := findByID[database.MigrateExercise](wr, EXERCISES_TABLE_NAME, "id", exerciseID); err != nil {
 				return false
 			}
 		}
 
 		for _, seriesID := range unity.SeriesId {
+			if seriesID == "" {
+				continue
+			}
+
 			if _, err := findByID[database.MigrateSerie](wr, SERIES_TABLE_NAME, "id", seriesID); err != nil {
 				return false
 			}
@@ -192,9 +204,11 @@ func (wr WorkoutRepository) GetAllWorkoutsByUserId(uid string) (database.Migrate
 // ------------------------------- UPDATE -------------------------------
 
 func (wr WorkoutRepository) UpdateWorkouts(data model.Workout) *core.Error {
+	newData := data.ModelToDbSchema()
+
 	if raw := wr.DB.
 		Table(WORKOUTS_TABLE_NAME).
-		Save(&data); raw.Error != nil {
+		Save(&newData); raw.Error != nil {
 		wr.Log.Error(fmt.Sprintf(core.ErrDBUpdateWorkout, data.UserId, raw.Error.Error()))
 		return core.NewError(
 			http.StatusInternalServerError,
@@ -206,9 +220,11 @@ func (wr WorkoutRepository) UpdateWorkouts(data model.Workout) *core.Error {
 }
 
 func (wr WorkoutRepository) UpdateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error {
+	newData := data.ModelToDbSchema()
+
 	if raw := wr.DB.
 		Table(UNITIES_TABLE_NAME).
-		Save(&data); raw.Error != nil {
+		Save(&newData); raw.Error != nil {
 		wr.Log.Error(fmt.Sprintf(core.ErrDBUpdateUnitiesOfWorkouts, raw.Error.Error()))
 		return core.NewError(
 			http.StatusInternalServerError,
