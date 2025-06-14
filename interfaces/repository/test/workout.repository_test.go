@@ -57,7 +57,7 @@ func TestWorkoutRepository_CREATE_WORKOUT(t *testing.T) {
 			name: core.TestREPWorkoutCreateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "workout"`).
+				mock.ExpectExec(`INSERT INTO "workouts"`).
 					WithArgs(
 						workout.Id,
 						workout.UserId,
@@ -74,7 +74,7 @@ func TestWorkoutRepository_CREATE_WORKOUT(t *testing.T) {
 			name: core.TestWorkoutCreateFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "workout"`).
+				mock.ExpectExec(`INSERT INTO "workouts"`).
 					WithArgs(
 						workout.Id,
 						workout.UserId,
@@ -118,7 +118,7 @@ func TestWorkoutRepository_CREATE_UNITY_OF_WORKOUT(t *testing.T) {
 			name: core.TestREPUnityOfWorkoutCreateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "unity_of_workout"`).
+				mock.ExpectExec(`INSERT INTO "unities_of_workout"`).
 					WithArgs(
 						unity.Id,
 						sqlmock.AnyArg(),
@@ -135,7 +135,7 @@ func TestWorkoutRepository_CREATE_UNITY_OF_WORKOUT(t *testing.T) {
 			name: core.TestUnitiesOfWorkoutCreateFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "unity_of_workout"`).
+				mock.ExpectExec(`INSERT INTO "unities_of_workout"`).
 					WithArgs(
 						unity.Id,
 						sqlmock.AnyArg(),
@@ -180,7 +180,7 @@ func TestWorkoutRepository_CREATE_EXERCICE(t *testing.T) {
 			name: core.TestREPExerciceCreateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "exercice"`).
+				mock.ExpectExec(`INSERT INTO "exercises"`).
 					WithArgs(
 						exercice.Id,
 						exercice.Name,
@@ -194,7 +194,7 @@ func TestWorkoutRepository_CREATE_EXERCICE(t *testing.T) {
 			name: core.TestExercicesCreateFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "exercice"`).
+				mock.ExpectExec(`INSERT INTO "exercises"`).
 					WithArgs(
 						exercice.Id,
 						exercice.Name,
@@ -236,7 +236,7 @@ func TestWorkoutRepository_CREATE_SERIE(t *testing.T) {
 			name: core.TestREPSerieCreateSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "serie"`).
+				mock.ExpectExec(`INSERT INTO "series"`).
 					WithArgs(
 						serie.Id,
 						serie.Weight,
@@ -251,7 +251,7 @@ func TestWorkoutRepository_CREATE_SERIE(t *testing.T) {
 			name: core.TestSeriesCreateFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(`INSERT INTO "serie"`).
+				mock.ExpectExec(`INSERT INTO "series"`).
 					WithArgs(
 						serie.Id,
 						serie.Weight,
@@ -298,7 +298,7 @@ func TestWorkoutRepository_GET_WORKOUT(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"id", "user_id", "unities_id", "day", "name", "comment"}).
 					AddRow(workout.Id, workout.UserId, workout.UnitiesId, workout.Day, workout.Name, workout.Comment)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"workoutS\" WHERE user_id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"workouts\" WHERE user_id = (.+)`).
 					WithArgs(userId).
 					WillReturnRows(rows)
 			},
@@ -308,7 +308,7 @@ func TestWorkoutRepository_GET_WORKOUT(t *testing.T) {
 		{
 			name: core.TestWorkoutGetFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"workoutS\" WHERE user_id =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"workouts\" WHERE user_id =(.+)`).
 					WillReturnError(fmt.Errorf("database error"))
 			},
 			expectedRes: database.MigrateWorkout{},
@@ -431,7 +431,7 @@ func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
 				row := sqlmock.NewRows([]string{"id", "name", "equipment"}).
 					AddRow(exercice.Id, exercice.Name, exercice.Equipment)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"exercise\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"exercises\" WHERE id = (.+)`).
 					WithArgs(exercice.Id).
 					WillReturnRows(row)
 			},
@@ -441,7 +441,7 @@ func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
 		{
 			name: core.TestExercicesGetFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"exercise\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"exercises\" WHERE id = (.+)`).
 					WillReturnError(fmt.Errorf("database error"))
 			},
 			expectedRes: database.MigrateExercise{},

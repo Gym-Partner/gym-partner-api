@@ -271,7 +271,7 @@ func generateTestSeries(iteration int) Series {
 	return series
 }
 
-// ------------------------------ EXERCICE ------------------------------
+// ------------------------------ EXERCISE ------------------------------
 
 type Exercise struct {
 	Id        string `json:"id"`
@@ -300,7 +300,7 @@ func (e *Exercise) GenerateUID() {
 
 func (e *Exercise) GenerateTest() {
 	e.Id = uuid.New().String()
-	e.Name = "Name test exercice"
+	e.Name = "Name test exercise"
 	e.Equipment = true
 }
 

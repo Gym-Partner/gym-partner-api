@@ -45,7 +45,7 @@ func (u *UserInteractorMock) Delete(uid string) *core.Error {
 	return args.Error(0).(*core.Error)
 }
 
-func (u *UserInteractorMock) GetImageByUserId(uid string) (model.UserImage, *core.Error) {
+func (u *UserInteractorMock) GetImageByUserId(uid string) (model.UsersImage, *core.Error) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -60,7 +60,7 @@ func (u *UserInteractorMock) UserImageIsExist(uid string) bool {
 	panic("implement me")
 }
 
-func (u *UserInteractorMock) UploadImage(data model.UserImage) *core.Error {
+func (u *UserInteractorMock) UploadImage(data model.UsersImage) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }

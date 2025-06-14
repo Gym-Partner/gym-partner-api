@@ -127,7 +127,7 @@ type MigrateFollows struct {
 	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 
-type MigrateUserImage struct {
+type MigrateUsersImage struct {
 	Id        string    `json:"id" gorm:"primaryKey;not null"`
 	UserId    string    `json:"user_id" gorm:"not null"`
 	ImageURL  string    `json:"image_url" gorm:"not null"`
@@ -148,13 +148,13 @@ func (MigrateAuth) TableName() string { return "auth" }
 
 func (MigrateFollows) TableName() string { return "follows" }
 
-func (MigrateUserImage) TableName() string { return "user_image" }
+func (MigrateUsersImage) TableName() string { return "users_image" }
 
 func PsqlIndex(db *gorm.DB) {
 	// USER
-	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_first_name ON "user" (LOWER(first_name))`)
-	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_last_name ON "user" (LOWER(last_name))`)
-	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_username ON "user" (LOWER(username))`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_first_name ON "users" (LOWER(first_name))`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_last_name ON "users" (LOWER(last_name))`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_username ON "users" (LOWER(username))`)
 
 	// Workout
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_workout_user_id ON "workouts" (user_id)`)

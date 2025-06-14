@@ -44,9 +44,11 @@ func (wr WorkoutRepository) IsExist(ctx *gin.Context) bool {
 func (wr WorkoutRepository) CreateWorkouts(data model.Workout) *core.Error {
 	newData := data.ModelToDbSchema()
 
-	if retour := wr.DB.Table(WORKOUTS_TABLE_NAME).Create(&newData); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, retour.Error)
+	if raw := wr.DB.
+		Table(WORKOUTS_TABLE_NAME).
+		Create(&newData); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateWorkout, raw.Error)
 	}
 
 	return nil
@@ -55,27 +57,33 @@ func (wr WorkoutRepository) CreateWorkouts(data model.Workout) *core.Error {
 func (wr WorkoutRepository) CreateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error {
 	newData := data.ModelToDbSchema()
 
-	if retour := wr.DB.Table(UNITIES_TABLE_NAME).Create(&newData); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateUnityOfWorkout, retour.Error)
+	if raw := wr.DB.
+		Table(UNITIES_TABLE_NAME).
+		Create(&newData); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateUnityOfWorkout, raw.Error)
 	}
 
 	return nil
 }
 
 func (wr WorkoutRepository) CreateExercise(data model.Exercise) *core.Error {
-	if retour := wr.DB.Table(EXERCISES_TABLE_NAME).Create(&data); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice, retour.Error)
+	if raw := wr.DB.
+		Table(EXERCISES_TABLE_NAME).
+		Create(&data); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice, raw.Error)
 	}
 
 	return nil
 }
 
 func (wr WorkoutRepository) CreateSeries(data model.Serie) *core.Error {
-	if retour := wr.DB.Table(SERIES_TABLE_NAME).Create(&data); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie, retour.Error)
+	if raw := wr.DB.
+		Table(SERIES_TABLE_NAME).
+		Create(&data); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie, raw.Error)
 	}
 
 	return nil
@@ -86,9 +94,12 @@ func (wr WorkoutRepository) CreateSeries(data model.Serie) *core.Error {
 func (wr WorkoutRepository) GetOneWorkoutsByUserId(uid string) (database.MigrateWorkout, *core.Error) {
 	var workout database.MigrateWorkout
 
-	if retour := wr.DB.Table(WORKOUTS_TABLE_NAME).Where("user_id = ?", uid).Find(&workout); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return database.MigrateWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout, retour.Error)
+	if raw := wr.DB.
+		Table(WORKOUTS_TABLE_NAME).
+		Where("user_id = ?", uid).
+		First(&workout); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return database.MigrateWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout, raw.Error)
 	}
 
 	return workout, nil
@@ -97,31 +108,40 @@ func (wr WorkoutRepository) GetOneWorkoutsByUserId(uid string) (database.Migrate
 func (wr WorkoutRepository) GetUnitiesById(id string) (database.MigrateUnityOfWorkout, *core.Error) {
 	var unity database.MigrateUnityOfWorkout
 
-	if retour := wr.DB.Table(UNITIES_TABLE_NAME).Where("id = ?", id).Find(&unity); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return database.MigrateUnityOfWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetUnityOfWorkout, retour.Error)
+	if raw := wr.DB.
+		Table(UNITIES_TABLE_NAME).
+		Where("id = ?", id).
+		First(&unity); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return database.MigrateUnityOfWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetUnityOfWorkout, raw.Error)
 	}
 
 	return unity, nil
 }
 
 func (wr WorkoutRepository) GetExerciseById(id string) (database.MigrateExercise, *core.Error) {
-	var exercice database.MigrateExercise
+	var exercise database.MigrateExercise
 
-	if retour := wr.DB.Table(EXERCISES_TABLE_NAME).Where("id = ?", id).Find(&exercice); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return database.MigrateExercise{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice, retour.Error)
+	if raw := wr.DB.
+		Table(EXERCISES_TABLE_NAME).
+		Where("id = ?", id).
+		First(&exercise); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return database.MigrateExercise{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice, raw.Error)
 	}
 
-	return exercice, nil
+	return exercise, nil
 }
 
 func (wr WorkoutRepository) GetSeriesById(id string) (database.MigrateSerie, *core.Error) {
 	var serie database.MigrateSerie
 
-	if retour := wr.DB.Table(SERIES_TABLE_NAME).Where("id = ?", id).Find(&serie); retour.Error != nil {
-		wr.Log.Error(retour.Error.Error())
-		return database.MigrateSerie{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie, retour.Error)
+	if raw := wr.DB.
+		Table(SERIES_TABLE_NAME).
+		Where("id = ?", id).
+		First(&serie); raw.Error != nil {
+		wr.Log.Error(raw.Error.Error())
+		return database.MigrateSerie{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie, raw.Error)
 	}
 
 	return serie, nil
@@ -132,13 +152,16 @@ func (wr WorkoutRepository) GetSeriesById(id string) (database.MigrateSerie, *co
 func (wr WorkoutRepository) GetAllWorkoutsByUserId(uid string) (database.MigrateWorkouts, *core.Error) {
 	var workouts database.MigrateWorkouts
 
-	if retour := wr.DB.Table(WORKOUTS_TABLE_NAME).Where("user_id = ?", uid).Find(&workouts); retour.Error != nil {
-		wr.Log.Error(core.ErrDBGetWorkouts, uid, retour.Error.Error())
+	if raw := wr.DB.
+		Table(WORKOUTS_TABLE_NAME).
+		Where("user_id = ?", uid).
+		First(&workouts); raw.Error != nil {
+		wr.Log.Error(core.ErrDBGetWorkouts, uid, raw.Error.Error())
 
 		return workouts, core.NewError(
 			http.StatusInternalServerError,
 			core.ErrAppDBGetWorkouts,
-			retour.Error)
+			raw.Error)
 	}
 
 	return workouts, nil

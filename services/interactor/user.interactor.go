@@ -27,7 +27,7 @@ type IUserInteractor interface {
 	GetOneByEmail(ctx *gin.Context) (model.User, *core.Error)
 	GetUsers(ctx *gin.Context) (model.Users, *core.Error)
 	Search(query string, limit, offset int) (model.Users, *core.Error)
-	UploadImage(ctx *gin.Context) (model.UserImage, *core.Error)
+	UploadImage(ctx *gin.Context) (model.UsersImage, *core.Error)
 	Update(ctx *gin.Context) *core.Error
 	Delete(ctx *gin.Context) *core.Error
 }
@@ -87,7 +87,7 @@ func (ui *UserInteractor) GetAll() (model.Users, *core.Error) {
 
 		users[key].Followers = followers.Followers
 		users[key].Following = followers.Followings
-		users[key].UserImage = userImage.ImageURL
+		users[key].UsersImage = userImage.ImageURL
 	}
 
 	return users, nil
@@ -115,7 +115,7 @@ func (ui *UserInteractor) GetOne(c *gin.Context) (model.User, *core.Error) {
 
 	user.Followers = followers.Followers
 	user.Following = followers.Followings
-	user.UserImage = userImage.ImageURL
+	user.UsersImage = userImage.ImageURL
 	return user, nil
 }
 
@@ -145,7 +145,7 @@ func (ui *UserInteractor) GetOneByEmail(ctx *gin.Context) (model.User, *core.Err
 	user.Password = data.Password
 	user.Followers = followers.Followers
 	user.Following = followers.Followings
-	user.UserImage = userImage.ImageURL
+	user.UsersImage = userImage.ImageURL
 	return user, err
 }
 
@@ -179,7 +179,7 @@ func (ui *UserInteractor) GetUsers(ctx *gin.Context) (model.Users, *core.Error) 
 
 		user.Followers = followers.Followers
 		user.Following = followers.Followings
-		user.UserImage = userImage.ImageURL
+		user.UsersImage = userImage.ImageURL
 
 		users = append(users, user)
 	}
@@ -207,17 +207,17 @@ func (ui *UserInteractor) Search(query string, limit, offset int) (model.Users, 
 
 		users[key].Followers = followers.Followers
 		users[key].Following = followers.Followings
-		users[key].UserImage = userImage.ImageURL
+		users[key].UsersImage = userImage.ImageURL
 	}
 
 	return users, nil
 }
 
-func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.Error) {
+func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UsersImage, *core.Error) {
 	uid, _ := ctx.Get("uid")
 	file, err := ctx.FormFile("image")
 	if err != nil {
-		return model.UserImage{}, core.NewError(
+		return model.UsersImage{}, core.NewError(
 			http.StatusNotAcceptable,
 			fmt.Sprintf(core.ErrAppINTUserImageNotFound, uid),
 			err)
@@ -227,7 +227,7 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 
 	src, err := file.Open()
 	if err != nil {
-		return model.UserImage{}, core.NewError(
+		return model.UsersImage{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppINTUserImageNotOpen, uid),
 			err)
@@ -243,7 +243,7 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 	if exist {
 		oldImage, err := ui.IUserRepository.GetImageByUserId(uid.(string))
 		if err != nil {
-			return model.UserImage{}, err
+			return model.UsersImage{}, err
 		}
 
 		oldKey := filepath.Base(oldImage.ImageURL)
@@ -255,14 +255,14 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 			Key:    aws.String(oldKey),
 		})
 		if errS3 != nil {
-			return model.UserImage{}, core.NewError(
+			return model.UsersImage{}, core.NewError(
 				http.StatusInternalServerError,
 				fmt.Sprintf(core.ErrAppINTUserImageDeleteS3, uid),
 				err)
 		}
 
 		if err := ui.IUserRepository.DeleteUserImage(uid.(string)); err != nil {
-			return model.UserImage{}, err
+			return model.UsersImage{}, err
 		}
 	}
 
@@ -274,7 +274,7 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 	})
 	if err != nil {
 		log.Println(err.Error())
-		return model.UserImage{}, core.NewError(
+		return model.UsersImage{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppINTUserImageUpload, uid),
 			err)
@@ -285,7 +285,7 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 		viper.GetString("AWS_REGION"),
 		filename)
 
-	userImage := model.UserImage{
+	userImage := model.UsersImage{
 		Id:        uuid.New().String(),
 		UserId:    uid.(string),
 		ImageURL:  imageURL,
@@ -293,7 +293,7 @@ func (ui *UserInteractor) UploadImage(ctx *gin.Context) (model.UserImage, *core.
 	}
 
 	if err := ui.IUserRepository.UploadImage(userImage); err != nil {
-		return model.UserImage{}, err
+		return model.UsersImage{}, err
 	}
 
 	return userImage, nil

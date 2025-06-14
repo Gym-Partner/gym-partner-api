@@ -173,7 +173,7 @@ func TestUserController_GETALL(t *testing.T) {
 				uc.On("GetAll").Return(users, (*core.Error)(nil)).Once()
 			},
 			expectedCode: http.StatusOK,
-			expectedBody: users.Respons(),
+			expectedBody: users.Response(),
 		},
 		{
 			name: core.TestUsersNotFound,

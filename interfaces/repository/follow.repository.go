@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const FOLLOWS_TABLE_NAME = "follows"
+
 type FollowRepository struct {
 	DB  *gorm.DB
 	Log *core.Log
@@ -17,8 +19,11 @@ type FollowRepository struct {
 func (fr FollowRepository) FollowerIsExistByFollowedId(data model.Follow) bool {
 	var newData model.Follow
 
-	if retour := fr.DB.Table("follows").Where("follower_id = ? AND followed_id = ?", data.FollowerId, data.FollowedId).First(&newData); retour.Error != nil {
-		fr.Log.Error(retour.Error.Error())
+	if raw := fr.DB.
+		Table(FOLLOWS_TABLE_NAME).
+		Where("follower_id = ? AND followed_id = ?", data.FollowerId, data.FollowedId).
+		First(&newData); raw.Error != nil {
+		fr.Log.Error(raw.Error.Error())
 		return false
 	}
 
@@ -31,25 +36,30 @@ func (fr FollowRepository) FollowerIsExistByFollowedId(data model.Follow) bool {
 }
 
 func (fr FollowRepository) AddFollower(data model.Follow) *core.Error {
-	if retour := fr.DB.Table("follows").Create(&data); retour.Error != nil {
-		fr.Log.Error(core.ErrDBAddFollower, retour.Error.Error())
+	if raw := fr.DB.
+		Table(FOLLOWS_TABLE_NAME).
+		Create(&data); raw.Error != nil {
+		fr.Log.Error(core.ErrDBAddFollower, raw.Error.Error())
 
 		return core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppDBAddFollower, data.FollowedId),
-			retour.Error)
+			raw.Error)
 	}
 	return nil
 }
 
 func (fr FollowRepository) RemoveFollower(data model.Follow) *core.Error {
-	if retour := fr.DB.Table("follows").Where("follower_id = ? AND followed_id = ?", data.FollowerId, data.FollowedId).Delete(&data); retour.Error != nil {
-		fr.Log.Error(core.ErrDBRemoveFollower, retour.Error.Error())
+	if raw := fr.DB.
+		Table(FOLLOWS_TABLE_NAME).
+		Where("follower_id = ? AND followed_id = ?", data.FollowerId, data.FollowedId).
+		Delete(&data); raw.Error != nil {
+		fr.Log.Error(core.ErrDBRemoveFollower, raw.Error.Error())
 
 		return core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppDBRemoveFollower, data.FollowedId),
-			retour.Error)
+			raw.Error)
 	}
 	return nil
 }
@@ -59,23 +69,30 @@ func (fr FollowRepository) GetAllByUserId(userId string) (model.UserFollows, *co
 	var followers []string
 	var userFollows model.UserFollows
 
-	if followedReturn := fr.DB.Table("follows").Where("followed_id = ?", userId).Select("follower_id").Find(&followed); followedReturn.Error != nil {
-		fr.Log.Error(core.ErrDBGetFollowers, followedReturn.Error.Error())
+	if followedRaw := fr.DB.
+		Table(FOLLOWS_TABLE_NAME).
+		Where("followed_id = ?", userId).
+		Select("follower_id").
+		First(&followed); followedRaw.Error != nil {
+		fr.Log.Error(core.ErrDBGetFollowers, followedRaw.Error.Error())
 
 		return model.UserFollows{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppDBGetFollowers, userId),
-			followedReturn.Error)
+			followedRaw.Error)
 	}
 	userFollows.Followings = followed
 
-	if followerReturn := fr.DB.Table("follows").Where("follower_id = ?", userId).Select("followed_id").Find(&followers); followerReturn.Error != nil {
-		fr.Log.Error(core.ErrDBGetFollowed, followerReturn.Error.Error())
+	if followerRaw := fr.DB.
+		Where("follower_id = ?", userId).
+		Select("followed_id").
+		Find(&followers); followerRaw.Error != nil {
+		fr.Log.Error(core.ErrDBGetFollowed, followerRaw.Error.Error())
 
 		return model.UserFollows{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppDBGetFollowed, userId),
-			followerReturn.Error)
+			followerRaw.Error)
 	}
 	userFollows.Followers = followers
 

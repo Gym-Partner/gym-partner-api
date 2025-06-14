@@ -51,7 +51,7 @@ func (u *UserControllerMock) GetUsers(ctx *gin.Context) (model.Users, *core.Erro
 	panic("implement me")
 }
 
-func (u *UserControllerMock) UploadImage(ctx *gin.Context) (model.UserImage, *core.Error) {
+func (u *UserControllerMock) UploadImage(ctx *gin.Context) (model.UsersImage, *core.Error) {
 	//TODO implement me
 	panic("implement me")
 }
