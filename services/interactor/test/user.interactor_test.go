@@ -10,7 +10,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
+	"gitlab.com/gym-partner1/api/gym-partner-api/services/interactor"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"

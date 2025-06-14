@@ -23,7 +23,7 @@ type IUtils[T model.User | model.Workout | model.UserToLogin | model.Follow] int
 	InjectBodyInModel(ctx *gin.Context) (T, *core.Error)
 	Bind(target, patch interface{}) *core.Error
 	GenerateUUID() string
-	SchemaToModel(workout database.MigrateWorkout, unitie database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout
+	SchemaToModel(workout database.MigrateWorkout, unities database.MigrateUnitiesOfWorkout, exercises database.MigrateExercises, series database.MigrateSeries) model.Workout
 }
 
 type Utils[T model.User | model.Workout | model.UserToLogin | model.Follow] struct{}
@@ -51,28 +51,28 @@ func (u Utils[T]) InjectBodyInModel(ctx *gin.Context) (T, *core.Error) {
 	return data, nil
 }
 
-func (u Utils[T]) SchemaToModel(workout database.MigrateWorkout, unities database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout {
+func (u Utils[T]) SchemaToModel(workout database.MigrateWorkout, unities database.MigrateUnitiesOfWorkout, exercises database.MigrateExercises, series database.MigrateSeries) model.Workout {
 	var newWorkout model.Workout
 	var newUnities model.UnitiesOfWorkout
 
 	for _, unity := range unities {
 		var newUnity model.UnityOfWorkout
-		newExercices := make(model.Exercices, 0)
+		newExercises := make(model.Exercises, 0)
 		newSeries := make(model.Series, 0)
 
-		for _, exercice := range exercices {
-			if contains(unity.ExerciceId, exercice.Id) {
-				newExercice := model.Exercice{
-					Id:         exercice.Id,
-					Name:       exercice.Name,
-					Equipement: exercice.Equipement,
+		for _, exercise := range exercises {
+			if contains(unity.ExercisesId, exercise.Id) {
+				newExercise := model.Exercise{
+					Id:        exercise.Id,
+					Name:      exercise.Name,
+					Equipment: exercise.Equipment,
 				}
-				newExercices = append(newExercices, newExercice)
+				newExercises = append(newExercises, newExercise)
 			}
 		}
 
 		for _, serie := range series {
-			if contains(unity.SerieId, serie.Id) {
+			if contains(unity.SeriesId, serie.Id) {
 				newSerie := model.Serie{
 					Id:          serie.Id,
 					Weight:      serie.Weight,
@@ -85,16 +85,16 @@ func (u Utils[T]) SchemaToModel(workout database.MigrateWorkout, unities databas
 
 		newUnity = model.UnityOfWorkout{
 			Id:          unity.Id,
-			Exercices:   newExercices,
+			Exercises:   newExercises,
 			Series:      newSeries,
-			NbSerie:     unity.NbSerie,
+			NbSeries:    unity.NbSeries,
 			Comment:     unity.Comment,
 			RestTimeSec: unity.RestTimeSec,
 		}
 
 		newUnities = append(newUnities, newUnity)
 
-		newExercices = nil
+		newExercises = nil
 		newSeries = nil
 	}
 
