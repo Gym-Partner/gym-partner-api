@@ -9,7 +9,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
-	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
+	"gitlab.com/gym-partner1/api/gym-partner-api/services/interactor"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
 
@@ -89,4 +89,22 @@ func (wc *WorkoutController) GetAllByUserId(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, workouts.Respons())
+}
+
+func (wc *WorkoutController) Update(ctx *gin.Context) {
+	if err := wc.IWorkoutInteractor.Update(ctx); err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
+}
+
+func (wc *WorkoutController) Delete(ctx *gin.Context) {
+	if err := wc.IWorkoutInteractor.Delete(ctx); err != nil {
+		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
 }

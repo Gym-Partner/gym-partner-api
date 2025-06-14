@@ -60,6 +60,8 @@ func Router(db *core.Database) *gin.Engine {
 			v1Auth.GET("/user/workout/get_one", workoutController.GetOneByUserId)
 			v1Auth.GET("/user/workout/get_all", workoutController.GetAllByUserId)
 			v1Auth.POST("/workout/create", workoutController.Create)
+			v1Auth.PATCH("/workout/update", workoutController.Update)
+			v1Auth.DELETE("/workout/delete", workoutController.Delete)
 
 			// ###########################################################
 			//							AUTH

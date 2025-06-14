@@ -8,7 +8,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
-	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
+	"gitlab.com/gym-partner1/api/gym-partner-api/services/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
 
@@ -16,6 +16,8 @@ type IWorkoutInteractor interface {
 	Create(ctx *gin.Context) *core.Error
 	GetOneByUserId(ctx *gin.Context) (model.Workout, *core.Error)
 	GetAllByUserId(ctx *gin.Context) (model.Workouts, *core.Error)
+	Update(ctx *gin.Context) *core.Error
+	Delete(ctx *gin.Context) *core.Error
 }
 
 type WorkoutInteractor struct {
@@ -49,14 +51,14 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 			return err
 		}
 
-		for _, exercice := range unity.Exercices {
-			if err := wi.IWorkoutRepository.CreateExcercice(exercice); err != nil {
+		for _, exercise := range unity.Exercices {
+			if err := wi.IWorkoutRepository.CreateExercise(exercise); err != nil {
 				return err
 			}
 		}
 
 		for _, serie := range unity.Series {
-			if err := wi.IWorkoutRepository.CreateSerie(serie); err != nil {
+			if err := wi.IWorkoutRepository.CreateSeries(serie); err != nil {
 				return err
 			}
 		}
@@ -79,14 +81,14 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 	var series database.MigrateSeries
 
 	for _, unityId := range workout.UnitiesId {
-		unity, err := wi.IWorkoutRepository.GetUntyById(unityId)
+		unity, err := wi.IWorkoutRepository.GetUnityById(unityId)
 		if err != nil {
 			return emptyWorkout, err
 		}
 		unities = append(unities, unity)
 
 		for _, exerciceId := range unity.ExerciceId {
-			exercice, err := wi.IWorkoutRepository.GetExerciceById(exerciceId)
+			exercice, err := wi.IWorkoutRepository.GetExerciseById(exerciceId)
 			if err != nil {
 				return emptyWorkout, err
 			}
@@ -94,7 +96,7 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 		}
 
 		for _, serieId := range unity.SerieId {
-			serie, err := wi.IWorkoutRepository.GetSerieById(serieId)
+			serie, err := wi.IWorkoutRepository.GetSeriesById(serieId)
 			if err != nil {
 				return emptyWorkout, err
 			}
@@ -123,14 +125,14 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 		var series database.MigrateSeries
 
 		for _, unityId := range workout.UnitiesId {
-			unity, err := wi.IWorkoutRepository.GetUntyById(unityId)
+			unity, err := wi.IWorkoutRepository.GetUnityById(unityId)
 			if err != nil {
 				return emptyWorkouts, err
 			}
 			unities = append(unities, unity)
 
 			for _, exerciceId := range unity.ExerciceId {
-				exercice, err := wi.IWorkoutRepository.GetExerciceById(exerciceId)
+				exercice, err := wi.IWorkoutRepository.GetExerciseById(exerciceId)
 				if err != nil {
 					return emptyWorkouts, err
 				}
@@ -138,7 +140,7 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 			}
 
 			for _, serieId := range unity.SerieId {
-				serie, err := wi.IWorkoutRepository.GetSerieById(serieId)
+				serie, err := wi.IWorkoutRepository.GetSeriesById(serieId)
 				if err != nil {
 					return emptyWorkouts, err
 				}
@@ -151,4 +153,14 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 	}
 
 	return result, nil
+}
+
+func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wi *WorkoutInteractor) Delete(ctx *gin.Context) *core.Error {
+	//TODO implement me
+	panic("implement me")
 }

@@ -8,7 +8,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
-	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
+	"gitlab.com/gym-partner1/api/gym-partner-api/services/interactor"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 	"net/http"
 	"testing"
@@ -32,10 +32,10 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 				for _, unity := range workout.UnitiesOfWorkout {
 					workoutMock.On("CreateUnityOfWorkout", unity).Return((*core.Error)(nil))
 					for _, exercice := range unity.Exercices {
-						workoutMock.On("CreateExcercice", exercice).Return((*core.Error)(nil))
+						workoutMock.On("CreateExercise", exercice).Return((*core.Error)(nil))
 					}
 					for _, serie := range unity.Series {
-						workoutMock.On("CreateSerie", serie).Return((*core.Error)(nil))
+						workoutMock.On("CreateSeries", serie).Return((*core.Error)(nil))
 					}
 				}
 			},
@@ -72,7 +72,7 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 				for _, unity := range workout.UnitiesOfWorkout {
 					workoutMock.On("CreateUnityOfWorkout", unity).Return((*core.Error)(nil)).Maybe()
 					for _, exercice := range unity.Exercices {
-						workoutMock.On("CreateExcercice", exercice).Return(
+						workoutMock.On("CreateExercise", exercice).Return(
 							core.NewError(http.StatusInternalServerError,
 								core.ErrDBCreateExercice)).Maybe()
 					}
@@ -88,10 +88,10 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 				for _, unity := range workout.UnitiesOfWorkout {
 					workoutMock.On("CreateUnityOfWorkout", unity).Return((*core.Error)(nil)).Maybe()
 					for _, exercice := range unity.Exercices {
-						workoutMock.On("CreateExcercice", exercice).Return((*core.Error)(nil)).Maybe()
+						workoutMock.On("CreateExercise", exercice).Return((*core.Error)(nil)).Maybe()
 					}
 					for _, serie := range unity.Series {
-						workoutMock.On("CreateSerie", serie).Return(
+						workoutMock.On("CreateSeries", serie).Return(
 							core.NewError(http.StatusInternalServerError,
 								core.ErrDBCreateSerie)).Maybe()
 					}
@@ -161,7 +161,7 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 					workoutMock.On("GetUntyById", unityId).Return(migrateUnityOfWorkout, (*core.Error)(nil))
 					migrateUnitiesOfWorkout.GenerateForTest(migrateUnityOfWorkout)
 					for _, exerciceId := range migrateUnityOfWorkout.ExerciceId {
-						workoutMock.On("GetExerciceById", exerciceId).Return(migrateExercice, (*core.Error)(nil))
+						workoutMock.On("GetExerciseById", exerciceId).Return(migrateExercice, (*core.Error)(nil))
 						migrateExercices.GenerateForTest(migrateExercice)
 					}
 					for _, serieId := range migrateUnityOfWorkout.SerieId {
@@ -208,7 +208,7 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 				for _, unityId := range migrateWorkout.UnitiesId {
 					workoutMock.On("GetUntyById", unityId).Return(migrateUnityOfWorkout, (*core.Error)(nil)).Maybe()
 					for _, exerciceId := range migrateUnityOfWorkout.ExerciceId {
-						workoutMock.On("GetExerciceById", exerciceId).Return(
+						workoutMock.On("GetExerciseById", exerciceId).Return(
 							database.MigrateExercice{},
 							core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice)).Maybe()
 					}
@@ -224,7 +224,7 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 				for _, unityId := range migrateWorkout.UnitiesId {
 					workoutMock.On("GetUntyById", unityId).Return(migrateUnityOfWorkout, (*core.Error)(nil)).Maybe()
 					for _, exerciceId := range migrateUnityOfWorkout.ExerciceId {
-						workoutMock.On("GetExerciceById", exerciceId).Return(migrateExercice, (*core.Error)(nil)).Maybe()
+						workoutMock.On("GetExerciseById", exerciceId).Return(migrateExercice, (*core.Error)(nil)).Maybe()
 					}
 					for _, serieId := range migrateUnityOfWorkout.SerieId {
 						workoutMock.On("GetSerieById", serieId).Return(
