@@ -33,6 +33,8 @@ const (
 	ErrAppINTUserImageDeleteS3   = "User [%s] failed to delete file image in S3 service"
 	ErrAppINTUserImageDeletePsql = "User [%s] failed to delete file image in PSQL service"
 
+	ErrAppINTWorkoutsNotExist = "User's workout [%s] not exist in database."
+
 	ErrAppINTFollowerExist    = "Follower [%s] already exist for user [%s] in database."
 	ErrAppINTFollowerNotExist = "Follower [%s] not exist for user [%s] in database."
 

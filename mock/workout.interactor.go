@@ -1,7 +1,6 @@
 package mock
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
@@ -97,7 +96,7 @@ func (w *WorkoutInteractorMock) DeleteWorkoutByUserId(uid string) *core.Error {
 	panic("implement me")
 }
 
-func (w *WorkoutInteractorMock) IsExist(ctx *gin.Context) bool {
+func (w *WorkoutInteractorMock) IsExist(uid string) bool {
 	//TODO implement me
 	panic("implement me")
 }

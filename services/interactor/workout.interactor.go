@@ -1,6 +1,8 @@
 package interactor
 
 import (
+	"fmt"
+	"net/http"
 	"reflect"
 
 	"github.com/gin-gonic/gin"
@@ -157,9 +159,17 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 }
 
 func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
+	uid, _ := ctx.Get("uid")
 	update, err := wi.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
 		return err
+	}
+
+	exist := wi.IWorkoutRepository.IsExist(uid.(string))
+	if !exist {
+		return core.NewError(
+			http.StatusBadRequest,
+			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, uid.(string)))
 	}
 
 	if err := wi.IWorkoutRepository.UpdateWorkouts(update); err != nil {

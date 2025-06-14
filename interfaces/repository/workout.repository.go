@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -35,9 +34,31 @@ func MockWorkoutRepository(db *gorm.DB) *WorkoutRepository {
 
 // ------------------------------ IS EXIST-------------------------------
 
-func (wr WorkoutRepository) IsExist(ctx *gin.Context) bool {
-	//TODO implement me
-	panic("implement me")
+func (wr WorkoutRepository) IsExist(uid string) bool {
+	workout, err := findByID[database.MigrateWorkout](wr, WORKOUTS_TABLE_NAME, "user_id", uid)
+	if err != nil {
+		return false
+	}
+
+	for _, unityID := range workout.UnitiesId {
+		unity, err := findByID[database.MigrateUnityOfWorkout](wr, UNITIES_TABLE_NAME, "id", unityID)
+		if err != nil {
+			return false
+		}
+
+		for _, exerciseID := range unity.ExercisesId {
+			if _, err := findByID[database.MigrateExercise](wr, EXERCISES_TABLE_NAME, "id", exerciseID); err != nil {
+				return false
+			}
+		}
+
+		for _, seriesID := range unity.SeriesId {
+			if _, err := findByID[database.MigrateSerie](wr, SERIES_TABLE_NAME, "id", seriesID); err != nil {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // -------------------------------- CREATE-------------------------------
