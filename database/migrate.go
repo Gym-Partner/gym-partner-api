@@ -134,7 +134,7 @@ type MigrateUserImage struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (MigrateUser) TableName() string { return "user" }
+func (MigrateUser) TableName() string { return "users" }
 
 func (MigrateWorkout) TableName() string { return "workouts" }
 
@@ -142,7 +142,7 @@ func (MigrateUnityOfWorkout) TableName() string { return "unities_of_workout" }
 
 func (MigrateSerie) TableName() string { return "series" }
 
-func (MigrateExercise) TableName() string { return "exercise" }
+func (MigrateExercise) TableName() string { return "exercises" }
 
 func (MigrateAuth) TableName() string { return "auth" }
 
@@ -161,13 +161,13 @@ func PsqlIndex(db *gorm.DB) {
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_workout_day ON "workouts" (day)`)
 
 	// Unities Of Workout
-	db.Exec(`CREATE INDEX IF NOT EXISTS idx_unity_of_workout_exercise_id ON "unities_of_workout" USING GIN (exercise_id)`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_unity_of_workout_exercises_id ON "unities_of_workout" USING GIN (exercises_id)`)
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_unity_of_workout_series_id ON "unities_of_workout" USING GIN (series_id)`)
 
 	// Exercises
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_exercises_lower_name ON "exercises" (LOWER(name))`)
 
 	// Series
-	db.Exec(`CREATE INDEX IF NOT EXITS idx_series_wight ON "series" (weight)`)
-	db.Exec(`CREATE INDEX IF NOT EXITS idx_series_repetitions ON "series" (repetitions)`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_series_wight ON "series" (weight)`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_series_repetitions ON "series" (repetitions)`)
 }

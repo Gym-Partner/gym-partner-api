@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const TABLE_NAME = "user"
+const USERS_TABLE_NAME = "users"
 
 type UserRepository struct {
 	DB  *gorm.DB
@@ -38,7 +38,7 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 		queryColumn = "email"
 	}
 
-	if retour := u.DB.Table(TABLE_NAME).Where(queryColumn+" = ?", data).Find(&user); retour.Error != nil {
+	if retour := u.DB.Table(USERS_TABLE_NAME).Where(queryColumn+" = ?", data).Find(&user); retour.Error != nil {
 		u.Log.Error(retour.Error.Error())
 		return false
 	}
@@ -52,7 +52,7 @@ func (u UserRepository) IsExist(data, OPT string) bool {
 }
 
 func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
-	if retour := u.DB.Table(TABLE_NAME).Create(&data); retour.Error != nil {
+	if retour := u.DB.Table(USERS_TABLE_NAME).Create(&data); retour.Error != nil {
 		u.Log.Error(core.ErrDBCreateUser, retour.Error.Error())
 
 		return model.User{}, core.NewError(
@@ -67,7 +67,7 @@ func (u UserRepository) Create(data model.User) (model.User, *core.Error) {
 func (u UserRepository) GetAll() (model.Users, *core.Error) {
 	var users model.Users
 
-	if retour := u.DB.Table(TABLE_NAME).Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
+	if retour := u.DB.Table(USERS_TABLE_NAME).Select("id, first_name, last_name, username, email").Find(&users); retour.Error != nil {
 		u.Log.Error(core.ErrDBGetAllUser, retour.Error.Error())
 
 		return model.Users{}, core.NewError(
@@ -82,7 +82,7 @@ func (u UserRepository) GetAll() (model.Users, *core.Error) {
 func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 	var user model.User
 
-	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).Find(&user); retour.Error != nil {
+	if retour := u.DB.Table(USERS_TABLE_NAME).Where("id = ?", uid).Find(&user); retour.Error != nil {
 		u.Log.Error(core.ErrDBGetOneUser, uid, retour.Error.Error())
 
 		return model.User{}, core.NewError(
@@ -97,7 +97,7 @@ func (u UserRepository) GetOneById(uid string) (model.User, *core.Error) {
 func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 	var user model.User
 
-	if retour := u.DB.Table(TABLE_NAME).Where("email = ?", email).Select("id").Find(&user); retour.Error != nil {
+	if retour := u.DB.Table(USERS_TABLE_NAME).Where("email = ?", email).Select("id").Find(&user); retour.Error != nil {
 		u.Log.Error(core.ErrDBGetOneUser, email, retour.Error.Error())
 
 		return model.User{}, core.NewError(
@@ -110,7 +110,7 @@ func (u UserRepository) GetOneByEmail(email string) (model.User, *core.Error) {
 }
 
 func (u UserRepository) Update(data model.User) *core.Error {
-	if retour := u.DB.Table(TABLE_NAME).Save(&data); retour.Error != nil {
+	if retour := u.DB.Table(USERS_TABLE_NAME).Save(&data); retour.Error != nil {
 		u.Log.Error(core.ErrDBUpdateUser, data.Email, retour.Error.Error())
 
 		return core.NewError(
@@ -125,7 +125,7 @@ func (u UserRepository) Update(data model.User) *core.Error {
 func (u UserRepository) Delete(uid string) *core.Error {
 	var user model.User
 
-	if retour := u.DB.Table(TABLE_NAME).Where("id = ?", uid).Delete(&user); retour.Error != nil {
+	if retour := u.DB.Table(USERS_TABLE_NAME).Where("id = ?", uid).Delete(&user); retour.Error != nil {
 		u.Log.Error(core.ErrDBDeleteUser, uid, retour.Error.Error())
 
 		return core.NewError(

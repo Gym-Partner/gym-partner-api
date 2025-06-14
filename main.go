@@ -22,7 +22,7 @@ func main() {
 		database.MigrateUser{},
 		database.MigrateWorkout{},
 		database.MigrateUnityOfWorkout{},
-		database.MigrateExercice{},
+		database.MigrateExercise{},
 		database.MigrateSerie{},
 		database.MigrateAuth{},
 		database.MigrateFollows{},
