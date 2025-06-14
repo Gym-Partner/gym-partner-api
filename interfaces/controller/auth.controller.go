@@ -8,7 +8,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/middleware"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
-	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
+	"gitlab.com/gym-partner1/api/gym-partner-api/services/interactor"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
 

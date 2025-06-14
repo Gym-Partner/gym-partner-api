@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
-	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/repository"
+	"gitlab.com/gym-partner1/api/gym-partner-api/services/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 	"net/http"
 )

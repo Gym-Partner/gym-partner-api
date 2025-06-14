@@ -11,7 +11,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/interfaces/repository"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
-	"gitlab.com/gym-partner1/api/gym-partner-api/usecases/interactor"
+	"gitlab.com/gym-partner1/api/gym-partner-api/services/interactor"
 	"gitlab.com/gym-partner1/api/gym-partner-api/utils"
 )
 
@@ -71,7 +71,7 @@ func (uc *UserController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, user.Respons())
+	ctx.JSON(http.StatusCreated, user.Response())
 }
 
 // GetAll godoc
@@ -91,7 +91,7 @@ func (uc *UserController) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, users.Respons())
+	ctx.JSON(http.StatusOK, users.Response())
 }
 
 // GetOne godoc
@@ -111,7 +111,7 @@ func (uc *UserController) GetOne(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, user.Respons())
+	ctx.JSON(http.StatusOK, user.Response())
 }
 
 func (uc *UserController) GetUsers(ctx *gin.Context) {
@@ -121,7 +121,7 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, users.Respons())
+	ctx.JSON(http.StatusOK, users.Response())
 }
 
 func (uc *UserController) Search(ctx *gin.Context) {

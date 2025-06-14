@@ -10,31 +10,6 @@ type UserInteractorMock struct {
 	mock.Mock
 }
 
-func (u *UserInteractorMock) GetImageByUserId(uid string) (model.UserImage, *core.Error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *UserInteractorMock) DeleteUserImage(uid string) *core.Error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *UserInteractorMock) UserImageIsExist(uid string) bool {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *UserInteractorMock) UploadImage(data model.UserImage) *core.Error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *UserInteractorMock) Search(query string, limit, offset int) (model.Users, *core.Error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (u *UserInteractorMock) IsExist(data, OPT string) bool {
 	args := u.Called(data, OPT)
 	return args.Bool(0)
@@ -68,4 +43,29 @@ func (u *UserInteractorMock) Update(data model.User) *core.Error {
 func (u *UserInteractorMock) Delete(uid string) *core.Error {
 	args := u.Called(uid)
 	return args.Error(0).(*core.Error)
+}
+
+func (u *UserInteractorMock) GetImageByUserId(uid string) (model.UsersImage, *core.Error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (u *UserInteractorMock) DeleteUserImage(uid string) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (u *UserInteractorMock) UserImageIsExist(uid string) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (u *UserInteractorMock) UploadImage(data model.UsersImage) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (u *UserInteractorMock) Search(query string, limit, offset int) (model.Users, *core.Error) {
+	//TODO implement me
+	panic("implement me")
 }
