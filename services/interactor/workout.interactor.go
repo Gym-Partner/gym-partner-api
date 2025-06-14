@@ -58,8 +58,8 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 			}
 		}
 
-		for _, serie := range unity.Series {
-			if err := wi.IWorkoutRepository.CreateSeries(serie); err != nil {
+		for _, series := range unity.Series {
+			if err := wi.IWorkoutRepository.CreateSeries(series); err != nil {
 				return err
 			}
 		}
@@ -157,14 +157,34 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 }
 
 func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
-	//uid, _ := ctx.Get("uid")
-	//patch, err := wi.IUtils.InjectBodyInModel(ctx)
-	//if err != nil {
-	//	return err
-	//}
+	update, err := wi.IUtils.InjectBodyInModel(ctx)
+	if err != nil {
+		return err
+	}
 
-	//TODO implement me
-	panic("implement me")
+	if err := wi.IWorkoutRepository.UpdateWorkouts(update); err != nil {
+		return err
+	}
+
+	for _, unity := range update.UnitiesOfWorkout {
+		if err := wi.IWorkoutRepository.UpdateUnitiesOfWorkout(unity); err != nil {
+			return err
+		}
+
+		for _, exercises := range unity.Exercises {
+			if err := wi.IWorkoutRepository.UpdateExercise(exercises); err != nil {
+				return err
+			}
+		}
+
+		for _, series := range unity.Series {
+			if err := wi.IWorkoutRepository.UpdateSeries(series); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func (wi *WorkoutInteractor) Delete(ctx *gin.Context) *core.Error {

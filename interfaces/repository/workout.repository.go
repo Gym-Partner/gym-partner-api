@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 
@@ -72,7 +73,7 @@ func (wr WorkoutRepository) CreateExercise(data model.Exercise) *core.Error {
 		Table(EXERCISES_TABLE_NAME).
 		Create(&data); raw.Error != nil {
 		wr.Log.Error(raw.Error.Error())
-		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice, raw.Error)
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercise, raw.Error)
 	}
 
 	return nil
@@ -83,7 +84,7 @@ func (wr WorkoutRepository) CreateSeries(data model.Serie) *core.Error {
 		Table(SERIES_TABLE_NAME).
 		Create(&data); raw.Error != nil {
 		wr.Log.Error(raw.Error.Error())
-		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie, raw.Error)
+		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateSeries, raw.Error)
 	}
 
 	return nil
@@ -127,7 +128,7 @@ func (wr WorkoutRepository) GetExerciseById(id string) (database.MigrateExercise
 		Where("id = ?", id).
 		First(&exercise); raw.Error != nil {
 		wr.Log.Error(raw.Error.Error())
-		return database.MigrateExercise{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice, raw.Error)
+		return database.MigrateExercise{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercise, raw.Error)
 	}
 
 	return exercise, nil
@@ -141,7 +142,7 @@ func (wr WorkoutRepository) GetSeriesById(id string) (database.MigrateSerie, *co
 		Where("id = ?", id).
 		First(&serie); raw.Error != nil {
 		wr.Log.Error(raw.Error.Error())
-		return database.MigrateSerie{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie, raw.Error)
+		return database.MigrateSerie{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetSeries, raw.Error)
 	}
 
 	return serie, nil
@@ -170,23 +171,59 @@ func (wr WorkoutRepository) GetAllWorkoutsByUserId(uid string) (database.Migrate
 // ------------------------------- UPDATE -------------------------------
 
 func (wr WorkoutRepository) UpdateWorkouts(data model.Workout) *core.Error {
-	//TODO implement me
-	panic("implement me")
+	if raw := wr.DB.
+		Table(WORKOUTS_TABLE_NAME).
+		Save(&data); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBUpdateWorkout, data.UserId, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBUpdateWorkouts,
+			raw.Error)
+	}
+
+	return nil
 }
 
 func (wr WorkoutRepository) UpdateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error {
-	//TODO implement me
-	panic("implement me")
+	if raw := wr.DB.
+		Table(UNITIES_TABLE_NAME).
+		Save(&data); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBUpdateUnitiesOfWorkouts, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBUpdateUnitiesOfWorkouts,
+			raw.Error)
+	}
+
+	return nil
 }
 
 func (wr WorkoutRepository) UpdateExercise(data model.Exercise) *core.Error {
-	//TODO implement me
-	panic("implement me")
+	if raw := wr.DB.
+		Table(EXERCISES_TABLE_NAME).
+		Save(&data); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBUpdateExercises, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBUpdateExercises,
+			raw.Error)
+	}
+
+	return nil
 }
 
 func (wr WorkoutRepository) UpdateSeries(data model.Serie) *core.Error {
-	//TODO implement me
-	panic("implement me")
+	if raw := wr.DB.
+		Table(SERIES_TABLE_NAME).
+		Save(&data); raw.Error != nil {
+		wr.Log.Error(fmt.Sprintf(core.ErrDBUpdateSeries, raw.Error.Error()))
+		return core.NewError(
+			http.StatusInternalServerError,
+			core.ErrAppDBUpdateSeries,
+			raw.Error)
+	}
+
+	return nil
 }
 
 // ------------------------------- DELETE -------------------------------
@@ -194,4 +231,10 @@ func (wr WorkoutRepository) UpdateSeries(data model.Serie) *core.Error {
 func (wr WorkoutRepository) DeleteWorkoutsByUserId(uid string) *core.Error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func findByID[T any](wr WorkoutRepository, tableName, columnName, value string) (T, error) {
+	var result T
+	err := wr.DB.Table(tableName).Where(fmt.Sprintf("%s = ?", columnName), value).First(&result).Error
+	return result, err
 }

@@ -74,11 +74,11 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 					for _, exercice := range unity.Exercises {
 						workoutMock.On("CreateExercise", exercice).Return(
 							core.NewError(http.StatusInternalServerError,
-								core.ErrDBCreateExercice)).Maybe()
+								core.ErrDBCreateExercise)).Maybe()
 					}
 				}
 			},
-			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice),
+			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercise),
 		},
 		{
 			name: core.TestSeriesCreateFailed,
@@ -93,11 +93,11 @@ func TestWorkoutInteractor_CREATE(t *testing.T) {
 					for _, serie := range unity.Series {
 						workoutMock.On("CreateSeries", serie).Return(
 							core.NewError(http.StatusInternalServerError,
-								core.ErrDBCreateSerie)).Maybe()
+								core.ErrDBCreateSeries)).Maybe()
 					}
 				}
 			},
-			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie),
+			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateSeries),
 		},
 	}
 
@@ -210,12 +210,12 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 					for _, exerciceId := range migrateUnityOfWorkout.ExercisesId {
 						workoutMock.On("GetExerciseById", exerciceId).Return(
 							database.MigrateExercise{},
-							core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice)).Maybe()
+							core.NewError(http.StatusInternalServerError, core.ErrDBGetExercise)).Maybe()
 					}
 				}
 			},
 			expectedRes: model.Workout{},
-			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice),
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetExercise),
 		},
 		{
 			name: core.TestSeriesGetFailed,
@@ -229,12 +229,12 @@ func TestWorkoutInteractor_GETONEBYUSERID(t *testing.T) {
 					for _, serieId := range migrateUnityOfWorkout.SeriesId {
 						workoutMock.On("GetSerieById", serieId).Return(
 							database.MigrateSerie{},
-							core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie)).Maybe()
+							core.NewError(http.StatusInternalServerError, core.ErrDBGetSeries)).Maybe()
 					}
 				}
 			},
 			expectedRes: model.Workout{},
-			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetSerie),
+			expectedErr: core.NewError(http.StatusInternalServerError, core.ErrDBGetSeries),
 		},
 	}
 

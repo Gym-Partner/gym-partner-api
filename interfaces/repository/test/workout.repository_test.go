@@ -202,7 +202,7 @@ func TestWorkoutRepository_CREATE_EXERCICE(t *testing.T) {
 					WillReturnError(fmt.Errorf("database error"))
 				mock.ExpectRollback()
 			},
-			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice, fmt.Errorf("database error")),
+			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercise, fmt.Errorf("database error")),
 		},
 	}
 
@@ -260,7 +260,7 @@ func TestWorkoutRepository_CREATE_SERIE(t *testing.T) {
 					WillReturnError(fmt.Errorf("database error"))
 				mock.ExpectRollback()
 			},
-			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateSerie, fmt.Errorf("database error")),
+			expectedRes: core.NewError(http.StatusInternalServerError, core.ErrDBCreateSeries, fmt.Errorf("database error")),
 		},
 	}
 
@@ -447,7 +447,7 @@ func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
 			expectedRes: database.MigrateExercise{},
 			expectedErr: core.NewError(
 				http.StatusInternalServerError,
-				core.ErrDBGetExercice,
+				core.ErrDBGetExercise,
 				fmt.Errorf("database error")),
 		},
 	}
@@ -515,7 +515,7 @@ func TestWorkoutRepository_GET_SERIE(t *testing.T) {
 			expectedRes: database.MigrateSerie{},
 			expectedErr: core.NewError(
 				http.StatusInternalServerError,
-				core.ErrDBGetSerie,
+				core.ErrDBGetSeries,
 				fmt.Errorf("database error")),
 		},
 	}

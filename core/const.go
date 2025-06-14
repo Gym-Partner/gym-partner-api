@@ -13,7 +13,11 @@ const (
 	ErrAppDBUpdateUser      = "Failed to update user [%s] in database."
 	ErrAppDBDeleteUser      = "Failed to delete user [%s] in database."
 
-	ErrAppDBGetWorkouts = "Failed to retrieve all user's workouts in database."
+	ErrAppDBGetWorkouts             = "Failed to retrieve all user's workouts in database."
+	ErrAppDBUpdateWorkouts          = "Failed to update user's workouts in database."
+	ErrAppDBUpdateUnitiesOfWorkouts = "Failed to update user's unities of workouts in database."
+	ErrAppDBUpdateExercises         = "Failed to update user's exercises of workouts in database."
+	ErrAppDBUpdateSeries            = "Failed to update user's series of workouts in database."
 
 	ErrAppDBAddFollower    = "Failed to add follower for user [%s] in database."
 	ErrAppDBRemoveFollower = "Failed to remove follower for user [%s] in database."
@@ -54,14 +58,19 @@ const (
 
 	ErrDBCreateWorkout        = "[WORKOUT][REPOSITORY] Failed to create user's workout"
 	ErrDBCreateUnityOfWorkout = "[UNITY_OF_WORKOUT][REPOSITORY] Failed to create workout's unity"
-	ErrDBCreateExercice       = "[EXERCICE][REPOSITORY] Failed to create unity's exercice"
-	ErrDBCreateSerie          = "[SERIE][REPOSITORY] Failed to create unity's serie"
+	ErrDBCreateExercise       = "[EXERCISE][REPOSITORY] Failed to create unity's exercise"
+	ErrDBCreateSeries         = "[SERIES][REPOSITORY] Failed to create unity's series"
 
 	ErrDBGetWorkout        = "[WORKOUT][REPOSITORY] Failed to recover user's workout with his id"
 	ErrDBGetWorkouts       = "[WORKOUT][REPOSITORY] Failed to recover user's workouts with his id [%s] | [ORIGINAL-ERROR] : %s"
 	ErrDBGetUnityOfWorkout = "[UNITY_OF_WORKOUT][REPOSITORY] Failed to recover workout's unity with his id"
-	ErrDBGetExercice       = "[EXERCICE][REPOSITORY] Failed to recover unity's exercice with his id"
-	ErrDBGetSerie          = "[SERIE][REPOSITORY] Failed to recover unity's serie with his id"
+	ErrDBGetExercise       = "[EXERCISE][REPOSITORY] Failed to recover unity's exercise with his id"
+	ErrDBGetSeries         = "[SERIES][REPOSITORY] Failed to recover unity's series with his id"
+
+	ErrDBUpdateWorkout           = "[WORKOUT][REPOSITORY] Failed to update workout with is user_id: %s | [ORIGINAL-ERROR] : %s"
+	ErrDBUpdateUnitiesOfWorkouts = "[UNITIES_OF_WORKOUT][REPOSITORY] Failed to update workout's unity unities | [ORIGINAL-ERROR] : %s"
+	ErrDBUpdateExercises         = "[EXERCISES][REPOSITORY] Failed to update workout's exercises | [ORIGINAL-ERROR] : %s"
+	ErrDBUpdateSeries            = "[SERIES][REPOSITORY] Failed to update workout's series | [ORIGINAL-ERROR] : %s"
 
 	// AUTH
 
