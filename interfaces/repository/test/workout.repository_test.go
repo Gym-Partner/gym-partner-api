@@ -94,7 +94,7 @@ func TestWorkoutRepository_CREATE_WORKOUT(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			err := wp.CreateWorkout(workout)
+			err := wp.CreateWorkouts(workout)
 			assert.Equal(t, err, value.expectedRes)
 		})
 
@@ -123,7 +123,7 @@ func TestWorkoutRepository_CREATE_UNITY_OF_WORKOUT(t *testing.T) {
 						unity.Id,
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						unity.NbSerie,
+						unity.NbSeries,
 						unity.Comment,
 						sqlmock.AnyArg()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -140,7 +140,7 @@ func TestWorkoutRepository_CREATE_UNITY_OF_WORKOUT(t *testing.T) {
 						unity.Id,
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						unity.NbSerie,
+						unity.NbSeries,
 						unity.Comment,
 						sqlmock.AnyArg()).
 					WillReturnError(fmt.Errorf("database error"))
@@ -155,7 +155,7 @@ func TestWorkoutRepository_CREATE_UNITY_OF_WORKOUT(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			err := wp.CreateUnityOfWorkout(unity)
+			err := wp.CreateUnitiesOfWorkout(unity)
 			assert.Equal(t, err, value.expectedRes)
 		})
 
@@ -166,7 +166,7 @@ func TestWorkoutRepository_CREATE_UNITY_OF_WORKOUT(t *testing.T) {
 }
 
 func TestWorkoutRepository_CREATE_EXERCICE(t *testing.T) {
-	var exercice model.Exercice
+	var exercice model.Exercise
 	exercice.GenerateTest()
 
 	db, mock := setUpDB()
@@ -184,7 +184,7 @@ func TestWorkoutRepository_CREATE_EXERCICE(t *testing.T) {
 					WithArgs(
 						exercice.Id,
 						exercice.Name,
-						exercice.Equipement).
+						exercice.Equipment).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
@@ -198,7 +198,7 @@ func TestWorkoutRepository_CREATE_EXERCICE(t *testing.T) {
 					WithArgs(
 						exercice.Id,
 						exercice.Name,
-						exercice.Equipement).
+						exercice.Equipment).
 					WillReturnError(fmt.Errorf("database error"))
 				mock.ExpectRollback()
 			},
@@ -211,7 +211,7 @@ func TestWorkoutRepository_CREATE_EXERCICE(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			err := wp.CreateExcercice(exercice)
+			err := wp.CreateExercise(exercice)
 			assert.Equal(t, err, value.expectedRes)
 		})
 
@@ -269,7 +269,7 @@ func TestWorkoutRepository_CREATE_SERIE(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			err := wp.CreateSerie(serie)
+			err := wp.CreateSeries(serie)
 			assert.Equal(t, err, value.expectedRes)
 		})
 
@@ -298,7 +298,7 @@ func TestWorkoutRepository_GET_WORKOUT(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"id", "user_id", "unities_id", "day", "name", "comment"}).
 					AddRow(workout.Id, workout.UserId, workout.UnitiesId, workout.Day, workout.Name, workout.Comment)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"workout\" WHERE user_id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"workoutS\" WHERE user_id = (.+)`).
 					WithArgs(userId).
 					WillReturnRows(rows)
 			},
@@ -308,7 +308,7 @@ func TestWorkoutRepository_GET_WORKOUT(t *testing.T) {
 		{
 			name: core.TestWorkoutGetFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"workout\" WHERE user_id =(.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"workoutS\" WHERE user_id =(.+)`).
 					WillReturnError(fmt.Errorf("database error"))
 			},
 			expectedRes: database.MigrateWorkout{},
@@ -321,7 +321,7 @@ func TestWorkoutRepository_GET_WORKOUT(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			result, err := wp.GetOneWorkoutByUserId(userId)
+			result, err := wp.GetOneWorkoutsByUserId(userId)
 
 			switch value.name {
 			case core.TestREPWorkoutGetSuccess:
@@ -360,10 +360,10 @@ func TestWorkoutRepository_GET_UNITY_OF_WORKOUT(t *testing.T) {
 		{
 			name: core.TestREPUnityOfWorkoutGetSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows([]string{"id", "exercice_id", "serie_id", "nb_serie", "comment", "rest_time_sec"}).
-					AddRow(unity.Id, unity.ExerciceId, unity.SerieId, unity.NbSerie, unity.Comment, unity.RestTimeSec)
+				rows := sqlmock.NewRows([]string{"id", "exercises_id", "series_id", "nb_series", "comment", "rest_time_sec"}).
+					AddRow(unity.Id, unity.ExercisesId, unity.SeriesId, unity.NbSeries, unity.Comment, unity.RestTimeSec)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"unity_of_workout\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"unities_of_workout\" WHERE id = (.+)`).
 					WithArgs(unity.Id).
 					WillReturnRows(rows)
 			},
@@ -373,7 +373,7 @@ func TestWorkoutRepository_GET_UNITY_OF_WORKOUT(t *testing.T) {
 		{
 			name: core.TestUnitiesOfWorkoutGetFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"unity_of_workout\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"unities_of_workout\" WHERE id = (.+)`).
 					WillReturnError(fmt.Errorf("database error"))
 			},
 			expectedRes: database.MigrateUnityOfWorkout{},
@@ -389,7 +389,7 @@ func TestWorkoutRepository_GET_UNITY_OF_WORKOUT(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			result, err := wp.GetUntyById(unity.Id)
+			result, err := wp.GetUnitiesById(unity.Id)
 
 			switch value.name {
 			case core.TestREPUnityOfWorkoutGetSuccess:
@@ -411,7 +411,7 @@ func TestWorkoutRepository_GET_UNITY_OF_WORKOUT(t *testing.T) {
 }
 
 func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
-	var exercice database.MigrateExercice
+	var exercice database.MigrateExercise
 	exercice.GenerateForTest(pq.StringArray{
 		uuid.New().String(),
 		uuid.New().String(),
@@ -422,16 +422,16 @@ func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
 	setupTest := []struct {
 		name        string
 		setupMock   func(mock sqlmock.Sqlmock)
-		expectedRes database.MigrateExercice
+		expectedRes database.MigrateExercise
 		expectedErr *core.Error
 	}{
 		{
 			name: core.TestREPExerciceGetSuccess,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				row := sqlmock.NewRows([]string{"id", "name", "equipement"}).
-					AddRow(exercice.Id, exercice.Name, exercice.Equipement)
+				row := sqlmock.NewRows([]string{"id", "name", "equipment"}).
+					AddRow(exercice.Id, exercice.Name, exercice.Equipment)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"exercice\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"exercise\" WHERE id = (.+)`).
 					WithArgs(exercice.Id).
 					WillReturnRows(row)
 			},
@@ -441,10 +441,10 @@ func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
 		{
 			name: core.TestExercicesGetFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"exercice\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"exercise\" WHERE id = (.+)`).
 					WillReturnError(fmt.Errorf("database error"))
 			},
-			expectedRes: database.MigrateExercice{},
+			expectedRes: database.MigrateExercise{},
 			expectedErr: core.NewError(
 				http.StatusInternalServerError,
 				core.ErrDBGetExercice,
@@ -457,7 +457,7 @@ func TestWorkoutRepository_GET_EXERCICE(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			result, err := wp.GetExerciceById(exercice.Id)
+			result, err := wp.GetExerciseById(exercice.Id)
 
 			switch value.name {
 			case core.TestREPExerciceGetSuccess:
@@ -499,7 +499,7 @@ func TestWorkoutRepository_GET_SERIE(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"id", "weight", "repetitions", "is_warm_up"}).
 					AddRow(serie.Id, serie.Weight, serie.Repetitions, serie.IsWarmUp)
 
-				mock.ExpectQuery(`SELECT (.+) FROM \"serie\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"series\" WHERE id = (.+)`).
 					WithArgs(serie.Id).
 					WillReturnRows(rows)
 			},
@@ -509,7 +509,7 @@ func TestWorkoutRepository_GET_SERIE(t *testing.T) {
 		{
 			name: core.TestSeriesGetFailed,
 			setupMock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT (.+) FROM \"serie\" WHERE id = (.+)`).
+				mock.ExpectQuery(`SELECT (.+) FROM \"series\" WHERE id = (.+)`).
 					WillReturnError(fmt.Errorf("database error"))
 			},
 			expectedRes: database.MigrateSerie{},
@@ -525,7 +525,7 @@ func TestWorkoutRepository_GET_SERIE(t *testing.T) {
 			wp := repository.MockWorkoutRepository(db)
 			value.setupMock(mock)
 
-			result, err := wp.GetSerieById(serie.Id)
+			result, err := wp.GetSeriesById(serie.Id)
 
 			switch value.name {
 			case core.TESTREPSerieGetSuccess:

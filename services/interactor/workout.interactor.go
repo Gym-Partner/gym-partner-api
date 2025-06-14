@@ -43,12 +43,12 @@ func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 		data.ChargeData(uid.(string), data.Day)
 	}
 
-	if err := wi.IWorkoutRepository.CreateWorkout(data); err != nil {
+	if err := wi.IWorkoutRepository.CreateWorkouts(data); err != nil {
 		return err
 	}
 
 	for _, unity := range data.UnitiesOfWorkout {
-		if err := wi.IWorkoutRepository.CreateUnityOfWorkout(unity); err != nil {
+		if err := wi.IWorkoutRepository.CreateUnitiesOfWorkout(unity); err != nil {
 			return err
 		}
 
@@ -72,23 +72,23 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 	var emptyWorkout model.Workout
 	uid, _ := ctx.Get("uid")
 
-	workout, err := wi.IWorkoutRepository.GetOneWorkoutByUserId(*uid.(*string))
+	workout, err := wi.IWorkoutRepository.GetOneWorkoutsByUserId(*uid.(*string))
 	if err != nil {
 		return emptyWorkout, err
 	}
 
 	var unities database.MigrateUnitiesOfWorkout
-	var exercices database.MigrateExercices
+	var exercices database.MigrateExercises
 	var series database.MigrateSeries
 
 	for _, unityId := range workout.UnitiesId {
-		unity, err := wi.IWorkoutRepository.GetUnityById(unityId)
+		unity, err := wi.IWorkoutRepository.GetUnitiesById(unityId)
 		if err != nil {
 			return emptyWorkout, err
 		}
 		unities = append(unities, unity)
 
-		for _, exerciceId := range unity.ExerciceId {
+		for _, exerciceId := range unity.ExercisesId {
 			exercice, err := wi.IWorkoutRepository.GetExerciseById(exerciceId)
 			if err != nil {
 				return emptyWorkout, err
@@ -96,7 +96,7 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 			exercices = append(exercices, exercice)
 		}
 
-		for _, serieId := range unity.SerieId {
+		for _, serieId := range unity.SeriesId {
 			serie, err := wi.IWorkoutRepository.GetSeriesById(serieId)
 			if err != nil {
 				return emptyWorkout, err
@@ -113,7 +113,7 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 	var emptyWorkouts model.Workouts
 	uid, _ := ctx.Get("uid")
 
-	workouts, err := wi.IWorkoutRepository.GetAllWorkoutByUserId(uid.(string))
+	workouts, err := wi.IWorkoutRepository.GetAllWorkoutsByUserId(uid.(string))
 	if err != nil {
 		return emptyWorkouts, err
 	}
@@ -122,17 +122,17 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 
 	for _, workout := range workouts {
 		var unities database.MigrateUnitiesOfWorkout
-		var exercices database.MigrateExercices
+		var exercices database.MigrateExercises
 		var series database.MigrateSeries
 
 		for _, unityId := range workout.UnitiesId {
-			unity, err := wi.IWorkoutRepository.GetUnityById(unityId)
+			unity, err := wi.IWorkoutRepository.GetUnitiesById(unityId)
 			if err != nil {
 				return emptyWorkouts, err
 			}
 			unities = append(unities, unity)
 
-			for _, exerciceId := range unity.ExerciceId {
+			for _, exerciceId := range unity.ExercisesId {
 				exercice, err := wi.IWorkoutRepository.GetExerciseById(exerciceId)
 				if err != nil {
 					return emptyWorkouts, err
@@ -140,7 +140,7 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 				exercices = append(exercices, exercice)
 			}
 
-			for _, serieId := range unity.SerieId {
+			for _, serieId := range unity.SeriesId {
 				serie, err := wi.IWorkoutRepository.GetSeriesById(serieId)
 				if err != nil {
 					return emptyWorkouts, err

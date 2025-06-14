@@ -10,22 +10,22 @@ import (
 type IWorkoutRepository interface {
 	IsExist(ctx *gin.Context) bool
 
-	CreateWorkout(data model.Workout) *core.Error
-	CreateUnityOfWorkout(data model.UnityOfWorkout) *core.Error
-	CreateExercise(data model.Exercice) *core.Error
+	CreateWorkouts(data model.Workout) *core.Error
+	CreateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error
+	CreateExercise(data model.Exercise) *core.Error
 	CreateSeries(data model.Serie) *core.Error
 
-	GetOneWorkoutByUserId(uid string) (database.MigrateWorkout, *core.Error)
-	GetUnityById(id string) (database.MigrateUnityOfWorkout, *core.Error)
-	GetExerciseById(id string) (database.MigrateExercice, *core.Error)
+	GetOneWorkoutsByUserId(uid string) (database.MigrateWorkout, *core.Error)
+	GetUnitiesById(id string) (database.MigrateUnityOfWorkout, *core.Error)
+	GetExerciseById(id string) (database.MigrateExercise, *core.Error)
 	GetSeriesById(id string) (database.MigrateSerie, *core.Error)
 
-	GetAllWorkoutByUserId(uid string) (database.MigrateWorkouts, *core.Error)
+	GetAllWorkoutsByUserId(uid string) (database.MigrateWorkouts, *core.Error)
 
-	UpdateWorkout(data model.Workout) *core.Error
-	UpdateUnityOfWorkout(data model.UnityOfWorkout) *core.Error
-	UpdateExercise(data model.Exercice) *core.Error
+	UpdateWorkouts(data model.Workout) *core.Error
+	UpdateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error
+	UpdateExercise(data model.Exercise) *core.Error
 	UpdateSeries(data model.Serie) *core.Error
 
-	DeleteWorkoutByUserId(uid string) *core.Error
+	DeleteWorkoutsByUserId(uid string) *core.Error
 }

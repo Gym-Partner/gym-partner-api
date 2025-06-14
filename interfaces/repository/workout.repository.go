@@ -41,7 +41,7 @@ func (wr WorkoutRepository) IsExist(ctx *gin.Context) bool {
 
 // -------------------------------- CREATE-------------------------------
 
-func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
+func (wr WorkoutRepository) CreateWorkouts(data model.Workout) *core.Error {
 	newData := data.ModelToDbSchema()
 
 	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Create(&newData); retour.Error != nil {
@@ -52,7 +52,7 @@ func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
 	return nil
 }
 
-func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *core.Error {
+func (wr WorkoutRepository) CreateUnitiesOfWorkout(data model.UnityOfWorkout) *core.Error {
 	newData := data.ModelToDbSchema()
 
 	if retour := wr.DB.Table(UNITY_TABLE_NAME).Create(&newData); retour.Error != nil {
@@ -63,7 +63,7 @@ func (wr WorkoutRepository) CreateUnityOfWorkout(data model.UnityOfWorkout) *cor
 	return nil
 }
 
-func (wr WorkoutRepository) CreateExercise(data model.Exercice) *core.Error {
+func (wr WorkoutRepository) CreateExercise(data model.Exercise) *core.Error {
 	if retour := wr.DB.Table(EXERCICE_TABLE_NAME).Create(&data); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
 		return core.NewError(http.StatusInternalServerError, core.ErrDBCreateExercice, retour.Error)
@@ -83,7 +83,7 @@ func (wr WorkoutRepository) CreateSeries(data model.Serie) *core.Error {
 
 // ------------------------------ READ ONE ------------------------------
 
-func (wr WorkoutRepository) GetOneWorkoutByUserId(uid string) (database.MigrateWorkout, *core.Error) {
+func (wr WorkoutRepository) GetOneWorkoutsByUserId(uid string) (database.MigrateWorkout, *core.Error) {
 	var workout database.MigrateWorkout
 
 	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Where("user_id = ?", uid).Find(&workout); retour.Error != nil {
@@ -94,7 +94,7 @@ func (wr WorkoutRepository) GetOneWorkoutByUserId(uid string) (database.MigrateW
 	return workout, nil
 }
 
-func (wr WorkoutRepository) GetUnityById(id string) (database.MigrateUnityOfWorkout, *core.Error) {
+func (wr WorkoutRepository) GetUnitiesById(id string) (database.MigrateUnityOfWorkout, *core.Error) {
 	var unity database.MigrateUnityOfWorkout
 
 	if retour := wr.DB.Table(UNITY_TABLE_NAME).Where("id = ?", id).Find(&unity); retour.Error != nil {
@@ -105,12 +105,12 @@ func (wr WorkoutRepository) GetUnityById(id string) (database.MigrateUnityOfWork
 	return unity, nil
 }
 
-func (wr WorkoutRepository) GetExerciseById(id string) (database.MigrateExercice, *core.Error) {
-	var exercice database.MigrateExercice
+func (wr WorkoutRepository) GetExerciseById(id string) (database.MigrateExercise, *core.Error) {
+	var exercice database.MigrateExercise
 
 	if retour := wr.DB.Table(EXERCICE_TABLE_NAME).Where("id = ?", id).Find(&exercice); retour.Error != nil {
 		wr.Log.Error(retour.Error.Error())
-		return database.MigrateExercice{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice, retour.Error)
+		return database.MigrateExercise{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetExercice, retour.Error)
 	}
 
 	return exercice, nil
@@ -129,7 +129,7 @@ func (wr WorkoutRepository) GetSeriesById(id string) (database.MigrateSerie, *co
 
 // ------------------------------ READ ALL ------------------------------
 
-func (wr WorkoutRepository) GetAllWorkoutByUserId(uid string) (database.MigrateWorkouts, *core.Error) {
+func (wr WorkoutRepository) GetAllWorkoutsByUserId(uid string) (database.MigrateWorkouts, *core.Error) {
 	var workouts database.MigrateWorkouts
 
 	if retour := wr.DB.Table(WORKOUT_TABLE_NAME).Where("user_id = ?", uid).Find(&workouts); retour.Error != nil {
@@ -156,7 +156,7 @@ func (wr WorkoutRepository) UpdateUnityOfWorkout(data model.UnityOfWorkout) *cor
 	panic("implement me")
 }
 
-func (wr WorkoutRepository) UpdateExercise(data model.Exercice) *core.Error {
+func (wr WorkoutRepository) UpdateExercise(data model.Exercise) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }

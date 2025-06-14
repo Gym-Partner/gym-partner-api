@@ -22,7 +22,7 @@ func (w *WorkoutInteractorMock) CreateUnityOfWorkout(data model.UnityOfWorkout) 
 	return args.Error(0).(*core.Error)
 }
 
-func (w *WorkoutInteractorMock) CreateExercise(data model.Exercice) *core.Error {
+func (w *WorkoutInteractorMock) CreateExercise(data model.Exercise) *core.Error {
 	args := w.Called(data)
 	return args.Error(0).(*core.Error)
 }
@@ -42,9 +42,9 @@ func (w *WorkoutInteractorMock) GetUnityById(id string) (database.MigrateUnityOf
 	return args.Get(0).(database.MigrateUnityOfWorkout), args.Error(1).(*core.Error)
 }
 
-func (w *WorkoutInteractorMock) GetExerciseById(id string) (database.MigrateExercice, *core.Error) {
+func (w *WorkoutInteractorMock) GetExerciseById(id string) (database.MigrateExercise, *core.Error) {
 	args := w.Called(id)
-	return args.Get(0).(database.MigrateExercice), args.Error(1).(*core.Error)
+	return args.Get(0).(database.MigrateExercise), args.Error(1).(*core.Error)
 }
 
 func (w *WorkoutInteractorMock) GetSeriesById(id string) (database.MigrateSerie, *core.Error) {
@@ -67,7 +67,7 @@ func (w *WorkoutInteractorMock) UpdateUnityOfWorkout(data model.UnityOfWorkout) 
 	panic("implement me")
 }
 
-func (w *WorkoutInteractorMock) UpdateExercise(data model.Exercice) *core.Error {
+func (w *WorkoutInteractorMock) UpdateExercise(data model.Exercise) *core.Error {
 	//TODO implement me
 	panic("implement me")
 }

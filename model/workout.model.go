@@ -73,16 +73,16 @@ func (w *Workout) ChargeData(uid string, day time.Time) {
 			defer WG.Done()
 			w.UnitiesOfWorkout[i].GenerateUID()
 
-			var exerciceWG sync.WaitGroup
-			for j := range w.UnitiesOfWorkout[i].Exercices {
-				exerciceWG.Add(1)
+			var exerciseWG sync.WaitGroup
+			for j := range w.UnitiesOfWorkout[i].Exercises {
+				exerciseWG.Add(1)
 
 				go func(j int) {
-					defer exerciceWG.Done()
-					w.UnitiesOfWorkout[i].Exercices[j].GenerateUID()
+					defer exerciseWG.Done()
+					w.UnitiesOfWorkout[i].Exercises[j].GenerateUID()
 				}(j)
 			}
-			exerciceWG.Wait()
+			exerciseWG.Wait()
 
 			var serieWG sync.WaitGroup
 			for k := range w.UnitiesOfWorkout[i].Series {
@@ -140,9 +140,9 @@ func (w *Workout) GenerateTestWorkout(uid ...string) {
 
 type UnityOfWorkout struct {
 	Id          string    `json:"id"`
-	Exercices   Exercices `json:"exercices"`
+	Exercises   Exercises `json:"exercises"`
 	Series      Series    `json:"series"`
-	NbSerie     int       `json:"nb_serie"`
+	NbSeries    int       `json:"nb_series"`
 	Comment     string    `json:"comment"`
 	RestTimeSec int       `json:"rest_time_sec"`
 }
@@ -154,9 +154,9 @@ func (uow *UnitiesOfWorkout) Response() []gin.H {
 	for i, unity := range *uow {
 		response[i] = gin.H{
 			"id":            unity.Id,
-			"exercices":     unity.Exercices.Response(),
+			"exercises":     unity.Exercises.Response(),
 			"series":        unity.Series.Response(),
-			"nb_serie":      unity.NbSerie,
+			"nb_series":     unity.NbSeries,
 			"comment":       unity.Comment,
 			"rest_time_sec": unity.RestTimeSec,
 		}
@@ -165,26 +165,26 @@ func (uow *UnitiesOfWorkout) Response() []gin.H {
 	return response
 }
 
-func (uw *UnityOfWorkout) GenerateUID() {
-	uw.Id = uuid.New().String()
+func (uow *UnityOfWorkout) GenerateUID() {
+	uow.Id = uuid.New().String()
 }
 
 func (uow *UnityOfWorkout) ModelToDbSchema() database.MigrateUnityOfWorkout {
-	var exerciceId, serieId []string
+	var exerciseId, seriesId []string
 
-	for _, exercice := range uow.Exercices {
-		exerciceId = append(exerciceId, exercice.Id)
+	for _, exercise := range uow.Exercises {
+		exerciseId = append(exerciseId, exercise.Id)
 	}
 
-	for _, serie := range uow.Series {
-		serieId = append(serieId, serie.Id)
+	for _, series := range uow.Series {
+		seriesId = append(seriesId, series.Id)
 	}
 
 	return database.MigrateUnityOfWorkout{
 		Id:          uow.Id,
-		ExerciceId:  exerciceId,
-		SerieId:     serieId,
-		NbSerie:     uow.NbSerie,
+		ExercisesId: exerciseId,
+		SeriesId:    seriesId,
+		NbSeries:    uow.NbSeries,
 		Comment:     uow.Comment,
 		RestTimeSec: uow.RestTimeSec,
 	}
@@ -192,9 +192,9 @@ func (uow *UnityOfWorkout) ModelToDbSchema() database.MigrateUnityOfWorkout {
 
 func (uow *UnityOfWorkout) GenerateTestUnity() {
 	uow.Id = uuid.New().String()
-	uow.Exercices = generateTestExercices(2)
+	uow.Exercises = generateTestExercises(2)
 	uow.Series = generateTestSeries(2)
-	uow.NbSerie = 2
+	uow.NbSeries = 2
 	uow.Comment = "Comment test unity of workout"
 	uow.RestTimeSec = 20
 }
@@ -205,9 +205,9 @@ func generateTestUnities(iteration int) UnitiesOfWorkout {
 	for i := 0; i < iteration; i++ {
 		unity := UnityOfWorkout{
 			Id:        uuid.New().String(),
-			Exercices: generateTestExercices(iteration),
+			Exercises: generateTestExercises(iteration),
 			Series:    generateTestSeries(iteration),
-			NbSerie:   i,
+			NbSeries:  i,
 			Comment:   fmt.Sprintf("Comment test: %d", i),
 			//RestTimeSec: time.Now(),
 		}
@@ -273,49 +273,49 @@ func generateTestSeries(iteration int) Series {
 
 // ------------------------------ EXERCICE ------------------------------
 
-type Exercice struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Equipement bool   `json:"equipement"`
+type Exercise struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	Equipment bool   `json:"equipment"`
 }
-type Exercices []Exercice
+type Exercises []Exercise
 
-func (e *Exercices) Response() []gin.H {
+func (e *Exercises) Response() []gin.H {
 	response := make([]gin.H, len(*e))
 
-	for i, exercice := range *e {
+	for i, exercise := range *e {
 		response[i] = gin.H{
-			"id":         exercice.Id,
-			"name":       exercice.Name,
-			"equipement": exercice.Equipement,
+			"id":        exercise.Id,
+			"name":      exercise.Name,
+			"equipment": exercise.Equipment,
 		}
 	}
 
 	return response
 }
 
-func (e *Exercice) GenerateUID() {
+func (e *Exercise) GenerateUID() {
 	e.Id = uuid.New().String()
 }
 
-func (e *Exercice) GenerateTest() {
+func (e *Exercise) GenerateTest() {
 	e.Id = uuid.New().String()
 	e.Name = "Name test exercice"
-	e.Equipement = true
+	e.Equipment = true
 }
 
-func generateTestExercices(iteration int) Exercices {
-	var exercices Exercices
+func generateTestExercises(iteration int) Exercises {
+	var exercises Exercises
 
 	for i := 0; i < iteration; i++ {
-		exercice := Exercice{
-			Id:         uuid.New().String(),
-			Name:       fmt.Sprintf("Exercice %d", i),
-			Equipement: true,
+		exercise := Exercise{
+			Id:        uuid.New().String(),
+			Name:      fmt.Sprintf("Exercice %d", i),
+			Equipment: true,
 		}
 
-		exercices = append(exercices, exercice)
+		exercises = append(exercises, exercise)
 	}
 
-	return exercices
+	return exercises
 }
