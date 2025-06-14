@@ -31,8 +31,8 @@ func (w *WorkoutInteractorMock) CreateSeries(data model.Serie) *core.Error {
 	return args.Error(0).(*core.Error)
 }
 
-func (w *WorkoutInteractorMock) GetOneWorkoutsByUserId(uid string) (database.MigrateWorkout, *core.Error) {
-	args := w.Called(uid)
+func (w *WorkoutInteractorMock) GetOneWorkoutsByValue(column, value string) (database.MigrateWorkout, *core.Error) {
+	args := w.Called(column, value)
 	return args.Get(0).(database.MigrateWorkout), args.Error(1).(*core.Error)
 }
 

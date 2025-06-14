@@ -74,7 +74,7 @@ func (wi *WorkoutInteractor) GetOneByUserId(ctx *gin.Context) (model.Workout, *c
 	var emptyWorkout model.Workout
 	uid, _ := ctx.Get("uid")
 
-	workout, err := wi.IWorkoutRepository.GetOneWorkoutsByUserId(*uid.(*string))
+	workout, err := wi.IWorkoutRepository.GetOneWorkoutsByValue("user_id", uid.(string))
 	if err != nil {
 		return emptyWorkout, err
 	}
@@ -216,33 +216,52 @@ func (wi *WorkoutInteractor) Delete(ctx *gin.Context) *core.Error {
 		return err
 	}
 
-	exist := wi.IWorkoutRepository.IsExist(workout.Id)
-	if !exist {
+	if exist := wi.IWorkoutRepository.IsExist(workout.Id); !exist {
 		return core.NewError(
 			http.StatusNotFound,
-			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, workout.Name))
+			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, workout.Name),
+		)
+	}
+
+	w, err := wi.IWorkoutRepository.GetOneWorkoutsByValue("id", workout.Id)
+	if err != nil {
+		return err
+	}
+
+	var unityIDs []string
+	var exerciseIDs []string
+	var seriesIDs []string
+
+	for _, unityID := range w.UnitiesId {
+		unity, err := wi.IWorkoutRepository.GetUnitiesById(unityID)
+		if err != nil {
+			return err
+		}
+		unityIDs = append(unityIDs, unity.Id)
+		exerciseIDs = append(exerciseIDs, unity.ExercisesId...)
+		seriesIDs = append(seriesIDs, unity.SeriesId...)
+	}
+
+	for _, exID := range exerciseIDs {
+		if err := wi.IWorkoutRepository.DeleteExercises(exID); err != nil {
+			return err
+		}
+	}
+
+	for _, sID := range seriesIDs {
+		if err := wi.IWorkoutRepository.DeleteSeries(sID); err != nil {
+			return err
+		}
+	}
+
+	for _, uID := range unityIDs {
+		if err := wi.IWorkoutRepository.DeleteUnities(uID); err != nil {
+			return err
+		}
 	}
 
 	if err := wi.IWorkoutRepository.DeleteWorkouts(workout.Id); err != nil {
 		return err
-	}
-
-	for _, unity := range workout.UnitiesOfWorkout {
-		if err := wi.IWorkoutRepository.DeleteUnities(unity.Id); err != nil {
-			return err
-		}
-
-		for _, exercise := range unity.Exercises {
-			if err := wi.IWorkoutRepository.DeleteExercises(exercise.Id); err != nil {
-				return err
-			}
-		}
-
-		for _, series := range unity.Series {
-			if err := wi.IWorkoutRepository.DeleteSeries(series.Id); err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil

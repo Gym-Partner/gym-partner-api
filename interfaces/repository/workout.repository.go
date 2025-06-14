@@ -125,12 +125,12 @@ func (wr WorkoutRepository) CreateSeries(data model.Serie) *core.Error {
 
 // ------------------------------ READ ONE ------------------------------
 
-func (wr WorkoutRepository) GetOneWorkoutsByUserId(uid string) (database.MigrateWorkout, *core.Error) {
+func (wr WorkoutRepository) GetOneWorkoutsByValue(column, value string) (database.MigrateWorkout, *core.Error) {
 	var workout database.MigrateWorkout
 
 	if raw := wr.DB.
 		Table(WORKOUTS_TABLE_NAME).
-		Where("user_id = ?", uid).
+		Where(fmt.Sprintf("%s = ?", column), value).
 		First(&workout); raw.Error != nil {
 		wr.Log.Error(raw.Error.Error())
 		return database.MigrateWorkout{}, core.NewError(http.StatusInternalServerError, core.ErrDBGetWorkout, raw.Error)
