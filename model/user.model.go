@@ -8,17 +8,17 @@ import (
 )
 
 type User struct {
-	Id        string    `json:"id" gorm:"primaryKey, not null" swaggerignore:"true"`
-	FirstName string    `json:"first_name" example:"test"`
-	LastName  string    `json:"last_name" example:"test"`
-	UserName  string    `json:"username" gorm:"column:username; not null" example:"test_test"`
-	Email     string    `json:"email" gorm:"not null" example:"test@test.com"`
-	Password  string    `json:"password" gorm:"not null" example:"aaaAAA111"`
-	Age       int       `json:"age" example:"24"`
-	Followers []string  `json:"followers" gorm:"-"`
-	Following []string  `json:"following" gorm:"-"`
-	UserImage string    `json:"user_image" gorm:"-"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	Id         string    `json:"id" gorm:"primaryKey, not null" swaggerignore:"true"`
+	FirstName  string    `json:"first_name" example:"test"`
+	LastName   string    `json:"last_name" example:"test"`
+	UserName   string    `json:"username" gorm:"column:username; not null" example:"test_test"`
+	Email      string    `json:"email" gorm:"not null" example:"test@test.com"`
+	Password   string    `json:"password" gorm:"not null" example:"aaaAAA111"`
+	Age        int       `json:"age" example:"24"`
+	Followers  []string  `json:"followers" gorm:"-"`
+	Following  []string  `json:"following" gorm:"-"`
+	UsersImage string    `json:"users_image" gorm:"-"`
+	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 type Users []User
 
@@ -31,14 +31,14 @@ type Login struct {
 	Password string `json:"password"`
 }
 
-type UserImage struct {
+type UsersImage struct {
 	Id        string    `json:"id"`
 	UserId    string    `json:"user_id"`
 	ImageURL  string    `json:"image_url"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (u *User) Respons() gin.H {
+func (u *User) Response() gin.H {
 	return gin.H{
 		"data": gin.H{
 			"id":         u.Id,
@@ -49,7 +49,7 @@ func (u *User) Respons() gin.H {
 			"age":        u.Age,
 			"followers":  u.Followers,
 			"following":  u.Following,
-			"user_image": u.UserImage,
+			"user_image": u.UsersImage,
 		},
 	}
 }
@@ -86,7 +86,7 @@ func (u *User) UserToAnother(data User) {
 	u.Password = data.Password
 }
 
-func (u *Users) Respons() gin.H {
+func (u *Users) Response() gin.H {
 	var result []gin.H
 
 	for _, user := range *u {
@@ -99,7 +99,7 @@ func (u *Users) Respons() gin.H {
 			"age":        user.Age,
 			"followers":  user.Followers,
 			"following":  user.Following,
-			"user_image": user.UserImage,
+			"user_image": user.UsersImage,
 		})
 	}
 
@@ -147,7 +147,7 @@ func (u *NewUsers) AddCreatedAt() {
 	}
 }
 
-func (u *UserImage) Response() gin.H {
+func (u *UsersImage) Response() gin.H {
 	return gin.H{
 		"data": gin.H{
 			"id":         u.Id,

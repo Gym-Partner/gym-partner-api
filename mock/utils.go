@@ -12,8 +12,8 @@ type UtilsMock[T model.User | model.Workout] struct {
 	mock.Mock
 }
 
-func (u *UtilsMock[T]) SchemaToModel(workout database.MigrateWorkout, unitie database.MigrateUnitiesOfWorkout, exercices database.MigrateExercices, series database.MigrateSeries) model.Workout {
-	args := u.Called(workout, unitie, exercices, series)
+func (u *UtilsMock[T]) SchemaToModel(workout database.MigrateWorkout, unities database.MigrateUnitiesOfWorkout, exercises database.MigrateExercises, series database.MigrateSeries) model.Workout {
+	args := u.Called(workout, unities, exercises, series)
 	return args.Get(0).(model.Workout)
 }
 
