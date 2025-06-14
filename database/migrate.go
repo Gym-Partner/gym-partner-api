@@ -44,9 +44,9 @@ func (mw *MigrateWorkout) GenerateForTest(userId string) {
 
 type MigrateUnityOfWorkout struct {
 	Id          string         `json:"id" gorm:"primaryKey;not null"`
-	ExerciceId  pq.StringArray `json:"exercice_id" gorm:"type:text[]; not null"`
-	SerieId     pq.StringArray `json:"serie_id" gorm:"type:text[]; not null"`
-	NbSerie     int            `json:"nb_serie" gorm:"not null"`
+	ExercisesId pq.StringArray `json:"exercises_id" gorm:"type:text[]; not null"`
+	SeriesId    pq.StringArray `json:"series_id" gorm:"type:text[]; not null"`
+	NbSeries    int            `json:"nb_series" gorm:"not null"`
 	Comment     string         `json:"comment"`
 	RestTimeSec int            `json:"rest_time_sec"`
 }
@@ -55,15 +55,15 @@ type MigrateUnitiesOfWorkout []MigrateUnityOfWorkout
 func (mu *MigrateUnityOfWorkout) GenerateForTest(ids pq.StringArray) {
 	for _, value := range ids {
 		mu.Id = value
-		mu.ExerciceId = pq.StringArray{
+		mu.ExercisesId = pq.StringArray{
 			uuid.New().String(),
 			uuid.New().String(),
 		}
-		mu.SerieId = pq.StringArray{
+		mu.SeriesId = pq.StringArray{
 			uuid.New().String(),
 			uuid.New().String(),
 		}
-		mu.NbSerie = 0
+		mu.NbSeries = 0
 		mu.Comment = "Unity of workout comment test"
 		// mu.RestTimeSec = time.Now()
 	}
@@ -90,27 +90,27 @@ func (ms *MigrateSerie) GenerateForTest(ids pq.StringArray) {
 	}
 }
 
-func (mss *MigrateSeries) GenerateForTest(serie MigrateSerie) {
-	*mss = append(*mss, serie)
+func (mss *MigrateSeries) GenerateForTest(series MigrateSerie) {
+	*mss = append(*mss, series)
 }
 
-type MigrateExercice struct {
-	Id         string `json:"id" gorm:"primaryKey;not null"`
-	Name       string `json:"name" gorm:"not null"`
-	Equipement bool   `json:"equipement" gorm:"not null"`
+type MigrateExercise struct {
+	Id        string `json:"id" gorm:"primaryKey;not null"`
+	Name      string `json:"name" gorm:"not null"`
+	Equipment bool   `json:"equipment" gorm:"not null"`
 }
-type MigrateExercices []MigrateExercice
+type MigrateExercises []MigrateExercise
 
-func (me *MigrateExercice) GenerateForTest(ids pq.StringArray) {
+func (me *MigrateExercise) GenerateForTest(ids pq.StringArray) {
 	for _, value := range ids {
 		me.Id = value
-		me.Name = "Exercice name test"
-		me.Equipement = true
+		me.Name = "Exercise name test"
+		me.Equipment = true
 	}
 }
 
-func (mes *MigrateExercices) GenerateForTest(exercice MigrateExercice) {
-	*mes = append(*mes, exercice)
+func (mes *MigrateExercises) GenerateForTest(exercise MigrateExercise) {
+	*mes = append(*mes, exercise)
 }
 
 type MigrateAuth struct {
@@ -136,13 +136,13 @@ type MigrateUserImage struct {
 
 func (MigrateUser) TableName() string { return "user" }
 
-func (MigrateWorkout) TableName() string { return "workout" }
+func (MigrateWorkout) TableName() string { return "workouts" }
 
-func (MigrateUnityOfWorkout) TableName() string { return "unity_of_workout" }
+func (MigrateUnityOfWorkout) TableName() string { return "unities_of_workout" }
 
-func (MigrateSerie) TableName() string { return "serie" }
+func (MigrateSerie) TableName() string { return "series" }
 
-func (MigrateExercice) TableName() string { return "exercice" }
+func (MigrateExercise) TableName() string { return "exercise" }
 
 func (MigrateAuth) TableName() string { return "auth" }
 
@@ -151,7 +151,23 @@ func (MigrateFollows) TableName() string { return "follows" }
 func (MigrateUserImage) TableName() string { return "user_image" }
 
 func PsqlIndex(db *gorm.DB) {
+	// USER
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_first_name ON "user" (LOWER(first_name))`)
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_last_name ON "user" (LOWER(last_name))`)
 	db.Exec(`CREATE INDEX IF NOT EXISTS idx_user_lower_username ON "user" (LOWER(username))`)
+
+	// Workout
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_workout_user_id ON "workouts" (user_id)`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_workout_day ON "workouts" (day)`)
+
+	// Unities Of Workout
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_unity_of_workout_exercise_id ON "unities_of_workout" USING GIN (exercise_id)`)
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_unity_of_workout_series_id ON "unities_of_workout" USING GIN (series_id)`)
+
+	// Exercises
+	db.Exec(`CREATE INDEX IF NOT EXISTS idx_exercises_lower_name ON "exercises" (LOWER(name))`)
+
+	// Series
+	db.Exec(`CREATE INDEX IF NOT EXITS idx_series_wight ON "series" (weight)`)
+	db.Exec(`CREATE INDEX IF NOT EXITS idx_series_repetitions ON "series" (repetitions)`)
 }

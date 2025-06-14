@@ -31,6 +31,7 @@ func MockWorkoutInteractor(workoutMock *mock.WorkoutInteractorMock, utilsMock *m
 		IUtils:             utilsMock,
 	}
 }
+
 func (wi *WorkoutInteractor) Create(ctx *gin.Context) *core.Error {
 	data, err := wi.IUtils.InjectBodyInModel(ctx)
 	if err != nil {
@@ -156,6 +157,12 @@ func (wi *WorkoutInteractor) GetAllByUserId(ctx *gin.Context) (model.Workouts, *
 }
 
 func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
+	uid, _ := ctx.Get("uid")
+	patch, err := wi.IUtils.InjectBodyInModel(ctx)
+	if err != nil {
+		return err
+	}
+
 	//TODO implement me
 	panic("implement me")
 }

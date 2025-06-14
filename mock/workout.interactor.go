@@ -1,6 +1,7 @@
 package mock
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
@@ -56,7 +57,6 @@ func (w *WorkoutInteractorMock) GetAllWorkoutByUserId(uid string) (database.Migr
 	return args.Get(0).(database.MigrateWorkouts), args.Error(1).(*core.Error)
 }
 
-// TODO implement me
 func (w *WorkoutInteractorMock) UpdateWorkout(data model.Workout) *core.Error {
 	//TODO implement me
 	panic("implement me")
@@ -78,6 +78,11 @@ func (w *WorkoutInteractorMock) UpdateSeries(data model.Serie) *core.Error {
 }
 
 func (w *WorkoutInteractorMock) DeleteWorkoutByUserId(uid string) *core.Error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (w *WorkoutInteractorMock) IsExist(ctx *gin.Context) bool {
 	//TODO implement me
 	panic("implement me")
 }

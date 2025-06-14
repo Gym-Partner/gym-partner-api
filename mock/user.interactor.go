@@ -45,7 +45,6 @@ func (u *UserInteractorMock) Delete(uid string) *core.Error {
 	return args.Error(0).(*core.Error)
 }
 
-// TODO implement me
 func (u *UserInteractorMock) GetImageByUserId(uid string) (model.UserImage, *core.Error) {
 	//TODO implement me
 	panic("implement me")

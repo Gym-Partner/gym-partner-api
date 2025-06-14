@@ -46,7 +46,6 @@ func (u *UserControllerMock) Login(user model.User) (string, *core.Error) {
 	return args.String(0), args.Error(1).(*core.Error)
 }
 
-// TODO implement me
 func (u *UserControllerMock) GetUsers(ctx *gin.Context) (model.Users, *core.Error) {
 	//TODO implement me
 	panic("implement me")

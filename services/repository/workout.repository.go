@@ -1,12 +1,15 @@
 package repository
 
 import (
+	"github.com/gin-gonic/gin"
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
 	"gitlab.com/gym-partner1/api/gym-partner-api/database"
 	"gitlab.com/gym-partner1/api/gym-partner-api/model"
 )
 
 type IWorkoutRepository interface {
+	IsExist(ctx *gin.Context) bool
+
 	CreateWorkout(data model.Workout) *core.Error
 	CreateUnityOfWorkout(data model.UnityOfWorkout) *core.Error
 	CreateExercise(data model.Exercice) *core.Error

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/core"
@@ -31,7 +32,14 @@ func MockWorkoutRepository(db *gorm.DB) *WorkoutRepository {
 	}
 }
 
-// ------------------------------ CREATE------------------------------
+// ------------------------------ IS EXIST-------------------------------
+
+func (wr WorkoutRepository) IsExist(ctx *gin.Context) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+// -------------------------------- CREATE-------------------------------
 
 func (wr WorkoutRepository) CreateWorkout(data model.Workout) *core.Error {
 	newData := data.ModelToDbSchema()
