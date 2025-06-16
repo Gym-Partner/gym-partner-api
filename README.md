@@ -56,3 +56,5 @@ For better practice, one swagger was implement. For the case was using the API i
 this host: **http://localhost:4200/swagger/index.html**
 
 Then you can use the swagger for all routes, request and response.
+
+## Add something for run .gitlab-ic.yml script
