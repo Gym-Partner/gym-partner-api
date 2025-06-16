@@ -211,19 +211,16 @@ func (wi *WorkoutInteractor) Update(ctx *gin.Context) *core.Error {
 }
 
 func (wi *WorkoutInteractor) Delete(ctx *gin.Context) *core.Error {
-	workout, err := wi.IUtils.InjectBodyInModel(ctx)
-	if err != nil {
-		return err
-	}
+	wid := ctx.Param("ID")
 
-	if exist := wi.IWorkoutRepository.IsExist(workout.Id); !exist {
+	if exist := wi.IWorkoutRepository.IsExist(wid); !exist {
 		return core.NewError(
 			http.StatusNotFound,
-			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, workout.Name),
+			fmt.Sprintf(core.ErrAppINTWorkoutsNotExist, wid),
 		)
 	}
 
-	w, err := wi.IWorkoutRepository.GetOneWorkoutsByValue("id", workout.Id)
+	w, err := wi.IWorkoutRepository.GetOneWorkoutsByValue("id", wid)
 	if err != nil {
 		return err
 	}
@@ -260,7 +257,7 @@ func (wi *WorkoutInteractor) Delete(ctx *gin.Context) *core.Error {
 		}
 	}
 
-	if err := wi.IWorkoutRepository.DeleteWorkouts(workout.Id); err != nil {
+	if err := wi.IWorkoutRepository.DeleteWorkouts(wid); err != nil {
 		return err
 	}
 
