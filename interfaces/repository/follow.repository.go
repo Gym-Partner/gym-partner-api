@@ -65,36 +65,50 @@ func (fr FollowRepository) RemoveFollower(data model.Follow) *core.Error {
 }
 
 func (fr FollowRepository) GetAllByUserId(userId string) (model.UserFollows, *core.Error) {
-	var followed []string
-	var followers []string
+	type followResult struct {
+		ID string `gorm:"column:follower_id"`
+	}
+	type followerResult struct {
+		ID string `gorm:"column:followed_id"`
+	}
+
+	var followResults []followResult
+	var followerResults []followerResult
 	var userFollows model.UserFollows
 
-	if followedRaw := fr.DB.
+	if res := fr.DB.
 		Table(FOLLOWS_TABLE_NAME).
 		Where("followed_id = ?", userId).
 		Select("follower_id").
-		First(&followed); followedRaw.Error != nil {
-		fr.Log.Error(core.ErrDBGetFollowers, followedRaw.Error.Error())
-
+		Find(&followResults); res.Error != nil {
+		fr.Log.Error(core.ErrDBGetFollowers, res.Error.Error())
 		return model.UserFollows{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppDBGetFollowers, userId),
-			followedRaw.Error)
+			res.Error,
+		)
 	}
-	userFollows.Followings = followed
 
-	if followerRaw := fr.DB.
+	for _, r := range followResults {
+		userFollows.Followings = append(userFollows.Followings, r.ID)
+	}
+
+	if res := fr.DB.
+		Table(FOLLOWS_TABLE_NAME).
 		Where("follower_id = ?", userId).
 		Select("followed_id").
-		Find(&followers); followerRaw.Error != nil {
-		fr.Log.Error(core.ErrDBGetFollowed, followerRaw.Error.Error())
-
+		Find(&followerResults); res.Error != nil {
+		fr.Log.Error(core.ErrDBGetFollowed, res.Error.Error())
 		return model.UserFollows{}, core.NewError(
 			http.StatusInternalServerError,
 			fmt.Sprintf(core.ErrAppDBGetFollowed, userId),
-			followerRaw.Error)
+			res.Error,
+		)
 	}
-	userFollows.Followers = followers
+
+	for _, r := range followerResults {
+		userFollows.Followers = append(userFollows.Followers, r.ID)
+	}
 
 	return userFollows, nil
 }
