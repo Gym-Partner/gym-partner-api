@@ -189,7 +189,7 @@ func (wr WorkoutRepository) GetAllWorkoutsByUserId(uid string) (database.Migrate
 	if raw := wr.DB.
 		Table(WORKOUTS_TABLE_NAME).
 		Where("user_id = ?", uid).
-		First(&workouts); raw.Error != nil {
+		Find(&workouts); raw.Error != nil {
 		wr.Log.Error(core.ErrDBGetWorkouts, uid, raw.Error.Error())
 
 		return workouts, core.NewError(
