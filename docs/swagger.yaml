@@ -2,28 +2,23 @@ definitions:
   core.Error:
     properties:
       code:
+        example: 500
         type: integer
       message:
+        example: Error from repository part
         type: string
-      occurredAt:
-        type: string
-      originalErr: {}
+      original_err: {}
     type: object
-  model.Exercice:
+  model.Exercise:
     properties:
-      equipement:
+      equipment:
         type: boolean
       id:
         type: string
       name:
         type: string
     type: object
-  model.Login:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
+  model.GetUsersRequestBody:
     type: object
   model.Serie:
     properties:
@@ -40,16 +35,16 @@ definitions:
     properties:
       comment:
         type: string
-      exercices:
+      exercises:
         items:
-          $ref: '#/definitions/model.Exercice'
+          $ref: '#/definitions/model.Exercise'
         type: array
       id:
         type: string
-      nb_serie:
+      nb_series:
         type: integer
       rest_time_sec:
-        type: string
+        type: integer
       series:
         items:
           $ref: '#/definitions/model.Serie'
@@ -57,6 +52,9 @@ definitions:
     type: object
   model.User:
     properties:
+      age:
+        example: 24
+        type: integer
       created_at:
         type: string
       email:
@@ -65,6 +63,14 @@ definitions:
       first_name:
         example: test
         type: string
+      followers:
+        items:
+          type: string
+        type: array
+      following:
+        items:
+          type: string
+        type: array
       last_name:
         example: test
         type: string
@@ -73,6 +79,19 @@ definitions:
         type: string
       username:
         example: test_test
+        type: string
+      users_image:
+        type: string
+    type: object
+  model.UsersImage:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      user_id:
         type: string
     type: object
   model.Workout:
@@ -95,25 +114,12 @@ definitions:
 info:
   contact: {}
 paths:
-  /ping:
-    get:
-      description: Do ping for test connection with the API
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: PONG
-          schema:
-            type: string
-      summary: Do ping
-      tags:
-      - PING
   /user/create:
     post:
       consumes:
       - application/json
-      description: Create new user in database and return the created user withour
-        the password
+      description: Create new user in database and return the created user without
+        the password.
       parameters:
       - description: User data
         in: body
@@ -128,6 +134,10 @@ paths:
           description: User successfully created
           schema:
             $ref: '#/definitions/model.User'
+        "400":
+          description: User already exist in database.
+          schema:
+            $ref: '#/definitions/core.Error'
         "500":
           description: Internal server error
           schema:
@@ -147,6 +157,10 @@ paths:
       responses:
         "200":
           description: User successfully deleted
+        "400":
+          description: User not exist in database
+          schema:
+            $ref: '#/definitions/core.Error'
         "500":
           description: Internal server error
           schema:
@@ -156,9 +170,9 @@ paths:
       - User
   /user/getAll:
     get:
-      description: Retreive all user in database and return this without password
+      description: Retrieve all user in database and return this without password.
       parameters:
-      - description: User Token
+      - description: User's Token
         in: header
         name: Authorization
         required: true
@@ -181,7 +195,7 @@ paths:
       - User
   /user/getOne:
     get:
-      description: Retrieve one user with id in token and return this without password
+      description: Retrieve one user with id in token and return this without password.
       parameters:
       - description: User Token
         in: header
@@ -202,32 +216,10 @@ paths:
       summary: Retrieve one user
       tags:
       - User
-  /user/login:
-    post:
-      description: Sign in one user with this credentials and return user's token
-      parameters:
-      - description: User's credentials
-        in: body
-        name: credentials
-        required: true
-        schema:
-          $ref: '#/definitions/model.Login'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User's token
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/core.Error'
-      summary: Sign in one user
-      tags:
-      - User
   /user/update:
     patch:
+      consumes:
+      - application/json
       description: Update on user and return nil
       parameters:
       - description: User Token
@@ -244,11 +236,49 @@ paths:
       responses:
         "200":
           description: User successfully updated
+        "400":
+          description: User not exist in database
+          schema:
+            $ref: '#/definitions/core.Error'
         "500":
           description: Internal server error
           schema:
             $ref: '#/definitions/core.Error'
       summary: Update one user
+      tags:
+      - User
+  /user/upload_image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload user's image in S3 aws's service and his url in database.
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User's profile image (JPEG, PNG, max TMB)
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User's image uploaded successfully
+          schema:
+            $ref: '#/definitions/model.UsersImage'
+        "406":
+          description: User's image not available in request body
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Upload user's image
       tags:
       - User
   /user/workout/getOne:
@@ -274,6 +304,82 @@ paths:
       summary: Get one workout with user id
       tags:
       - Workout
+  /users/get_users:
+    post:
+      consumes:
+      - application/json
+      description: Accepts a raw array of user IDs (JSON array of strings).
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Array of user IDs (as raw JSON)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.GetUsersRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users successfully retrieves
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Retrieve a list of users
+      tags:
+      - User
+  /users/search:
+    get:
+      description: Retrieve users in search bar, with the first letter of his first_name
+        / username / email.
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Search query (min 3 characters)
+        in: query
+        name: Params
+        required: true
+        type: string
+      - description: 'Max number of users to return (default: 10, max: 50)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of users to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Matching users
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "400":
+          description: Query too short or invalid
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Retrieves users in search bar
+      tags:
+      - User
   /workout/create:
     post:
       consumes:

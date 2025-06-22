@@ -15,29 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/ping": {
-            "get": {
-                "description": "Do ping for test connection with the API",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "PING"
-                ],
-                "summary": "Do ping",
-                "responses": {
-                    "200": {
-                        "description": "PONG",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/user/create": {
             "post": {
-                "description": "Create new user in database and return the created user withour the password",
+                "description": "Create new user in database and return the created user without the password.",
                 "consumes": [
                     "application/json"
                 ],
@@ -64,6 +44,12 @@ const docTemplate = `{
                         "description": "User successfully created",
                         "schema": {
                             "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "User already exist in database.",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
                         }
                     },
                     "500": {
@@ -95,6 +81,12 @@ const docTemplate = `{
                     "200": {
                         "description": "User successfully deleted"
                     },
+                    "400": {
+                        "description": "User not exist in database",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
@@ -106,7 +98,7 @@ const docTemplate = `{
         },
         "/user/getAll": {
             "get": {
-                "description": "Retreive all user in database and return this without password",
+                "description": "Retrieve all user in database and return this without password.",
                 "produces": [
                     "application/json"
                 ],
@@ -117,7 +109,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Token",
+                        "description": "User's Token",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -144,7 +136,7 @@ const docTemplate = `{
         },
         "/user/getOne": {
             "get": {
-                "description": "Retrieve one user with id in token and return this without password",
+                "description": "Retrieve one user with id in token and return this without password.",
                 "produces": [
                     "application/json"
                 ],
@@ -177,46 +169,12 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/login": {
-            "post": {
-                "description": "Sign in one user with this credentials and return user's token",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Sign in one user",
-                "parameters": [
-                    {
-                        "description": "User's credentials",
-                        "name": "credentials",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.Login"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User's token",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/core.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/user/update": {
             "patch": {
                 "description": "Update on user and return nil",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "User"
                 ],
@@ -242,6 +200,63 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "User successfully updated"
+                    },
+                    "400": {
+                        "description": "User not exist in database",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/upload_image": {
+            "post": {
+                "description": "Upload user's image in S3 aws's service and his url in database.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Upload user's image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "User's profile image (JPEG, PNG, max TMB)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User's image uploaded successfully",
+                        "schema": {
+                            "$ref": "#/definitions/model.UsersImage"
+                        }
+                    },
+                    "406": {
+                        "description": "User's image not available in request body",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
                     },
                     "500": {
                         "description": "Internal server error",
@@ -276,6 +291,119 @@ const docTemplate = `{
                         "description": "User's workout",
                         "schema": {
                             "$ref": "#/definitions/model.Workout"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/get_users": {
+            "post": {
+                "description": "Accepts a raw array of user IDs (JSON array of strings).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Retrieve a list of users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Array of user IDs (as raw JSON)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.GetUsersRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users successfully retrieves",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/search": {
+            "get": {
+                "description": "Retrieve users in search bar, with the first letter of his first_name / username / email.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Retrieves users in search bar",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query (min 3 characters)",
+                        "name": "Params",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max number of users to return (default: 10, max: 50)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of users to skip (default: 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Matching users",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Query too short or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
                         }
                     },
                     "500": {
@@ -334,21 +462,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 500
                 },
                 "message": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Error from repository part"
                 },
-                "occurredAt": {
-                    "type": "string"
-                },
-                "originalErr": {}
+                "original_err": {}
             }
         },
-        "model.Exercice": {
+        "model.Exercise": {
             "type": "object",
             "properties": {
-                "equipement": {
+                "equipment": {
                     "type": "boolean"
                 },
                 "id": {
@@ -359,16 +486,8 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Login": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
+        "model.GetUsersRequestBody": {
+            "type": "object"
         },
         "model.Serie": {
             "type": "object",
@@ -393,20 +512,20 @@ const docTemplate = `{
                 "comment": {
                     "type": "string"
                 },
-                "exercices": {
+                "exercises": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Exercice"
+                        "$ref": "#/definitions/model.Exercise"
                     }
                 },
                 "id": {
                     "type": "string"
                 },
-                "nb_serie": {
+                "nb_series": {
                     "type": "integer"
                 },
                 "rest_time_sec": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "series": {
                     "type": "array",
@@ -419,6 +538,10 @@ const docTemplate = `{
         "model.User": {
             "type": "object",
             "properties": {
+                "age": {
+                    "type": "integer",
+                    "example": 24
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -429,6 +552,18 @@ const docTemplate = `{
                 "first_name": {
                     "type": "string",
                     "example": "test"
+                },
+                "followers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "following": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "last_name": {
                     "type": "string",
@@ -441,6 +576,26 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "test_test"
+                },
+                "users_image": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UsersImage": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
