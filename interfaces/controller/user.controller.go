@@ -55,14 +55,14 @@ func MockUserController(UCMock *mock.UserControllerMock) *UserController {
 
 // Create godoc
 // @Summary Create a new user
-// @Schemes
-// @Description Create new user in database and return the created user withour the password
+// @Description Create new user in database and return the created user without the password.
 // @Tags User
 // @Accept json
-// @Produce application/json
+// @Produce json
 // @Param user body model.User{} true "User data"
-// @Success 201 {object} model.User{} "User successfully created"
-// @Failure 500 {object} core.Error{} "Internal server error"
+// @Success 201 {object} model.User "User successfully created"
+// @Failure 400 {object} core.Error "User already exist in database."
+// @Failure 500 {object} core.Error "Internal server error"
 // @Router /user/create [post]
 func (uc *UserController) Create(ctx *gin.Context) {
 	user, err := uc.IUserInteractor.Create(ctx)
@@ -76,13 +76,12 @@ func (uc *UserController) Create(ctx *gin.Context) {
 
 // GetAll godoc
 // @Summary Retrieve all user
-// @Schemes
-// @Description Retreive all user in database and return this without password
+// @Description Retrieve all user in database and return this without password.
 // @Tags User
-// @Produce application/json
-// @Param Authorization header string true "User Token"
-// @Success 200 {object} model.Users{} "Users successfully retrieves"
-// @Failure 500 {object} core.Error{} "Internal server error"
+// @Produce json
+// @Param Authorization header string true "User's Token"
+// @Success 200 {object} model.Users "Users successfully retrieves"
+// @Failure 500 {object} core.Error "Internal server error"
 // @Router /user/getAll [get]
 func (uc *UserController) GetAll(ctx *gin.Context) {
 	users, err := uc.IUserInteractor.GetAll()
@@ -96,13 +95,12 @@ func (uc *UserController) GetAll(ctx *gin.Context) {
 
 // GetOne godoc
 // @Summary Retrieve one user
-// @Schemes
-// @Description Retrieve one user with id in token and return this without password
+// @Description Retrieve one user with id in token and return this without password.
 // @Tags User
-// @Produce application/json
+// @Produce json
 // @Param Authorization header string true "User Token"
-// @Success 200 {object} model.User{} "User successfully retrieve"
-// @Failure 500 {object} core.Error{} "Internal server error"
+// @Success 200 {object} model.User "User successfully retrieve"
+// @Failure 500 {object} core.Error "Internal server error"
 // @Router /user/getOne [get]
 func (uc *UserController) GetOne(ctx *gin.Context) {
 	user, err := uc.IUserInteractor.GetOne(ctx)
@@ -114,6 +112,17 @@ func (uc *UserController) GetOne(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user.Response())
 }
 
+// GetUsers godoc
+// @Summary Retrieve a list of users
+// @Description Accepts a raw array of user IDs (JSON array of strings).
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "User's token"
+// @Param request body model.GetUsersRequestBody true "Array of user IDs (as raw JSON)"
+// @Success 200 {object} model.Users "Users successfully retrieves"
+// @Failure 500 {object} core.Error "Internal server error"
+// @Router /users/get_users [post]
 func (uc *UserController) GetUsers(ctx *gin.Context) {
 	users, err := uc.IUserInteractor.GetUsers(ctx)
 	if err != nil {
@@ -124,6 +133,19 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, users.Response())
 }
 
+// Search godoc
+// @Summary Retrieves users in search bar
+// @Description Retrieve users in search bar, with the first letter of his first_name / username / email.
+// @Tags User
+// @Produce json
+// @Param Authorization header string true "User's token"
+// @Param Params query string true "Search query (min 3 characters)"
+// @Param limit query int false "Max number of users to return (default: 10, max: 50)"
+// @Param offset query int false "Number of users to skip (default: 0)"
+// @Success 200 {object} model.Users "Matching users"
+// @Failure 400 {object} core.Error "Query too short or invalid"
+// @Failure 500 {object} core.Error "Internal server error
+// @Router /users/search [get]
 func (uc *UserController) Search(ctx *gin.Context) {
 	query := strings.ToLower(ctx.Query("query"))
 	limitStr := ctx.DefaultQuery("limit", "10")
@@ -156,6 +178,18 @@ func (uc *UserController) Search(ctx *gin.Context) {
 	})
 }
 
+// UploadImage godoc
+// @Summary Upload user's image
+// @Description Upload user's image in S3 aws's service and his url in database.
+// @Tags User
+// @Accept multipart/form-data
+// @Produce json
+// @Param Authorization header string true "User's token"
+// @Param image formData file true "User's profile image (JPEG, PNG, max TMB)"
+// @Success 201 {object} model.UsersImage "User's image uploaded successfully"
+// @Failure 406 {object} core.Error "User's image not available in request body"
+// @Failure 500 {object} core.Error "Internal server error"
+// @Router /user/upload_image [post]
 func (uc *UserController) UploadImage(ctx *gin.Context) {
 	userImage, err := uc.IUserInteractor.UploadImage(ctx)
 	if err != nil {
@@ -168,12 +202,13 @@ func (uc *UserController) UploadImage(ctx *gin.Context) {
 
 // Update godoc
 // @Summary Update one user
-// @Schemes
 // @Description Update on user and return nil
 // @Tags User
+// @Accept json
 // @Param Authorization header string true "User Token"
 // @Param user_update body model.User{} true "User data update"
 // @Success 200 {object} nil "User successfully updated"
+// @Failure 400 {object} core.Error{} "User not exist in database"
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/update [patch]
 func (uc *UserController) Update(ctx *gin.Context) {
@@ -187,11 +222,11 @@ func (uc *UserController) Update(ctx *gin.Context) {
 
 // Delete godoc
 // @Summary Delete one user
-// @Schemes
 // @Description Delete one user and return nil
 // @Tags User
 // @Param Authorization header string true "User Token"
 // @Success 200 {object} nil "User successfully deleted"
+// @Failure 400 {object} core.Error{} "User not exist in database"
 // @Failure 500 {object} core.Error{} "Internal server error"
 // @Router /user/delete [delete]
 func (uc *UserController) Delete(ctx *gin.Context) {

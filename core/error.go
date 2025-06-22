@@ -7,9 +7,9 @@ import (
 )
 
 type Error struct {
-	Code        int
-	Message     string
-	OriginalErr error
+	Code        int    `json:"code" example:"500"`
+	Message     string `json:"message" example:"Error from repository part"`
+	OriginalErr error  `json:"original_err"`
 }
 
 func NewError(code int, msg string, origin ...error) *Error {
