@@ -9,6 +9,19 @@ definitions:
         type: string
       original_err: {}
     type: object
+  model.Auth:
+    properties:
+      expires_at:
+        type: string
+      id:
+        type: string
+      refresh_token:
+        type: string
+      token:
+        type: string
+      user_id:
+        type: string
+    type: object
   model.Exercise:
     properties:
       equipment:
@@ -83,6 +96,13 @@ definitions:
       users_image:
         type: string
     type: object
+  model.UserToLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   model.UsersImage:
     properties:
       created_at:
@@ -114,6 +134,67 @@ definitions:
 info:
   contact: {}
 paths:
+  /auth/refresh_token:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Re-generate user's token with his refresh token. Use it when token
+        is expired
+      parameters:
+      - description: User's refresh token
+        in: formData
+        name: refresh_token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User re-login successfully
+          schema:
+            $ref: '#/definitions/model.Auth'
+        "401":
+          description: Token generation error
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Re-generate token
+      tags:
+      - Auth
+  /auth/sign_in:
+    post:
+      consumes:
+      - application/json
+      description: Login user with his credentials (email / password) and retrieve
+        token / refresh_token
+      parameters:
+      - description: User's credentials for login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserToLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User login successfully
+          schema:
+            $ref: '#/definitions/model.Auth'
+        "401":
+          description: Token generation error
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Login user
+      tags:
+      - Auth
   /user/create:
     post:
       consumes:

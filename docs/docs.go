@@ -15,6 +15,96 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/refresh_token": {
+            "post": {
+                "description": "Re-generate user's token with his refresh token. Use it when token is expired",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Re-generate token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's refresh token",
+                        "name": "refresh_token",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User re-login successfully",
+                        "schema": {
+                            "$ref": "#/definitions/model.Auth"
+                        }
+                    },
+                    "401": {
+                        "description": "Token generation error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sign_in": {
+            "post": {
+                "description": "Login user with his credentials (email / password) and retrieve token / refresh_token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "User's credentials for login",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UserToLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User login successfully",
+                        "schema": {
+                            "$ref": "#/definitions/model.Auth"
+                        }
+                    },
+                    "401": {
+                        "description": "Token generation error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "description": "Create new user in database and return the created user without the password.",
@@ -472,6 +562,26 @@ const docTemplate = `{
                 "original_err": {}
             }
         },
+        "model.Auth": {
+            "type": "object",
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Exercise": {
             "type": "object",
             "properties": {
@@ -578,6 +688,17 @@ const docTemplate = `{
                     "example": "test_test"
                 },
                 "users_image": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.UserToLogin": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }
