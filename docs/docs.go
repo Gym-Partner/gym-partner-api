@@ -442,7 +442,7 @@ const docTemplate = `{
                 "tags": [
                     "Workout"
                 ],
-                "summary": "Get one workout with user id",
+                "summary": "Get one workout",
                 "parameters": [
                     {
                         "type": "string",
@@ -457,6 +457,44 @@ const docTemplate = `{
                         "description": "User's workout",
                         "schema": {
                             "$ref": "#/definitions/model.Workout"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/workout/get_all": {
+            "get": {
+                "description": "Get all workout by user's id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workout"
+                ],
+                "summary": "Get all workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User's workouts",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Workout"
+                            }
                         }
                     },
                     "500": {
@@ -612,6 +650,95 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "User's workout created"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/workout/delete": {
+            "delete": {
+                "description": "Delete one user's workout with his ID",
+                "tags": [
+                    "Workout"
+                ],
+                "summary": "Delete workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID of the workout to delete",
+                        "name": "workout_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User's workout successfully deleted"
+                    },
+                    "404": {
+                        "description": "User's workout not exist in database",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/workout/update": {
+            "put": {
+                "description": "Update one user's workout",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workout"
+                ],
+                "summary": "Update workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User's workout to update",
+                        "name": "workout_update",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Workout"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User's workout successfully updated"
+                    },
+                    "404": {
+                        "description": "User's workout not exist in database",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
                     },
                     "500": {
                         "description": "Internal server error",

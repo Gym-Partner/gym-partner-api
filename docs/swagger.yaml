@@ -412,6 +412,31 @@ paths:
       summary: Upload user's image
       tags:
       - User
+  /user/workout/get_all:
+    get:
+      description: Get all workout by user's id
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User's workouts
+          schema:
+            items:
+              $ref: '#/definitions/model.Workout'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Get all workout
+      tags:
+      - Workout
   /user/workout/getOne:
     get:
       description: Get one workout with user id from database
@@ -432,7 +457,7 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/core.Error'
-      summary: Get one workout with user id
+      summary: Get one workout
       tags:
       - Workout
   /users/get_users:
@@ -536,6 +561,65 @@ paths:
           schema:
             $ref: '#/definitions/core.Error'
       summary: Create user's workout
+      tags:
+      - Workout
+  /workout/delete:
+    delete:
+      description: Delete one user's workout with his ID
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: UUID of the workout to delete
+        in: path
+        name: workout_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: User's workout successfully deleted
+        "404":
+          description: User's workout not exist in database
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Delete workout
+      tags:
+      - Workout
+  /workout/update:
+    put:
+      consumes:
+      - application/json
+      description: Update one user's workout
+      parameters:
+      - description: User's token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User's workout to update
+        in: body
+        name: workout_update
+        required: true
+        schema:
+          $ref: '#/definitions/model.Workout'
+      responses:
+        "200":
+          description: User's workout successfully updated
+        "404":
+          description: User's workout not exist in database
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Update workout
       tags:
       - Workout
 swagger: "2.0"
