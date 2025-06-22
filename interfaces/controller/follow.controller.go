@@ -28,6 +28,16 @@ func NewFollowController(db *core.Database) *FollowController {
 	}
 }
 
+// AddFollower godoc
+// @Summary Add follower
+// @Description Add one user's followers
+// @Tags Follows
+// @Accept json
+// @Param Authorization header string true "User Token"
+// @Success 202 {object} nil "Follower successfully added"
+// @Failure 401 {object} core.Error "Follower already exist in database"
+// @Failure 500 {object} core.Error "Internal server error"
+// @Router /user/follower/add_follower [post]
 func (fc *FollowController) AddFollower(ctx *gin.Context) {
 	if err := fc.IFollowInteractor.AddFollower(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())
@@ -36,6 +46,16 @@ func (fc *FollowController) AddFollower(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, nil)
 }
 
+// RemoveFollower godoc
+// @Summary Remove follower
+// @Description Remove one user's followers
+// @Tags Follows
+// @Accept json
+// @Param Authorization header string true "User Token"
+// @Success 200 {object} nil "Follower successfully removed"
+// @Failure 401 {object} core.Error "Follower not exist in database"
+// @Failure 500 {object} core.Error "Internal server error"
+// @Router /user/follower/remove_follower [post]
 func (fc *FollowController) RemoveFollower(ctx *gin.Context) {
 	if err := fc.IFollowInteractor.RemoveFollower(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())

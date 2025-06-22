@@ -53,7 +53,8 @@ While Gym Partner API it's running ! By the way, you have a new folder in your P
 ## Way to using this API
 
 For better practice, one swagger was implement. For the case was using the API in local, you have  
-this host: **http://localhost:4200/swagger/index.html**
+this host: **http://localhost:4200/swagger/index.html**  
+Command for init swagger: ``swag init``
 
 Then you can use the swagger for all routes, request and response.
 
