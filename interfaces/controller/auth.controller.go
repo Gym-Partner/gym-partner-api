@@ -31,6 +31,17 @@ func NewAuthController(db *core.Database) *AuthController {
 	}
 }
 
+// Login godoc
+// @Summary Login user
+// @Description Login user with his credentials (email / password) and retrieve token / refresh_token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body model.UserToLogin true "User's credentials for login"
+// @Success 200 {object} model.Auth "User login successfully"
+// @Failure 401 {object} core.Error "Token generation error"
+// @Failure 500 {object} core.Error "Internal server error
+// @Router /auth/sign_in [post]
 func (ac *AuthController) Login(ctx *gin.Context) {
 	auth, err := ac.IAuthInteractor.Authenticate(ctx)
 	if err != nil {
@@ -40,6 +51,17 @@ func (ac *AuthController) Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, auth.Response())
 }
 
+// RefreshToken godoc
+// @Summary Re-generate token
+// @Description Re-generate user's token with his refresh token. Use it when token is expired
+// @Tags Auth
+// @Accept multipart/form-data
+// @Produce json
+// @Param refresh_token formData string true "User's refresh token"
+// @Success 200 {object} model.Auth "User re-login successfully"
+// @Failure 401 {object} core.Error "Token generation error"
+// @Failure 500 {object} core.Error "Internal server error
+// @Router /auth/refresh_token [post]
 func (ac *AuthController) RefreshToken(ctx *gin.Context) {
 	newAuth, err := ac.IAuthInteractor.RefreshAuthenticate(ctx)
 	if err != nil {
