@@ -249,6 +249,56 @@ paths:
       summary: Delete one user
       tags:
       - User
+  /user/follower/add_follower:
+    post:
+      consumes:
+      - application/json
+      description: Add one user's followers
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Follower successfully added
+        "401":
+          description: Follower already exist in database
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Add follower
+      tags:
+      - Follows
+  /user/follower/remove_follower:
+    post:
+      consumes:
+      - application/json
+      description: Remove one user's followers
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Follower successfully removed
+        "401":
+          description: Follower not exist in database
+          schema:
+            $ref: '#/definitions/core.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/core.Error'
+      summary: Remove follower
+      tags:
+      - Follows
   /user/getAll:
     get:
       description: Retrieve all user in database and return this without password.

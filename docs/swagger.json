@@ -175,6 +175,82 @@
                 }
             }
         },
+        "/user/follower/add_follower": {
+            "post": {
+                "description": "Add one user's followers",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Add follower",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Follower successfully added"
+                    },
+                    "401": {
+                        "description": "Follower already exist in database",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/follower/remove_follower": {
+            "post": {
+                "description": "Remove one user's followers",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Remove follower",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Follower successfully removed"
+                    },
+                    "401": {
+                        "description": "Follower not exist in database",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/core.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/getAll": {
             "get": {
                 "description": "Retrieve all user in database and return this without password.",
