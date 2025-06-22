@@ -1,4 +1,4 @@
-START_FLAG = "/Users/oscar/Library/Mobile Documents/com~apple~CloudDocs/Documents/Gym Partner/gym-partner-env/api/"
+START_FLAG = /Users/oscar/Documents/Gym-Partner/gym-partner-env/api
 
 run:
 	go run main.go -start=$(START_FLAG)
