@@ -33,8 +33,8 @@ func main() {
 	}
 	database.PsqlIndex(db.Handler)
 
-	rabbit := core.NewRabbitMQ()
-	rabbit.ConsumeMessage()
+	rabbit := core.InitRabbitMQ(core.QueueAPI)
+	defer rabbit.Close()
 
 	route := router.Router(db, rabbit)
 	address := viper.GetString("API_SERVER_HOST") + ":" + viper.GetString("API_SERVER_PORT")

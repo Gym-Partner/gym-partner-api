@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -246,10 +247,23 @@ func (uc *UserController) Delete(ctx *gin.Context) {
 }
 
 func (uc *UserController) RabbitMQTest(ctx *gin.Context) {
-	if err := uc.Rabbit.PublishMessage("RabbitMQ test successfully"); err != nil {
+	var user model.User
+	user.GenerateTestStruct()
+
+	body, _ := json.Marshal(user)
+	if err := uc.Rabbit.PublishMessage(core.QueueAPI, body); err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	ctx.JSON(http.StatusOK, nil)
 }
+
+//func (uc *UserController) RabbitMQConsume() {
+//	err := uc.Rabbit.ConsumeMessage(core.QueueAPI, func(msg amqp.Delivery) {
+//		log.Println(msg.Body)
+//	})
+//	if err != nil {
+//		panic(err)
+//	}
+//}

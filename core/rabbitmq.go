@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 	"time"
 )
 
@@ -14,7 +13,15 @@ type RabbitMQ struct {
 	Context context.Context
 }
 
-func NewRabbitMQ() *RabbitMQ {
+type QueueName string
+
+const (
+	QueueAPI       QueueName = "api.event"
+	QueueWebSocket QueueName = "ws.notification"
+	QueueCron      QueueName = "cron.task"
+)
+
+func InitRabbitMQ(name QueueName) *RabbitMQ {
 	Conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
 		panic(err)
@@ -26,7 +33,7 @@ func NewRabbitMQ() *RabbitMQ {
 	}
 
 	Queue, err := Channel.QueueDeclare(
-		"test_queue",
+		string(name),
 		false,
 		false,
 		false,
@@ -47,35 +54,46 @@ func NewRabbitMQ() *RabbitMQ {
 	}
 }
 
-func (r *RabbitMQ) PublishMessage(body string) error {
+func (r *RabbitMQ) PublishMessage(queue QueueName, body []byte) error {
 	err := r.Channel.PublishWithContext(r.Context,
 		"",
-		r.Queue.Name,
+		string(queue),
 		false,
 		false,
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        body,
 		})
 	return err
 }
 
-func (r *RabbitMQ) ConsumeMessage() {
+func (r *RabbitMQ) ConsumeMessage(queue QueueName, handler func(delivery amqp.Delivery)) error {
 	msgs, err := r.Channel.Consume(
-		r.Queue.Name,
-		"",
+		string(queue),
+		"gym-partner-consumer",
 		true,
 		false,
 		false,
 		false,
 		nil)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
+			handler(d)
 		}
 	}()
+
+	return nil
+}
+
+func (r *RabbitMQ) Close() {
+	if r.Channel != nil {
+		_ = r.Channel.Close()
+	}
+	if r.Conn != nil {
+		_ = r.Conn.Close()
+	}
 }
