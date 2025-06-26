@@ -73,7 +73,7 @@ func (u *User) GenerateTestStruct(uid ...string) {
 	u.FirstName = "Test"
 	u.LastName = "Test"
 	u.UserName = "test_test"
-	u.Email = "test@gmail.com"
+	u.Email = "titouan.esc@icloud.com"
 	u.Password = "aaaAAA111"
 }
 

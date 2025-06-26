@@ -2,9 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"gitlab.com/gym-partner1/api/gym-partner-api/mock"
 
@@ -21,6 +25,8 @@ type UserController struct {
 	Log             *core.Log
 	Rabbit          *core.RabbitMQ
 }
+
+var mailStatusMap = sync.Map{}
 
 // ------------------------------ Constructor ------------------------------
 
@@ -250,20 +256,42 @@ func (uc *UserController) RabbitMQTest(ctx *gin.Context) {
 	var user model.User
 	user.GenerateTestStruct()
 
+	corrID := uuid.New().String()
+	mailStatusMap.Store(corrID, "pending")
+
 	body, _ := json.Marshal(user)
-	if err := uc.Rabbit.PublishMessage(core.QueueAPI, body); err != nil {
+
+	if err := uc.Rabbit.Publish(core.QueueAPI, body, amqp.Publishing{
+		ReplyTo:       string(core.QueueSMTP),
+		Type:          "application/json",
+		CorrelationId: corrID,
+	}); err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, gin.H{
+		"correlation_id": corrID,
+		"status":         "pending",
+	})
 }
 
-//func (uc *UserController) RabbitMQConsume() {
-//	err := uc.Rabbit.ConsumeMessage(core.QueueAPI, func(msg amqp.Delivery) {
-//		log.Println(msg.Body)
-//	})
-//	if err != nil {
-//		panic(err)
-//	}
-//}
+func (uc *UserController) StartReplyConsumer() {
+	msgs, err := uc.Rabbit.Consume(core.QueueSMTP)
+	if err != nil {
+		panic(err)
+	}
+
+	go func() {
+		for msg := range msgs {
+			var res map[string]string
+
+			_ = json.Unmarshal(msg.Body, &res)
+			status := res["status"]
+			corrID := msg.CorrelationId
+
+			mailStatusMap.Store(corrID, status)
+			log.Println("Response from service B: ", res)
+		}
+	}()
+}

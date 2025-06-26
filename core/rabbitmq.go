@@ -17,6 +17,7 @@ type QueueName string
 
 const (
 	QueueAPI       QueueName = "api.event"
+	QueueSMTP      QueueName = "smtp.event"
 	QueueWebSocket QueueName = "ws.notification"
 	QueueCron      QueueName = "cron.task"
 )
@@ -54,17 +55,29 @@ func InitRabbitMQ(name QueueName) *RabbitMQ {
 	}
 }
 
-func (r *RabbitMQ) PublishMessage(queue QueueName, body []byte) error {
-	err := r.Channel.PublishWithContext(r.Context,
-		"",
+func (r *RabbitMQ) Publish(queue QueueName, body []byte, props amqp.Publishing) error {
+	_, err := r.Channel.QueueDeclare(
 		string(queue),
 		false,
 		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        body,
-		})
-	return err
+		false,
+		false,
+		nil)
+	if err != nil {
+		return err
+	}
+
+	props.Body = body
+	return r.Channel.Publish("", string(queue), false, false, props)
+}
+
+func (r *RabbitMQ) Consume(queue QueueName) (<-chan amqp.Delivery, error) {
+	_, err := r.Channel.QueueDeclare(string(queue), false, false, false, false, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Channel.Consume(string(queue), "", true, false, false, false, nil)
 }
 
 func (r *RabbitMQ) ConsumeMessage(queue QueueName, handler func(delivery amqp.Delivery)) error {

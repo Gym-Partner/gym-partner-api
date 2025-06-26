@@ -35,6 +35,7 @@ func Router(db *core.Database, rabbit *core.RabbitMQ) *gin.Engine {
 	}))
 
 	userController := controller.NewUserController(db, rabbit)
+	userController.StartReplyConsumer()
 	workoutController := controller.NewWorkoutController(db)
 	authController := controller.NewAuthController(db)
 	followController := controller.NewFollowController(db)
