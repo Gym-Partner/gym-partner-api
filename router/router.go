@@ -14,7 +14,7 @@ import (
 	"gitlab.com/gym-partner1/api/gym-partner-api/middleware"
 )
 
-func Router(db *core.Database) *gin.Engine {
+func Router(db *core.Database, rabbit *core.RabbitMQ) *gin.Engine {
 	route := gin.Default()
 	route.Use(middleware.InitMiddleware(db.Logger))
 	docs.SwaggerInfo.BasePath = "/api/v1"
@@ -34,7 +34,7 @@ func Router(db *core.Database) *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	userController := controller.NewUserController(db)
+	userController := controller.NewUserController(db, rabbit)
 	workoutController := controller.NewWorkoutController(db)
 	authController := controller.NewAuthController(db)
 	followController := controller.NewFollowController(db)
@@ -78,6 +78,7 @@ func Router(db *core.Database) *gin.Engine {
 		v1NoAuth := api.Group("/v1")
 		{
 			v1NoAuth.POST("/user/create", userController.Create)
+			v1NoAuth.GET("/user/rabbitmq_test", userController.RabbitMQTest)
 			v1NoAuth.POST("/auth/sign_in", authController.Login)
 			v1NoAuth.POST("/auth/refresh_token", authController.RefreshToken)
 			v1NoAuth.GET("/ping", func(context *gin.Context) {

@@ -43,6 +43,8 @@ const (
 	ErrAppINTFollowerExist    = "Follower [%s] already exist for user [%s] in database."
 	ErrAppINTFollowerNotExist = "Follower [%s] not exist for user [%s] in database."
 
+	ErrRabbitMQPublishMessage = "Failed to publish message."
+
 	// ######################################################################################
 	// 											LOG
 	// ######################################################################################

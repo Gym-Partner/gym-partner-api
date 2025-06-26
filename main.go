@@ -33,7 +33,10 @@ func main() {
 	}
 	database.PsqlIndex(db.Handler)
 
-	route := router.Router(db)
+	rabbit := core.NewRabbitMQ()
+	rabbit.ConsumeMessage()
+
+	route := router.Router(db, rabbit)
 	address := viper.GetString("API_SERVER_HOST") + ":" + viper.GetString("API_SERVER_PORT")
 
 	gymPartnerFigure := figure.NewFigure("Gym Partner API", "slant", true)

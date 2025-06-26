@@ -18,11 +18,12 @@ import (
 type UserController struct {
 	IUserInteractor interactor.IUserInteractor
 	Log             *core.Log
+	Rabbit          *core.RabbitMQ
 }
 
 // ------------------------------ Constructor ------------------------------
 
-func NewUserController(db *core.Database) *UserController {
+func NewUserController(db *core.Database, rabbit *core.RabbitMQ) *UserController {
 	return &UserController{
 		IUserInteractor: &interactor.UserInteractor{
 			IUserRepository: repository.UserRepository{
@@ -35,7 +36,8 @@ func NewUserController(db *core.Database) *UserController {
 			},
 			IUtils: utils.Utils[model.User]{},
 		},
-		Log: db.Logger,
+		Log:    db.Logger,
+		Rabbit: rabbit,
 	}
 }
 
@@ -70,6 +72,11 @@ func (uc *UserController) Create(ctx *gin.Context) {
 		ctx.JSON(err.Code, err.Respons())
 		return
 	}
+
+	//if err := uc.Rabbit.PublishMessage("User created successfully"); err != nil {
+	//	ctx.JSON(http.StatusInternalServerError, err.Error())
+	//	return
+	//}
 
 	ctx.JSON(http.StatusCreated, user.Response())
 }
@@ -232,6 +239,15 @@ func (uc *UserController) Update(ctx *gin.Context) {
 func (uc *UserController) Delete(ctx *gin.Context) {
 	if err := uc.IUserInteractor.Delete(ctx); err != nil {
 		ctx.JSON(err.Code, err.Respons())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
+}
+
+func (uc *UserController) RabbitMQTest(ctx *gin.Context) {
+	if err := uc.Rabbit.PublishMessage("RabbitMQ test successfully"); err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
