@@ -5,7 +5,7 @@ definitions:
         example: 500
         type: integer
       message:
-        example: Error from repository part
+        example: Error from repositories part
         type: string
       original_err: {}
     type: object

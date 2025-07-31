@@ -760,7 +760,7 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string",
-                    "example": "Error from repository part"
+                    "example": "Error from repositories part"
                 },
                 "original_err": {}
             }
